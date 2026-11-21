@@ -1,0 +1,719 @@
+{
+  "protocol": "claim-audit-lab.fitness-challenge.v1",
+  "source_commit": "017b644b07f7cb193e80f8d79f58062ff139ba6f",
+  "fixture": "cases/sandbox/minimal-valid-case",
+  "fixture_claims_sha256": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+  "validators": [
+    {
+      "name": "scripts/validate_case_topology.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_anomaly_ledger.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_investigation_integrity.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_assessment_anomaly_coverage.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_no_fixture_language.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_mechanical_migration_discipline.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_claims.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_comparative_claim_profile.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_sources.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_reported_claim_world_effect.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_source_verification_gate.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_source_weight_audit.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_hypothesis_support_ledger.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_contradictions.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_model_defeaters.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_inference_ledger.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_burden_layers.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_model_audit.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_verdict_caps.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_verdict_discipline.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_overclosure.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_evidence_pack.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_evidence_source_alignment.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_case_references.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_source_cluster_robustness.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_lifecycle.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_redteam_independence.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_answer_receipt.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_answer_receipt_claims_consistency.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_refusal_discipline.py",
+      "check": false
+    },
+    {
+      "name": "scripts/validate_aggregation_discipline.py",
+      "check": false
+    },
+    {
+      "name": "scripts/generate_bias_signals.py",
+      "check": true
+    },
+    {
+      "name": "scripts/validate_bias_response.py",
+      "check": false
+    }
+  ],
+  "summary": {
+    "total": 16,
+    "valid_control": {
+      "total": 4,
+      "accepted": 4,
+      "rejected": 0,
+      "errors": 0,
+      "met_expectation": 4
+    },
+    "structural_fault": {
+      "total": 9,
+      "accepted": 0,
+      "rejected": 9,
+      "errors": 0,
+      "met_expectation": 9
+    },
+    "semantic_canary": {
+      "total": 3,
+      "accepted": 3,
+      "rejected": 0,
+      "errors": 0,
+      "met_expectation": 0
+    },
+    "structural_detection_rate": 1.0,
+    "benign_false_alarm_rate": 0.0,
+    "semantic_canary_detection_rate": 0.0,
+    "case_errors": 0
+  },
+  "cases": [
+    {
+      "id": "valid_baseline",
+      "lane": "valid_control",
+      "expected": "accept",
+      "purpose": "Known-valid fixture unchanged",
+      "observed": "accept",
+      "changed_files": [],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.16
+    },
+    {
+      "id": "valid_quoted_consensus",
+      "lane": "valid_control",
+      "expected": "accept",
+      "purpose": "A scientific-consensus quotation is not a truth certificate",
+      "observed": "accept",
+      "changed_files": [
+        "assessment.md"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "0bc002a5532342cd3f21c8294d519df889b71dd3e018335a57aff09417f0e3de",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.13
+    },
+    {
+      "id": "valid_absence_negation",
+      "lane": "valid_control",
+      "expected": "accept",
+      "purpose": "Absence-of-evidence negation is not a forbidden phrase",
+      "observed": "accept",
+      "changed_files": [
+        "evidence-pack.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "e28e7534bc813e0b8a8655253f8368286f871eefb52b9eead4bed1042763a53c",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.1
+    },
+    {
+      "id": "valid_source_relabel",
+      "lane": "valid_control",
+      "expected": "accept",
+      "purpose": "A display label is not independent corroboration",
+      "observed": "accept",
+      "changed_files": [
+        "sources.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "c88a7f751a08641a340130cf3c2f2e2fd77b5da1725531af71d72998b8e8c7b0"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.32
+    },
+    {
+      "id": "orphan_claim_source",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Claim references missing source",
+      "observed": "reject",
+      "changed_files": [
+        "claims.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "4ecc70bd318b8c61ffbf02e245d31046b4f5146132ff3b4265eb5dab6a61a7d2",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_case_references.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_case_references.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-xcchik0a/cases/sandbox/minimal-valid-case:\n  Claim 'c001' source_ref 's999' not found in sources.yml.\n\n1 reference error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.42
+    },
+    {
+      "id": "orphan_claim_evidence",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Claim references missing evidence",
+      "observed": "reject",
+      "changed_files": [
+        "claims.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "237364625147aee804ac82676692a2ca0b823049776042c528913f31a7480e11",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_verdict_discipline.py",
+        "scripts/validate_case_references.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_verdict_discipline.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-hokk5eqc/cases/sandbox/minimal-valid-case:\n  Evidence relation must be mirrored by claim.evidence_refs and evidence.claim_refs for relation 'r001'.\n\n1 verdict-discipline error(s) found."
+        },
+        {
+          "validator": "scripts/validate_case_references.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-hokk5eqc/cases/sandbox/minimal-valid-case:\n  Claim 'c001' evidence_ref 'e999' not found in evidence-pack.yml.\n\n1 reference error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.36
+    },
+    {
+      "id": "orphan_evidence_source",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Evidence references missing source",
+      "observed": "reject",
+      "changed_files": [
+        "evidence-pack.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "95b3aed8ad91c2fabf2d6b138156f3b4ad6640cceab30f7a5c89e5ff8ee0e06f",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_source_weight_audit.py",
+        "scripts/validate_case_references.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_source_weight_audit.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-l_qdkden/cases/sandbox/minimal-valid-case:\n  source-weight-audit record 's001' must reference at least one evidence item from the same source.\n\n1 source-weight audit error(s) found."
+        },
+        {
+          "validator": "scripts/validate_case_references.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-l_qdkden/cases/sandbox/minimal-valid-case:\n  Evidence 'e001' source_ref 's999' not found in sources.yml.\n\n1 reference error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.29
+    },
+    {
+      "id": "orphan_evidence_claim",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Evidence references missing claim",
+      "observed": "reject",
+      "changed_files": [
+        "evidence-pack.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "dca4e66464d7acb01d822bc7c1516b48c1f921bb3fe9763fc93a364447674143",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_verdict_discipline.py",
+        "scripts/validate_case_references.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_verdict_discipline.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-caj677dq/cases/sandbox/minimal-valid-case:\n  Evidence relation must be mirrored by claim.evidence_refs and evidence.claim_refs for relation 'r001'.\n\n1 verdict-discipline error(s) found."
+        },
+        {
+          "validator": "scripts/validate_case_references.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-caj677dq/cases/sandbox/minimal-valid-case:\n  Evidence 'e001' claim_refs entry 'c999' not found in claims.yml.\n\n1 reference error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.32
+    },
+    {
+      "id": "orphan_relation_claim",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Typed relation references missing claim",
+      "observed": "reject",
+      "changed_files": [
+        "evidence-relations.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "a00577e3fb42c4d6a1553409181d8b3c0e262c6d2dd397538d9ccd4cd66f8d91",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_verdict_discipline.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_verdict_discipline.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-tossj3v7/cases/sandbox/minimal-valid-case:\n  evidence relation 'r001' claim_ref 'c999' not found in claims.yml.\n  Legacy evidence-pack supports requires supports_directly/supports_indirectly typed evidence relation or reports for a reported/source-report claim for evidence_ref 'e001' and claim_ref 'c001'.\n\n2 verdict-discipline error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.2
+    },
+    {
+      "id": "missing_weight_audit",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Weighted source has no source-weight audit",
+      "observed": "reject",
+      "changed_files": [
+        "source-weight-audit.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_source_weight_audit.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_source_weight_audit.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-e_kv_n_b/cases/sandbox/minimal-valid-case:\n  source-weight-audit.yml required because sources.yml assigns source_weight values.\n\n1 source-weight audit error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.65
+    },
+    {
+      "id": "premature_established",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Established verdict is declared without strong proof chain",
+      "observed": "reject",
+      "changed_files": [
+        "claims.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "fe64acc7d6fe632777ad212f03d376f0cf6363dd82010528913bfd690db60a69",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_inference_ledger.py",
+        "scripts/validate_answer_receipt_claims_consistency.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_inference_ledger.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-cdin0ap5/cases/sandbox/minimal-valid-case:\n  claim 'c001' (status='established') requires an inference-ledger entry, but inference-ledger.yml is absent.\n\n1 inference-ledger error(s) found."
+        },
+        {
+          "validator": "scripts/validate_answer_receipt_claims_consistency.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-cdin0ap5/cases/sandbox/minimal-valid-case:\n  strong claim 'c001' (status=established) must be present in answer-receipt.yml verdicts_used.\n\n1 receipt-claims consistency error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.57
+    },
+    {
+      "id": "receipt_status_mismatch",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Answer receipt overstates the structured verdict",
+      "observed": "reject",
+      "changed_files": [
+        "answer-receipt.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "d033efadef02ff8819f468137b818fa59cdaf8885eebdbc2c99cdd8f59fb0026",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_answer_receipt.py",
+        "scripts/validate_answer_receipt_claims_consistency.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_answer_receipt.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-p4g4jhki/cases/sandbox/minimal-valid-case:\n  answer-receipt.yml: verdicts include strongly_supported/established but forbidden_upgrades_check.upgrades_considered is empty; every strong verdict requires explicit consideration of which upgrades were avoided\n\n1 answer-receipt error(s) found."
+        },
+        {
+          "validator": "scripts/validate_answer_receipt_claims_consistency.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-p4g4jhki/cases/sandbox/minimal-valid-case:\n  status mismatch for claim_id 'c001': answer-receipt.yml has 'established', claims.yml has 'plausible'.\n\n1 receipt-claims consistency error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.62
+    },
+    {
+      "id": "missing_redteam",
+      "lane": "structural_fault",
+      "expected": "reject",
+      "purpose": "Lifecycle points to missing red-team file",
+      "observed": "reject",
+      "changed_files": [
+        "lifecycle.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "5c3df397777adea4c727ec0c2b8bd8d55901d7c1b162ceccfa712800e1675798",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [
+        "scripts/validate_case_references.py"
+      ],
+      "failures": [
+        {
+          "validator": "scripts/validate_case_references.py",
+          "exit": 1,
+          "diagnostic": "FAIL /tmp/lab-fitness-iam3ws28/cases/sandbox/minimal-valid-case:\n  lifecycle.yml redteam_ref 'missing-redteam.yml' does not point to an existing file.\n\n1 reference error(s) found."
+        }
+      ],
+      "crashes": [],
+      "seconds": 3.56
+    },
+    {
+      "id": "contradictory_event_time",
+      "lane": "semantic_canary",
+      "expected": "reject",
+      "purpose": "The cited event time directly contradicts the claim",
+      "observed": "accept",
+      "changed_files": [
+        "claims.yml",
+        "evidence-pack.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "4da1775e2060f1c81da405870473cf9881d3e242098b2b69ad6c6fbc24610c0d",
+        "evidence-pack.yml": "1adbc7fd92fc2cfa7247a7cd2c9fbc138875834c9c01bec0f2148b0a8a2a3517",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.47
+    },
+    {
+      "id": "contradictory_count",
+      "lane": "semantic_canary",
+      "expected": "reject",
+      "purpose": "Source states three people while claim says exactly two",
+      "observed": "accept",
+      "changed_files": [
+        "claims.yml",
+        "evidence-pack.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "04b388186190c8e38271698c2d0b6ff9916b1e9feb75cb8583f70942d8cd1cca",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "db8aea0a7d1d2f0f2645f3632bd2c7d6779f5e8c471114618147ea3dd8b81285",
+        "evidence-pack.yml": "1245c6e881c64771726da79db071fc7e028ccf79c40046a2231a64a45f10dd26",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.45
+    },
+    {
+      "id": "rhetorical_certainty_laundering",
+      "lane": "semantic_canary",
+      "expected": "reject",
+      "purpose": "Answer asserts certainty while structured claim is plausible",
+      "observed": "accept",
+      "changed_files": [
+        "answer-receipt.yml"
+      ],
+      "mutated_file_hashes": {
+        "anomaly-ledger.yml": "86803547700db0e850f50888ead940b22ded2a5a98f64788be32f34dfaf27e40",
+        "answer-receipt.yml": "d71a50482b5a5a7c14dd5332e878949eb3f4065aa357db9c1bda6d7899744a48",
+        "assessment.md": "179dcda620a02adde4605ce51670fc2f489ecb806e630bb2f37bfc313df6840f",
+        "claims.yml": "89013b9634a10357e87fe37d73ef87b594d094178968345ebded5a2b67db135d",
+        "evidence-pack.yml": "776cafd2fba03a16cb29965464b0f07f4f2f1742d2101e3ee08eb896fca840c2",
+        "evidence-relations.yml": "557137f13b77c9414c8515afb4b1c6e6d6c0cbdb9a7b5fb0e68d027d079683ce",
+        "investigation-integrity.yml": "b0b0120594372d4da6ac8ed01d080b8e14d080cb7bf45e5b09bad4e999c8735e",
+        "lifecycle.yml": "6596352d99bb9e5ddb3933ac4eebab4f66b8a3bd6ba8b947e3614438e7e1deb0",
+        "question.md": "26325f74774d5db03856ae379b751672a339c6489df4c502140bc7fe70f184ba",
+        "redteam.yml": "54656e7cf9d7fafd68db141f4a909f31c54a377efa4765fd35405e8d5db8b474",
+        "source-weight-audit.yml": "468403623623c76c42f2f8c2396ab7b8c4047514be153ec444fc5355726f60f3",
+        "sources.yml": "110f1b21a05943865268918bfef1aaf5c8fc5bc78df33ce6297ed2a92e2b360d"
+      },
+      "rejecting_validators": [],
+      "failures": [],
+      "crashes": [],
+      "seconds": 3.14
+    }
+  ]
+}
