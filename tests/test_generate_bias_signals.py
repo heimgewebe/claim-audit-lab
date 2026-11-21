@@ -366,6 +366,52 @@ class TestReportedClaimWorldPressure:
         assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
 
 
+    @pytest.mark.parametrize("relation_type", ["undercuts", "contradicts_conditionally"])
+    def test_schema_directional_major_relation_needs_valid_provenance(self, tmp_path, relation_type):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim"),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "sources.yml", {"sources": [
+            {"source_id": "s001"}, {"source_id": "s002"},
+        ]})
+        write(case / "evidence-pack.yml", {"evidence": [{
+            "evidence_id": "e001", "claim_refs": ["c001"], "source_ref": "s001",
+        }]})
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001", "claim_ref": "c002",
+            "relation_type": relation_type, "strength": 0.85,
+        }]})
+
+        # Both relation types are schema-supported directional world effects.
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+        assert gbs.provenance.validate_case(case)
+
+        # Merely naming independent support is insufficient when its origin overlaps.
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "argument_id": "arg001", "target_claim_ref": "c002",
+            "premise_claim_refs": ["c001"],
+            "origin_source_refs": ["s001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "major_with_independent_support",
+            "independent_support_source_refs": ["s001"],
+        }]})
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+
+        # A different known source restores the allowed major-effect path.
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "argument_id": "arg001", "target_claim_ref": "c002",
+            "premise_claim_refs": ["c001"],
+            "origin_source_refs": ["s001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "major_with_independent_support",
+            "independent_support_source_refs": ["s002"],
+        }]})
+        assert gbs.provenance.validate_case(case) == []
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+
 import json
 import pathlib
 from jsonschema_compat import jsonschema as _jsonschema
