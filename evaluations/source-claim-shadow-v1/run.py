@@ -137,7 +137,13 @@ def run_one(sample: dict, excerpt: str) -> dict:
             result["response_sha256"] = sha(process.stdout)
             result["stderr_sha256"] = sha(process.stderr)
             if process.returncode:
-                result["error"] = "model_or_cli_failure"
+                diagnostic = (process.stderr + "\n" + process.stdout).lower()
+                if "refresh token has expired" in diagnostic or "unauthorized (401)" in diagnostic:
+                    result["error"] = "authentication_expired"
+                elif "429" in diagnostic or "quota" in diagnostic:
+                    result["error"] = "quota_or_rate_limit"
+                else:
+                    result["error"] = "model_or_cli_failure"
             else:
                 try:
                     result["judgment"] = parse_response(process.stdout, excerpt)
@@ -175,9 +181,13 @@ def measurements(cases: list[dict], results: list[dict]) -> dict:
             index[c["id"]].get("judgment", {}).get("label") == c["gold_label"]
             for c in subset
         )
+        evaluated = sum(
+            index[c["id"]].get("status") == "valid" for c in subset
+        )
         segments[split] = {
-            "total": len(subset), "correct": correct,
-            "accuracy": round(correct / len(subset), 3)
+            "total": len(subset), "evaluated": evaluated, "correct": correct,
+            "accuracy": round(correct / evaluated, 3) if evaluated else None,
+            "accuracy_over_all_inputs": round(correct / len(subset), 3),
         }
     per_class = {}
     for label in LABELS:
@@ -200,6 +210,9 @@ def measurements(cases: list[dict], results: list[dict]) -> dict:
         "cases": len(cases),
         "valid": len(valid),
         "invalid": len(cases) - len(valid),
+        "attempted_calls": sum(
+            row.get("error") != "not_run_after_provider_failure" for row in results
+        ),
         "gold_prediction_matrix": matrix,
         "split_metrics": segments,
         "per_class": per_class,
@@ -220,11 +233,17 @@ def render_report(metrics: dict, cases: list[dict], rows: list[dict]) -> str:
         "",
         f"- Model: {MODEL}; seed: {SEED}",
         f"- Valid responses: {metrics['valid']}/{metrics['cases']}",
-        f"- Accuracy across all cases: {metrics['split_metrics']['all']['accuracy']}",
+        f"- Model calls actually attempted: {metrics['attempted_calls']}",
+        f"- Accuracy among valid responses (not measurable if none): {metrics['split_metrics']['all']['accuracy']}",
         f"- Blind holdout accuracy: {metrics['split_metrics']['holdout']['accuracy']}",
         f"- False contradiction calls among noncontradictions: "
         f"{metrics['false_contradiction_count']}/12",
         "",
+        *([
+            "**UNUSABLE MODEL TRIAL: no valid judgments. No semantic accuracy can be inferred.**",
+            "**CLI/auth failures must not be reported as model reasoning errors.**",
+            "",
+        ] if metrics["valid"] == 0 else []),
         "| Label | True positives | Gold cases | Recall | Precision |",
         "|---|---:|---:|---:|---:|",
     ]
@@ -283,11 +302,25 @@ def main() -> None:
     except FileExistsError:
         raise SystemExit("Output directory exists. No old data are overwritten.")
     by_id = {case["id"]: case for case in cases}
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        rows = list(executor.map(
-            lambda item: run_one(item, by_id[item["id"]]["source_excerpt"]),
-            samples,
-        ))
+
+    # One actual first sample detects expired authentication or a dead provider
+    # before the other 17 CLI requests are launched. The prompt/order stays
+    # preregistered, and skipped samples remain explicit invalid outcomes.
+    first = run_one(samples[0], by_id[samples[0]["id"]]["source_excerpt"])
+    if first.get("error") in {
+        "authentication_expired", "quota_or_rate_limit",
+        "model_or_cli_failure", "cli_unavailable",
+    }:
+        rows = [first] + [
+            {**sample, "error": "not_run_after_provider_failure", "status": "not_run"}
+            for sample in samples[1:]
+        ]
+    else:
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            rows = [first] + list(executor.map(
+                lambda item: run_one(item, by_id[item["id"]]["source_excerpt"]),
+                samples[1:],
+            ))
     metrics = measurements(cases, rows)
     output = {
         "schema_version": SCHEMA,

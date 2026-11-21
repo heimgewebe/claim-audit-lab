@@ -128,5 +128,48 @@ def test_failed_response_is_retained_and_does_not_fake_accuracy(monkeypatch):
     ]
     metrics = shadow.measurements(shadow.load_cases(), assembled)
     assert metrics["valid"] == 0
-    assert metrics["split_metrics"]["all"]["accuracy"] == 0
+    assert metrics["split_metrics"]["all"]["accuracy"] is None
+    assert metrics["split_metrics"]["all"]["accuracy_over_all_inputs"] == 0
     assert metrics["per_class"]["supported"]["recall_all_cases"] == 0
+
+def test_expired_auth_failure_is_classified_without_leaking_stderr(monkeypatch):
+    sample = shadow.assignments(shadow.load_cases())[0]
+    stderr = "Failed to refresh token: your refresh token has expired; unauthorized (401)"
+
+    def fake_exec(args, **kwargs):
+        return subprocess.CompletedProcess(
+            args=args, returncode=1, stdout="", stderr=stderr
+        )
+
+    monkeypatch.setattr(shadow.subprocess, "run", fake_exec)
+    result = shadow.run_one(sample, "Any arbitrary excerpt")
+    assert result["error"] == "authentication_expired"
+    assert result["stderr_sha256"] == shadow.sha(stderr)
+    assert "stderr" not in result
+    assert "judgment" not in result
+
+
+def test_first_cli_failure_aborts_remaining_17_without_false_accuracy(monkeypatch, tmp_path):
+    import json
+
+    seen = []
+
+    def fake_one(sample, excerpt):
+        seen.append(sample["id"])
+        return {**sample, "exit_code": 1, "error": "authentication_expired"}
+
+    monkeypatch.setattr(shadow, "run_one", fake_one)
+    monkeypatch.setattr(
+        sys, "argv",
+        ["run.py", "--execute", "--output-dir", str(tmp_path / "failed-run")],
+    )
+    with pytest.raises(SystemExit, match="Incomplete model run"):
+        shadow.main()
+    assert len(seen) == 1
+    result = json.loads((tmp_path / "failed-run" / "results.json").read_text())
+    assert result["metrics"]["attempted_calls"] == 1
+    assert result["metrics"]["valid"] == 0
+    assert result["metrics"]["invalid"] == 18
+    assert result["metrics"]["split_metrics"]["holdout"]["accuracy"] is None
+    assert sum(r["error"] == "not_run_after_provider_failure" for r in result["runs"]) == 17
+    assert "UNUSABLE MODEL TRIAL" in (tmp_path / "failed-run" / "report.md").read_text()

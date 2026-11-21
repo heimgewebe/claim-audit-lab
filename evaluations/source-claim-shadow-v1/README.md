@@ -54,3 +54,14 @@ Der erste Aufruf zeigt nur die deterministisch gemischten 18 Fallkennungen, Spli
 4. Es erfolgt keine automatische Integration in Produktions-Validatoren. Ein weiteres, unabhängig menschlich gegengeprüftes und umfangreicheres Holdout wäre die Voraussetzung, um einen dauerhaften semantischen Prüfdienst oder blockierende Ergebnisse überhaupt zu erwägen.
 
 **Erfolg dieses Piloten:** Die bisherige Strukturprüfung erhält eine **getrennte messbare inhaltliche Versuchsspur**, die sich nicht hinter Wortverboten, optionalen Erklärungen oder bloß grüner CI versteckt.
+
+
+## Erste Ausführung: authentifizierungsbedingt nicht auswertbar
+
+Die erste Ausführung vom 21. November 2026 ist unter `diagnostic-expired-auth-20261121/` **unverändert archiviert**. Das Modell lieferte **0/18 gültige Urteile**, weil alle 18 CLI-Aufrufe mit Exitcode 1 endeten. Ein anschließender einzelner echter Codex-Aufruf zeigte `refresh token has expired` und HTTP 401. Die formale Anzeige `codex login status` war trotz dessen erfolgreich und konnte die Nutzbarkeit nicht belegen.
+
+**Daraus folgt keinerlei beobachtete semantische Erkennungsquote.** Insbesondere ist die im alten Diagnosereport mechanisch angezeigte Nullgenauigkeit nicht als 0 % richtige Modellurteile zu interpretieren.
+
+Die CLI ist daraufhin minimal verbessert worden: Nach dem ersten eindeutigen Authentifizierungs-, Quota- oder CLI-Ausfall werden die weiteren 17 Modellaufrufe **nicht mehr gestartet**. Der Bericht enthält dann keine erfundene Modell-Genauigkeit (`accuracy=null`) und kennzeichnet die Messung als unbrauchbar. Falltexte, Goldlabels, Splits, Promptinhalt und die feste zufällige Reihenfolge blieben unangetastet.
+
+Sobald die **bestehende Codex-Anmeldung** wieder funktioniert, kann der Blindtest mit einem neuen `--output-dir` ausgeführt werden. Ein kurzer zusätzlicher Claude-Pro-Smoke-Test zeigte ebenfalls eine bloß formal positive `claude auth status`-Anzeige, während eine echte Generierung `Not logged in · Please run /login` zurückgab. Auch Claude steht daher gegenwärtig **nicht** als überprüft funktionsfähiger Ersatzanbieter bereit. Das Experiment benötigt keinen API-Schlüssel, keine neue Infrastruktur und kein zusätzliches Freigabegate.
