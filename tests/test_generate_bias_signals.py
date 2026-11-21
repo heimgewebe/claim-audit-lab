@@ -245,6 +245,127 @@ class TestReportedClaimWorldPressure:
         assert "reported_claim_world_pressure" not in types_of(signals)
 
 
+    def test_empty_provenance_file_does_not_suppress_world_link(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim", world_claim_refs=["c002"]),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "argument-provenance.yml", "")
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+
+    def test_unrelated_provenance_does_not_suppress_world_link(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim", world_claim_refs=["c002"]),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "target_claim_ref": "c999",
+            "premise_claim_refs": ["c001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "non_decisive",
+        }]})
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+
+    def test_matching_argument_provenance_is_sufficient_for_world_link(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim", world_claim_refs=["c002"]),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "argument_id": "arg001",
+            "target_claim_ref": "c002",
+            "premise_claim_refs": ["c001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "non_decisive",
+        }]})
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+    def test_matching_inference_ledger_is_valid_alternative(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim", world_claim_refs=["c002"]),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "inference-ledger.yml", {"inferences": [{
+            "claim_ref": "c002",
+            "premise_claim_refs": ["c001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "inference_type": "direct_premise",
+        }]})
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+    def test_ordinary_mention_does_not_claim_world_effect(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim"),
+        ]})
+        write(case / "assessment.md", "The source describes c001 as a report.")
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+    def test_relation_requires_matching_provenance_not_filename(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim"),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "evidence-pack.yml", {"evidence": [{
+            "evidence_id": "e001", "claim_refs": ["c001"], "source_ref": "s001",
+        }]})
+        write(case / "sources.yml", {"sources": [{"source_id": "s001"}]})
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001", "claim_ref": "c002",
+            "relation_type": "supports_directly", "strength": 0.70,
+        }]})
+        write(case / "argument-provenance.yml", {"arguments": []})
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "target_claim_ref": "c002",
+            "premise_claim_refs": ["c001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "non_decisive",
+        }]})
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+    def test_major_effect_needs_independent_support_not_just_provenance(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim"),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "evidence-pack.yml", {"evidence": [{
+            "evidence_id": "e001", "claim_refs": ["c001"], "source_ref": "s001",
+        }]})
+        write(case / "sources.yml", {"sources": [{"source_id": "s001"}]})
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001", "claim_ref": "c002",
+            "relation_type": "supports_directly", "strength": 0.85,
+        }]})
+        write(case / "argument-provenance.yml", {"arguments": [{
+            "target_claim_ref": "c002", "premise_claim_refs": ["c001"],
+            "forbidden_upgrades_checked": ["reported_to_world"],
+            "allowed_effect": "non_decisive",
+        }]})
+        assert "reported_claim_world_pressure" in types_of(gbs.generate_for_case(case))
+
+    def test_weak_relation_does_not_require_world_provenance(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="reported_claim"),
+            claim("c002", claim_type="causal_claim"),
+        ]})
+        write(case / "evidence-pack.yml", {"evidence": [{
+            "evidence_id": "e001", "claim_refs": ["c001"],
+        }]})
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001", "claim_ref": "c002",
+            "relation_type": "supports_indirectly", "strength": 0.35,
+        }]})
+        assert "reported_claim_world_pressure" not in types_of(gbs.generate_for_case(case))
+
+
 import json
 import pathlib
 from jsonschema_compat import jsonschema as _jsonschema

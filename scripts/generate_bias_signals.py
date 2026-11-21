@@ -26,6 +26,7 @@ import yaml
 
 from case_compat import find_cases_root
 from jsonschema_compat import jsonschema
+import validate_reported_claim_world_effect as provenance
 
 GENERATED_BY = "scripts/generate_bias_signals.py"
 GENERATED_SUBDIR = "_generated"
@@ -95,7 +96,10 @@ class CaseContext:
         self.redteam = _load_yaml(case_dir / "redteam.yml")
         self.lifecycle = _load_yaml(case_dir / "lifecycle.yml")
         self.assessment_text = _read_text(case_dir / "assessment.md")
-        self.has_argument_provenance = (case_dir / "argument-provenance.yml").exists()
+        argument_doc = _load_yaml(case_dir / "argument-provenance.yml")
+        self.argument_provenance = argument_doc if isinstance(argument_doc, dict) else {}
+        inference_doc = _load_yaml(case_dir / "inference-ledger.yml")
+        self.inference_ledger = inference_doc if isinstance(inference_doc, dict) else {}
         hypotheses_doc = _load_yaml(case_dir / "hypotheses.yml")
         self.hypotheses = _as_list(hypotheses_doc, "hypotheses")
         evidence_pack_doc = _load_yaml(case_dir / "evidence-pack.yml")
@@ -255,97 +259,137 @@ def detect_source_weight_asymmetry(ctx: CaseContext) -> list[dict]:
     return signals
 
 
+def _has_report_to_world_provenance(
+    ctx: CaseContext,
+    reported_claim_id: str,
+    world_claim_id: str,
+    *,
+    relation_type: str = "supports_indirectly",
+    strength: float = 0.6,
+    origin_source_refs: set[str] | None = None,
+) -> bool:
+    """Reuse the canonical evidence validator's per-claim provenance checks."""
+    token = (reported_claim_id, None)
+    sources = provenance.get_sources_by_id({"sources": ctx.sources})
+    origins = set(origin_source_refs or ())
+    return provenance.has_inference_provenance(
+        ctx.inference_ledger, world_claim_id, token, relation_type,
+        strength, sources, origins,
+    ) or provenance.has_argument_provenance(
+        ctx.argument_provenance, world_claim_id, token, relation_type,
+        strength, sources, origins,
+    )
+
+
 def detect_reported_claim_world_pressure(ctx: CaseContext) -> list[dict]:
     signals: list[dict] = []
+    claims_by_id = {
+        claim["claim_id"]: claim for claim in ctx.claims
+        if isinstance(claim.get("claim_id"), str)
+    }
+    reported_claim_ids = {
+        cid for cid, claim in claims_by_id.items()
+        if claim.get("claim_kind") == "reported_claim"
+        or claim.get("burden_profile") == "source_report"
+    }
 
-    # Build a set of reported_claim / source_report claim IDs.
-    reported_claim_ids: set[str] = set()
-    for claim in ctx.claims:
-        cid = claim.get("claim_id")
-        if isinstance(cid, str) and (
-            claim.get("claim_kind") == "reported_claim"
-            or claim.get("burden_profile") == "source_report"
+    covered_pairs: set[tuple[str, str]] = set()
+
+    # For actual strong report-derived evidence relations, rely on the
+    # same source- and effect-aware matching contract as the canonical
+    # validate_reported_claim_world_effect validator. Filename existence
+    # alone, unrelated arguments and weak relations cannot release a signal.
+    evidence_by_id = {
+        evidence["evidence_id"]: evidence for evidence in ctx.evidence_pack
+        if isinstance(evidence.get("evidence_id"), str)
+    }
+    for relation in ctx.relations:
+        rtype = relation.get("relation_type")
+        target = relation.get("claim_ref")
+        strength = relation.get("strength")
+        if (
+            rtype not in provenance.STRONG_EFFECT_RELATIONS
+            or not isinstance(target, str)
+            or not provenance.is_world_claim(claims_by_id, target)
+            or isinstance(strength, bool)
+            or not isinstance(strength, (int, float))
+            or strength < provenance.STRENGTH_THRESHOLD
         ):
-            reported_claim_ids.add(cid)
-
-    # Path A: world_claim_refs or assessment mention on the claim itself.
-    for claim in ctx.claims:
-        claim_id = claim.get("claim_id")
-        if not isinstance(claim_id, str) or claim_id not in reported_claim_ids:
             continue
-        world_refs = [r for r in (claim.get("world_claim_refs") or []) if isinstance(r, str)]
-        mentioned = bool(ctx.assessment_text) and claim_id in ctx.assessment_text
-        pressure = bool(world_refs) or mentioned
-        if not pressure or ctx.has_argument_provenance:
-            continue
-        trigger = "world_claim_refs" if world_refs else "assessment mention"
-        observation = (
-            f"reported_claim {claim_id} is leveraged toward a world claim (via {trigger}) "
-            f"while argument-provenance.yml is missing; the inference path is undeclared."
-        )
-        signals.append(
-            _build(
-                ctx,
-                signal_type="reported_claim_world_pressure",
-                severity=0.78,
-                affected_claims=sorted(set([claim_id, *world_refs])),
-                detected_from=[f"claims.yml#{claim_id}", "argument-provenance.yml(missing)"],
-                observation=observation,
-            )
-        )
-
-    # Path B: evidence-pack items derived from reported claims used via directional relations.
-    if not ctx.has_argument_provenance and reported_claim_ids and ctx.evidence_pack:
-        # Map evidence_id → list of reported claim IDs it is derived from.
-        reported_evidence: dict[str, list[str]] = {}
-        for evidence in ctx.evidence_pack:
-            eid = evidence.get("evidence_id")
-            if not isinstance(eid, str):
+        evidence_ids = _get_evidence_refs_from_relation(relation)
+        involved: set[str] = set()
+        origin_sources: set[str] = set()
+        for eid in evidence_ids:
+            evidence = evidence_by_id.get(eid)
+            if evidence is None:
                 continue
-            linked = [
+            linked = {
                 ref for ref in (evidence.get("claim_refs") or [])
                 if isinstance(ref, str) and ref in reported_claim_ids
-            ]
+            }
             if linked:
-                reported_evidence[eid] = linked
-
-        if reported_evidence:
-            for relation in ctx.relations:
-                rtype = relation.get("relation_type", "")
-                if rtype not in DIRECTIONAL_RELATION_TYPES:
-                    continue
-                ev_refs = _get_evidence_refs_from_relation(relation)
-                triggering_ev_refs: list[str] = []
-                involved_reported: set[str] = set()
-                for ev_ref in ev_refs:
-                    if ev_ref in reported_evidence:
-                        triggering_ev_refs.append(ev_ref)
-                        involved_reported.update(reported_evidence[ev_ref])
-                if not involved_reported:
-                    continue
-                target_claim = relation.get("claim_ref")
-                if not isinstance(target_claim, str) or not target_claim:
-                    continue
-                relation_id = relation.get("relation_id", "?")
-                observation = (
-                    f"evidence {sorted(triggering_ev_refs)} derived from reported_claim(s) "
-                    f"{sorted(involved_reported)} is used via '{rtype}' relation "
-                    f"({relation_id}) toward claim {target_claim} while "
-                    f"argument-provenance.yml is missing; the inference path is undeclared."
-                )
-                signals.append(
-                    _build(
-                        ctx,
-                        signal_type="reported_claim_world_pressure",
-                        severity=0.78,
-                        affected_claims=sorted(involved_reported | {target_claim}),
-                        detected_from=[
-                            f"evidence-relations.yml#{relation_id}",
-                            "argument-provenance.yml(missing)",
-                        ],
-                        observation=observation,
-                    )
-                )
+                involved.update(linked)
+                origin_sources.update(provenance.evidence_origin_sources(evidence))
+        if not involved:
+            continue
+        covered_pairs.update((reported_id, target) for reported_id in involved)
+        missing = [
+            reported_id for reported_id in sorted(involved)
+            if not _has_report_to_world_provenance(
+                ctx, reported_id, target, relation_type=rtype,
+                strength=float(strength), origin_source_refs=origin_sources,
+            )
+        ]
+        if not missing:
+            continue
+        relation_id = relation.get("relation_id", "?")
+        signals.append(_build(
+            ctx,
+            signal_type="reported_claim_world_pressure",
+            severity=0.78,
+            affected_claims=sorted({target, *missing}),
+            detected_from=[
+                f"evidence-relations.yml#{relation_id}",
+                "argument-provenance.yml / inference-ledger.yml",
+            ],
+            observation=(
+                f"relation {relation_id} uses report-derived evidence "
+                f"{sorted(evidence_ids)} toward world claim {target} with "
+                f"effect {rtype} at strength {strength}, but no matching "
+                f"provenance for reported claim(s) {missing}."
+            ),
+        ))
+    # Explicit report-to-world links are an early-warning signal even before
+    # a strong evidence relation is present. Merely mentioning a report in
+    # assessment prose is not evidence of such a world argument.
+    for reported_id in sorted(reported_claim_ids):
+        claim = claims_by_id[reported_id]
+        world_refs = [
+            ref for ref in (claim.get("world_claim_refs") or [])
+            if isinstance(ref, str)
+        ]
+        missing = [
+            ref for ref in world_refs
+            if (reported_id, ref) not in covered_pairs
+            and not _has_report_to_world_provenance(ctx, reported_id, ref)
+        ]
+        if not missing:
+            continue
+        signals.append(_build(
+            ctx,
+            signal_type="reported_claim_world_pressure",
+            severity=0.78,
+            affected_claims=sorted({reported_id, *missing}),
+            detected_from=[
+                f"claims.yml#{reported_id}",
+                "argument-provenance.yml / inference-ledger.yml",
+            ],
+            observation=(
+                f"reported_claim {reported_id} references world claim(s) "
+                f"{sorted(set(missing))} without a matching premise/target "
+                "and reported_to_world check in either provenance artifact."
+            ),
+        ))
 
     return signals
 
