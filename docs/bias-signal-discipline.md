@@ -89,8 +89,15 @@ The generator starts with a small set of hard signal types.
 |---|---:|---|
 | `relation_threshold_proximity` | 0.50 | a directional relation's numeric strength is within ±0.03 of a verdict threshold |
 | `source_weight_asymmetry` | 0.60 | extreme source-weight asymmetry is not supported by a source-weight audit |
-| `reported_claim_world_pressure` | 0.78 | reported evidence is used to support a world claim without argument-provenance |
+| `reported_claim_world_pressure` | 0.78 | explicit world-claim links or substantial report-derived evidence effects lack matching argument or inference provenance for that exact report/target and strength |
 | `redteam_pending_with_final_language` | 0.85 | structured lifecycle status is final while independent red-team verdict is pending |
+
+File presence alone does not establish provenance. The signal generator reuses
+the canonical world-effect provenance match for a specific reported claim,
+world target and relation strength, including the alternative
+`inference-ledger.yml` route. Mere mentions in prose and weak evidence
+relations do not create severe signals. An explicit world-claim link and its
+strong relation are not counted twice for the same report/target pair.
 
 Only structured indicators create mandatory signals. The historic schema retains
 old lexical signal names so archived records remain readable, but the generator

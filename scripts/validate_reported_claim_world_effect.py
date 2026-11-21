@@ -43,6 +43,8 @@ SAFE_RELATIONS = {
 STRONG_EFFECT_RELATIONS = {
     "alternative_explanation",
     "weakens",
+    "undercuts",
+    "contradicts_conditionally",
     "contradicts",
     "contradicts_directly",
     "contradicts_indirectly",

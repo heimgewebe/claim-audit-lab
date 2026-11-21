@@ -128,7 +128,7 @@ The full lists are:
 - `reports`, `contextualizes`, `source_position`
 
 **Registered strong-effect relations** (require provenance):
-- `alternative_explanation`, `weakens`, `contradicts`, `contradicts_directly`, `contradicts_indirectly`, `supports`, `supports_directly`, `supports_indirectly`, `method_challenge`
+- `alternative_explanation`, `weakens`, `undercuts`, `contradicts`, `contradicts_directly`, `contradicts_conditionally`, `contradicts_indirectly`, `supports`, `supports_directly`, `supports_indirectly`, `method_challenge`
 
 Any other relation type (e.g. `proves`, `establishes`, `decisively_refutes`) used with report-derived evidence targeting a world claim is flagged as unknown and must be registered in one of the two sets before use.
 
