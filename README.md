@@ -57,17 +57,16 @@ MVP 0.1-alpha validiert derzeit:
 - falllokale Quellen-/Evidence-Referenzen (keine hängenden IDs)
 - Lifecycle-Format und Statusübergänge
 - Red-Team-Finalisierungsgate
-- **Verbotene Sprache** in Agent-Prosa (`docs/forbidden-language.md`)
-- **Status/Prosa-Konsistenz** zwischen `claims.yml` und `assessment.md` (`docs/status-prose-consistency.md`)
+- **Strukturierte Statuskonsistenz** zwischen Claims und Answer-Receipts (ohne Wortfilter)
 - **Answer-Receipt-Disziplin**: strukturierte Pflicht-Output-Quittung für jede Agent-Antwort (`docs/answer-receipt-discipline.md`)
 - **Refusal-Disziplin**: Verweigerung als deklariertes strukturiertes Ereignis, nicht als Neutralitäts-Maske (`docs/refusal-discipline.md`)
 - **Aggregations-Disziplin**: Reported-Claims aggregieren nicht zu World-Claims ohne Bridge-Evidenz (`docs/aggregation-discipline.md`)
 
-Diese fünf neuen Validatoren bilden den Enforcement-Layer gegen agentenseitige
-Bias-Smuggle-Wege: Prosa, die strukturierte Verdicts hinterrücks aufwertet;
-Bias-Phrasen, die als Neutralität getarnt sind; Verweigerung, die als Balance
-verkleidet ist; Mehrfach-Reports, die als unabhängige Korroboration gewertet
-werden; freie Antworten ohne auditierbare Quittung.
+Die verbliebenen Validatoren prüfen strukturierte Evidenz, Referenzen und
+Deklarationen. Sie schließen weder rhetorische Manipulation noch falsche
+Schlussfolgerungen aus. Wortlisten, Negationsheuristiken und Stilverbote
+sind keine Qualitäts- oder Neutralitätsnachweise.
+Auch Bias-Signale beruhen jetzt auf strukturierten Befunden; Wörter in Assessment-Prosa lösen kein Finalisierungsgate aus.
 
 Noch nicht implementiert:
 
@@ -110,6 +109,8 @@ make test
 
 ## Enforcement-Layer
 
+**Keine pauschale Wortzensur:** Globale Verbotslisten, Refusal-Schlüsselwörter und stilistische Verdikt-Sperren sind entfernt. Claim-spezifische Heuristiken (etwa Abwesenheits- und Overclosure-Sprache) bestehen noch und ersetzen keine inhaltliche Evidenzprüfung. Aussagen werden anhand von Claim-Status, Quellen und Gegenbelegen bewertet.
+
 Agents, die in diesem Repository operieren, unterliegen dem **bindenden
 Vertrag** in `docs/agent-contract.md`. Compliance ist für repository-residente Artefakte mechanisch: die
 Validatoren in `scripts/` weisen Outputs zurück, die den Vertrag brechen.
@@ -125,7 +126,6 @@ deklariert:
 - die verwendeten Verdicts (mit Status und Unsicherheit),
 - die berücksichtigten Gegenhypothesen (mit Steelman-Qualität),
 - die geprüften und blockierten verbotenen Upgrades,
-- den Self-Scan auf verbotene Phrasen,
 - das Quellencluster-Audit mit Unabhängigkeitsverifikation oder Fragility-Score,
 - den Refusal-Check,
 - die externe Recherche (Tools, Quellen, oder Background-Knowledge-Only),
@@ -141,10 +141,9 @@ Begleitende Mechanismen:
 
 | Mechanismus | Datei | Was er blockiert |
 |---|---|---|
-| Forbidden Language | `scripts/validate_forbidden_language.py` | False-closure, Dismissal, Authority-Laundering, Smoothing, Refusal-as-Neutrality (Kategorie A-E) |
-| Status/Prose Consistency | `scripts/validate_status_prose_consistency.py` | Prosa, deren Register vom strukturierten `status` divergiert |
+| Claim/Receipt Consistency | `scripts/validate_answer_receipt_claims_consistency.py` | Strukturierte Claim-IDs und Status, die voneinander abweichen |
 | Answer Receipt | `scripts/validate_answer_receipt.py` | Receipts, die Schema oder Semantik-Checks verfehlen |
-| Refusal Discipline | `scripts/validate_refusal_discipline.py` | Verdeckte Verweigerung, Kontroverse-als-Refusal-Grund, Balanced-Framing ohne Burden-Layer-Aufschlüsselung |
+| Refusal Discipline | `scripts/validate_refusal_discipline.py` | Widersprüchliche deklarierte Refusal-Typen und fehlende strukturierte Burden-Layer |
 | Aggregation Discipline | `scripts/validate_aggregation_discipline.py` | Reported-Claims, die in einen `strongly_supported`/`established` World-Claim aggregiert werden, ohne Bridge-Evidenz oder Robustheits-Audit |
 
 ## Model Defeater und Burden-Layer

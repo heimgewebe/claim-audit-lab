@@ -33,27 +33,36 @@ def base_claim(claim_id, status="plausible", **extra):
 
 
 def severe_case(tmp_path, lifecycle_status):
-    """A case that generates exactly one severe (0.82) assessment_verdict_mismatch signal."""
+    """A reported claim improperly used to motivate a world claim without provenance."""
     case = tmp_path / "cases" / "severe"
     case.mkdir(parents=True)
-    write(case / "claims.yml", {"claims": [base_claim("c001", status="weak")]})
-    write(case / "assessment.md", "The audit clearly proves c001 beyond all doubt.")
+    write(case / "claims.yml", {"claims": [
+        base_claim("c001", status="weak", claim_kind="reported_claim",
+                   world_claim_refs=["c002"]),
+        base_claim("c002", status="weak", claim_type="causal_claim"),
+    ]})
+    write(case / "assessment.md", "An inference path has not been documented.")
     write(case / "lifecycle.yml", {"status": lifecycle_status})
     signals = gbs.generate_for_case(case)
-    assert len(signals) == 1 and signals[0]["severity"] >= 0.75
+    assert len(signals) == 1 and signals[0]["signal_type"] == "reported_claim_world_pressure"
+    assert signals[0]["severity"] >= 0.75
     return case, signals[0]["signal_id"]
 
 
 def soft_case(tmp_path, lifecycle_status):
-    """A case that generates exactly one non-severe (0.60) comparative_claim_underframed signal."""
+    """A relation strength near a structural verdict threshold."""
     case = tmp_path / "cases" / "soft"
     case.mkdir(parents=True)
-    write(case / "claims.yml", {"claims": [
-        base_claim("c001", claim_kind="comparative_claim", requires=["timeline"])
-    ]})
+    write(case / "claims.yml", {"claims": [base_claim("c001")]})
+    write(case / "evidence-relations.yml", {"relations": [{
+        "relation_id": "r001", "evidence_ref": "e001",
+        "claim_ref": "c001", "relation_type": "supports_directly",
+        "strength": 0.61,
+    }]})
     write(case / "lifecycle.yml", {"status": lifecycle_status})
     signals = gbs.generate_for_case(case)
-    assert len(signals) == 1 and signals[0]["severity"] < 0.75
+    assert len(signals) == 1 and signals[0]["signal_type"] == "relation_threshold_proximity"
+    assert signals[0]["severity"] < 0.75
     return case, signals[0]["signal_id"]
 
 

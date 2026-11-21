@@ -87,23 +87,19 @@ The generator starts with a small set of hard signal types.
 
 | type | severity | fires when |
 |---|---:|---|
-| `assessment_verdict_mismatch` | 0.82 | `assessment.md` uses finalizing language ("proves", "establishes", "widerlegt", "ist damit erwiesen", ...) about a claim whose status is `weak`/`speculative`/`unresolved`/`no_verdict_possible` |
-| `relation_threshold_proximity` | 0.50 | a directional relation's `strength` sits within ±0.03 of a verdict gate (0.60, 0.75) |
-| `source_weight_asymmetry` | 0.60 | source composite trust is strongly asymmetric **and** an extreme source lacks justification in `source-weight-audit.yml` |
-| `reported_claim_world_pressure` | 0.78 | a `reported_claim` is leveraged toward a world claim (via `world_claim_refs` or assessment mention) while `argument-provenance.yml` is missing |
-| `comparative_claim_underframed` | 0.60 | a `comparative_claim` declares no base rate / null hypothesis / alternative / decision standard |
-| `redteam_pending_with_final_language` | 0.85 | red-team verdict is `pending` while lifecycle/assessment language is finalizing |
-| `counterhypothesis_understeelman` | 0.70 | a strong causal/motive claim has a counterhypothesis but the steelman is absent, very low, or lacks "what would change the verdict" |
+| `relation_threshold_proximity` | 0.50 | a directional relation's numeric strength is within ±0.03 of a verdict threshold |
+| `source_weight_asymmetry` | 0.60 | extreme source-weight asymmetry is not supported by a source-weight audit |
+| `reported_claim_world_pressure` | 0.78 | reported evidence is used to support a world claim without argument-provenance |
+| `redteam_pending_with_final_language` | 0.85 | structured lifecycle status is final while independent red-team verdict is pending |
 
-**`counterhypothesis_understeelman` — claim locality rule:** a counterhypothesis
-is present when the claim carries `counterclaims`, *or* when an entry in
-`hypotheses.yml` explicitly references the claim via `claim_ref`, `claim_refs`,
-`target_claim_ref`, `target_claim_refs`, or `affected_claims`. A bare
-`hypotheses.yml` with no claim references does not trigger the signal for any
-claim — presence of the file alone is not evidence of a per-claim counter.
+Only structured indicators create mandatory signals. The historic schema retains
+old lexical signal names so archived records remain readable, but the generator
+does not produce `assessment_verdict_mismatch`, `comparative_claim_underframed`
+or `counterhypothesis_understeelman` from words in prose.
 
-Asymmetry alone is not bias. The rule is **asymmetry + missing justification =
-signal**, never **asymmetry = bias**.
+An unsubstantiated strong claim can still be rhetorically misleading without
+a mechanical signal. Structural validation is not a substitute for independent
+substantive review.
 
 ## Validator gate
 

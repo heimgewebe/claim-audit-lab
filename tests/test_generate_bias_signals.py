@@ -39,39 +39,6 @@ def types_of(signals):
     return {s["signal_type"] for s in signals}
 
 
-class TestAssessmentVerdictMismatch:
-    def test_weak_claim_with_finalizing_language_fires(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "The audit clearly proves c001 beyond doubt.")
-        signals = gbs.generate_for_case(case)
-        assert "assessment_verdict_mismatch" in types_of(signals)
-        sig = next(s for s in signals if s["signal_type"] == "assessment_verdict_mismatch")
-        assert sig["affected_claims"] == ["c001"]
-        assert sig["severity"] >= 0.75
-
-    def test_weak_claim_without_finalizing_language_does_not_fire(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "c001 remains weak and underdetermined.")
-        signals = gbs.generate_for_case(case)
-        assert "assessment_verdict_mismatch" not in types_of(signals)
-
-    def test_finalizing_language_in_table_row_is_ignored(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "| c001 | weak | this proves nothing in a table |\n")
-        signals = gbs.generate_for_case(case)
-        assert "assessment_verdict_mismatch" not in types_of(signals)
-
-    def test_strong_claim_with_finalizing_language_does_not_fire(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [claim("c001", status="established")]})
-        write(case / "assessment.md", "The record establishes c001 as documented fact.")
-        signals = gbs.generate_for_case(case)
-        assert "assessment_verdict_mismatch" not in types_of(signals)
-
-
 class TestRelationThresholdProximity:
     def test_strength_near_gate_fires(self, tmp_path):
         case = make_case(tmp_path)
@@ -138,35 +105,6 @@ class TestRelationThresholdProximity:
         assert "relation_threshold_proximity" in types_of(signals)
 
 
-class TestComparativeClaimUnderframed:
-    def test_comparative_without_null_hypothesis_fires(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_kind="comparative_claim", requires=["timeline"], notes="A is more probable")
-        ]})
-        signals = gbs.generate_for_case(case)
-        assert "comparative_claim_underframed" in types_of(signals)
-
-    def test_comparative_with_base_rate_does_not_fire(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_kind="comparative_claim",
-                  requires=["base rate", "explicit alternative"],
-                  notes="evaluated against the null hypothesis")
-        ]})
-        signals = gbs.generate_for_case(case)
-        assert "comparative_claim_underframed" not in types_of(signals)
-
-    def test_comparative_with_snake_case_base_rate_does_not_fire(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_kind="comparative_claim",
-                  requires=["comparative_base_rate"])
-        ]})
-        signals = gbs.generate_for_case(case)
-        assert "comparative_claim_underframed" not in types_of(signals)
-
-
 class TestRedteamPendingWithFinalLanguage:
     def test_pending_redteam_with_final_lifecycle_fires(self, tmp_path):
         case = make_case(tmp_path)
@@ -175,6 +113,14 @@ class TestRedteamPendingWithFinalLanguage:
         write(case / "lifecycle.yml", {"status": "final_under_uncertainty"})
         signals = gbs.generate_for_case(case)
         assert "redteam_pending_with_final_language" in types_of(signals)
+
+    def test_assessment_prose_is_not_a_lifecycle_gate(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [claim("c001")]})
+        write(case / "redteam.yml", {"verdict": {"status": "pending"}})
+        write(case / "lifecycle.yml", {"status": "draft"})
+        write(case / "assessment.md", "**Status: final_under_uncertainty**")
+        assert "redteam_pending_with_final_language" not in types_of(gbs.generate_for_case(case))
 
     def test_pending_redteam_with_draft_lifecycle_does_not_fire(self, tmp_path):
         case = make_case(tmp_path)
@@ -299,102 +245,36 @@ class TestReportedClaimWorldPressure:
         assert "reported_claim_world_pressure" not in types_of(signals)
 
 
-class TestCounterhypothesisUnderSteelman:
-    def test_strong_claim_with_counter_and_weak_steelman_fires(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established",
-                  counterclaims=["might be coincidence"])
-        ]})
-        write(case / "assessment.md", "c001 is the cause.")  # no steelman block
-        signals = gbs.generate_for_case(case)
-        sig = [s for s in signals if s["signal_type"] == "counterhypothesis_understeelman"]
-        assert sig and sig[0]["affected_claims"] == ["c001"]
-
-    def test_signal_is_claim_local_not_case_global(self, tmp_path):
-        # c001 carries a counterhypothesis; c002 (also strong) does not. The signal
-        # must attach to c001 only and must not piggyback onto c002.
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established",
-                  counterclaims=["alternative cause"]),
-            claim("c002", claim_type="motive_claim", status="established"),
-        ]})
-        write(case / "assessment.md", "Both claims hold.")
-        signals = gbs.generate_for_case(case)
-        affected = {
-            tuple(s["affected_claims"])
-            for s in signals if s["signal_type"] == "counterhypothesis_understeelman"
-        }
-        assert ("c001",) in affected
-        assert ("c002",) not in affected
-
-    def test_strong_claim_without_any_counter_does_not_fire(self, tmp_path):
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established")
-        ]})
-        write(case / "assessment.md", "c001 is the cause.")
-        signals = gbs.generate_for_case(case)
-        assert "counterhypothesis_understeelman" not in types_of(signals)
-
-    def test_unrelated_hypothesis_does_not_trigger(self, tmp_path):
-        # hypotheses.yml exists but carries no reference to c001 → no signal.
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established"),
-        ]})
-        write(case / "hypotheses.yml", {"hypotheses": [{
-            "id": "h001",
-            "description": "An alternative explanation unrelated to any claim.",
-        }]})
-        write(case / "assessment.md", "c001 is the cause.")
-        signals = gbs.generate_for_case(case)
-        assert "counterhypothesis_understeelman" not in types_of(signals)
-
-    def test_linked_hypothesis_triggers(self, tmp_path):
-        # hypotheses.yml references c001 via claim_refs → signal fires.
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established"),
-        ]})
-        write(case / "hypotheses.yml", {"hypotheses": [{
-            "id": "h001",
-            "description": "Alternative causation for c001.",
-            "claim_refs": ["c001"],
-        }]})
-        write(case / "assessment.md", "c001 is the cause.")  # no steelman block
-        signals = gbs.generate_for_case(case)
-        sig = [s for s in signals if s["signal_type"] == "counterhypothesis_understeelman"]
-        assert sig and sig[0]["affected_claims"] == ["c001"]
-
-    def test_linked_hypothesis_string_claim_ref_triggers(self, tmp_path):
-        # Defensive: claim_ref as a string (not list) still works.
-        case = make_case(tmp_path)
-        write(case / "claims.yml", {"claims": [
-            claim("c001", claim_type="causal_claim", status="established"),
-        ]})
-        write(case / "hypotheses.yml", {"hypotheses": [{
-            "id": "h001",
-            "description": "Alternative causation for c001.",
-            "claim_ref": "c001",  # singular string, not list
-        }]})
-        write(case / "assessment.md", "c001 is the cause.")  # no steelman block
-        signals = gbs.generate_for_case(case)
-        sig = [s for s in signals if s["signal_type"] == "counterhypothesis_understeelman"]
-        assert sig and sig[0]["affected_claims"] == ["c001"]
-
-
 import json
 import pathlib
 from jsonschema_compat import jsonschema as _jsonschema
+
+
+class TestLexicalNonVeto:
+    def test_words_do_not_generate_mandatory_bias_signals(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
+        write(case / "assessment.md", "Ein wissenschaftlicher Konsens ist kein Wahrheitsbeweis. "
+              "This clearly proves c001. No magical wording decides credibility.")
+        assert gbs.generate_for_case(case) == []
+
+    def test_comparative_wording_does_not_make_evidence(self, tmp_path):
+        case = make_case(tmp_path)
+        write(case / "claims.yml", {"claims": [
+            claim("c001", claim_kind="comparative_claim", notes="base rate"),
+        ]})
+        assert gbs.generate_for_case(case) == []
 
 
 class TestDeterminismAndDocument:
     def test_signal_ids_are_stable(self, tmp_path):
         case = make_case(tmp_path)
         write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "This clearly proves c001.")
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.76,
+        }]})
         first = gbs.generate_for_case(case)
         second = gbs.generate_for_case(case)
         assert [s["signal_id"] for s in first] == [s["signal_id"] for s in second]
@@ -403,7 +283,11 @@ class TestDeterminismAndDocument:
     def test_write_produces_loadable_generated_file(self, tmp_path):
         case = make_case(tmp_path)
         write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "This clearly proves c001.")
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.76,
+        }]})
         rc = gbs.main([str(tmp_path / "cases"), "--write"])
         assert rc == 0
         out = case / "_generated" / "bias-signals.yml"
@@ -415,24 +299,40 @@ class TestDeterminismAndDocument:
     def test_check_detects_drift(self, tmp_path):
         case = make_case(tmp_path)
         write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "This clearly proves c001.")
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.76,
+        }]})
         gbs.main([str(tmp_path / "cases"), "--write"])
-        # Mutate the case so generated signals would change.
-        write(case / "assessment.md", "c001 stays weak and underdetermined.")
+        # Only the structured relation changes; prose cannot change the signal.
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.50,
+        }]})
         rc = gbs.main([str(tmp_path / "cases"), "--check"])
         assert rc == 1
 
     def test_check_passes_when_no_committed_file(self, tmp_path):
         case = make_case(tmp_path)
         write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "This clearly proves c001.")
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.76,
+        }]})
         rc = gbs.main([str(tmp_path / "cases"), "--check"])
         assert rc == 0
 
     def test_build_document_is_schema_valid(self, tmp_path):
         case = make_case(tmp_path)
         write(case / "claims.yml", {"claims": [claim("c001", status="weak")]})
-        write(case / "assessment.md", "This clearly proves c001.")
+        write(case / "evidence-relations.yml", {"relations": [{
+            "relation_id": "r001", "evidence_ref": "e001",
+            "claim_ref": "c001", "relation_type": "supports_directly",
+            "strength": 0.76,
+        }]})
         signals = gbs.generate_for_case(case)
         doc = gbs.build_document(gbs.relative_case_ref(case), signals)
         schema_path = pathlib.Path(gbs.__file__).parent.parent / "schemas" / "bias-signals.v1.schema.json"

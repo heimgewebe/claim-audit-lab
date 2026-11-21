@@ -19,7 +19,6 @@ import argparse
 import hashlib
 import json
 import pathlib
-import re
 import sys
 from typing import Any
 
@@ -32,10 +31,6 @@ GENERATED_BY = "scripts/generate_bias_signals.py"
 GENERATED_SUBDIR = "_generated"
 GENERATED_FILENAME = "bias-signals.yml"
 SIGNALS_SCHEMA_PATH = pathlib.Path(__file__).parent.parent / "schemas" / "bias-signals.v1.schema.json"
-
-WEAK_STATUSES = {"weak", "speculative", "unresolved", "no_verdict_possible"}
-STRONG_STATUSES = {"strongly_supported", "established"}
-COUNTER_REQUIRING_TYPES = {"causal_claim", "motive_claim"}
 
 # Strong-effect relation types, kept in sync with STRONG_EFFECT_RELATIONS in
 # validate_reported_claim_world_effect.py. The bare forms "supports",
@@ -59,57 +54,7 @@ THRESHOLD_GATES = (0.60, 0.75)
 THRESHOLD_WINDOW = 0.03
 
 PENDING_REDTEAM_VERDICTS = {"pending", "pending_independent_review"}
-FINAL_LANGUAGE_TOKENS = {"assessed", "final_under_uncertainty"}
-
-# Finalizing prose: stronger than any below-established verdict warrants.
-FINALIZING_PATTERNS = (
-    r"\bproves\b",
-    r"\bproven\b",
-    r"\bestablishes\b",
-    r"\bclearly\s+shows\b",
-    r"\bdemonstrates\s+conclusively\b",
-    r"\bconclusively\b",
-    r"\bdefinitively\b",
-    r"\bbeweist\b",
-    r"\bwiderlegt\b",
-    r"\bbelegt\s+eindeutig\b",
-    r"\beindeutig\s+belegt\b",
-    r"\bist\s+damit\s+erwiesen\b",
-    r"\berwiesenerma[ßs]en\b",
-)
-
-# Framing tokens that a comparative claim must declare to be adequately framed.
-COMPARATIVE_FRAMING_TOKENS = (
-    "base rate",
-    "base_rate",
-    "baseline",
-    "basisrate",
-    "null hypothesis",
-    "null_hypothesis",
-    "nullhypothese",
-    "alternative",
-    "alternativen",
-    "comparison base",
-    "comparison_base",
-    "comparative_base_rate",
-    "vergleichsbasis",
-    "reference class",
-    "referenzklasse",
-    "prior",
-    "decision rule",
-    "decision_rule",
-    "decision logic",
-    "entscheidungslogik",
-    "evaluation standard",
-    "bewertungsma[ßs]stab",
-)
-
-WHAT_WOULD_CHANGE_PATTERNS = (
-    r"what\s+would\s+change",
-    r"what_would_change",
-    r"was\s+(?:das\s+urteil|die\s+einsch[äa]tzung|den\s+verdict)[^.]{0,40}\b[äa]nder",
-)
-
+FINAL_LIFECYCLE_STATUSES = {"assessed", "final_under_uncertainty"}
 
 def _load_yaml(path: pathlib.Path) -> Any:
     try:
@@ -170,26 +115,6 @@ def _read_text(path: pathlib.Path) -> str:
         return ""
 
 
-def _eligible_lines(text: str) -> list[str]:
-    """Lines outside markdown tables, blockquotes, and steelman fences."""
-    lines: list[str] = []
-    in_steelman = False
-    for raw in text.splitlines():
-        stripped = raw.lstrip()
-        if stripped.startswith("```"):
-            if "steelman" in stripped.lower():
-                in_steelman = True
-            elif in_steelman:
-                in_steelman = False
-            continue
-        if in_steelman:
-            continue
-        if stripped.startswith("|") or stripped.startswith(">"):
-            continue
-        lines.append(raw)
-    return lines
-
-
 def _get_evidence_refs_from_relation(relation: dict) -> list[str]:
     """Collect all evidence refs from a relation (singular and plural fields)."""
     refs: list[str] = []
@@ -216,57 +141,6 @@ def _schema_errors_for_document(document: dict, schema: dict) -> list[str]:
         f"Schema error at {list(e.absolute_path)}: {e.message}"
         for e in sorted(validator.iter_errors(document), key=lambda e: list(e.absolute_path))
     ]
-
-
-def _assessment_status_token(text: str) -> str:
-    for line in text.splitlines()[:20]:
-        m = re.search(r"status[:\*\s]+([a-z_]+)", line, flags=re.IGNORECASE)
-        if m:
-            return m.group(1).lower()
-    return ""
-
-
-# --- detectors ---------------------------------------------------------------
-
-
-def detect_assessment_verdict_mismatch(ctx: CaseContext) -> list[dict]:
-    signals: list[dict] = []
-    if not ctx.assessment_text:
-        return signals
-    lines = _eligible_lines(ctx.assessment_text)
-    for claim in ctx.claims:
-        claim_id = claim.get("claim_id")
-        status = claim.get("status", "")
-        if not claim_id or status not in WEAK_STATUSES:
-            continue
-        matched: str | None = None
-        for line in lines:
-            if claim_id not in line:
-                continue
-            for pattern in FINALIZING_PATTERNS:
-                m = re.search(pattern, line, flags=re.IGNORECASE)
-                if m:
-                    matched = m.group(0).lower()
-                    break
-            if matched:
-                break
-        if not matched:
-            continue
-        observation = (
-            f"assessment.md uses finalizing language '{matched}' about claim "
-            f"{claim_id} whose structured status is '{status}'."
-        )
-        signals.append(
-            _build(
-                ctx,
-                signal_type="assessment_verdict_mismatch",
-                severity=0.82,
-                affected_claims=[claim_id],
-                detected_from=["assessment.md", f"claims.yml#{claim_id}"],
-                observation=observation,
-            )
-        )
-    return signals
 
 
 def detect_relation_threshold_proximity(ctx: CaseContext) -> list[dict]:
@@ -476,45 +350,6 @@ def detect_reported_claim_world_pressure(ctx: CaseContext) -> list[dict]:
     return signals
 
 
-def detect_comparative_claim_underframed(ctx: CaseContext) -> list[dict]:
-    signals: list[dict] = []
-    for claim in ctx.claims:
-        claim_id = claim.get("claim_id")
-        if not isinstance(claim_id, str):
-            continue
-        is_comparative = (
-            claim.get("claim_kind") == "comparative_claim"
-            or claim.get("claim_type") == "comparative_claim"
-            or claim.get("burden_profile") == "comparative"
-        )
-        if not is_comparative:
-            continue
-        haystack_parts: list[str] = [str(claim.get("notes", "") or "")]
-        for item in claim.get("requires", []) or []:
-            haystack_parts.append(str(item))
-        for item in claim.get("counterclaims", []) or []:
-            haystack_parts.append(str(item))
-        haystack = " ".join(haystack_parts).lower()
-        framed = any(re.search(token, haystack) for token in COMPARATIVE_FRAMING_TOKENS)
-        if framed:
-            continue
-        observation = (
-            f"comparative claim {claim_id} declares no base rate, null hypothesis, "
-            f"explicit alternative, or decision standard in requires/notes/counterclaims."
-        )
-        signals.append(
-            _build(
-                ctx,
-                signal_type="comparative_claim_underframed",
-                severity=0.60,
-                affected_claims=[claim_id],
-                detected_from=[f"claims.yml#{claim_id}"],
-                observation=observation,
-            )
-        )
-    return signals
-
-
 def detect_redteam_pending_with_final_language(ctx: CaseContext) -> list[dict]:
     if not isinstance(ctx.redteam, dict):
         return []
@@ -526,17 +361,11 @@ def detect_redteam_pending_with_final_language(ctx: CaseContext) -> list[dict]:
     lifecycle_status = ""
     if isinstance(ctx.lifecycle, dict):
         lifecycle_status = str(ctx.lifecycle.get("status", ""))
-    assessment_status = _assessment_status_token(ctx.assessment_text)
-    final_language = (
-        lifecycle_status in FINAL_LANGUAGE_TOKENS
-        or assessment_status in FINAL_LANGUAGE_TOKENS
-    )
-    if not final_language:
+    if lifecycle_status not in FINAL_LIFECYCLE_STATUSES:
         return []
     observation = (
-        f"red-team verdict is '{verdict}' while finalizing language is present "
-        f"(lifecycle status '{lifecycle_status or 'n/a'}', assessment status "
-        f"'{assessment_status or 'n/a'}')."
+        f"red-team verdict is '{verdict}' while lifecycle status "
+        f"is '{lifecycle_status}'."
     )
     return [
         _build(
@@ -550,93 +379,11 @@ def detect_redteam_pending_with_final_language(ctx: CaseContext) -> list[dict]:
     ]
 
 
-def _refs_from_field(value: object) -> list[str]:
-    """Safely extract string refs from a field that may be a string, list, or invalid."""
-    if isinstance(value, str):
-        return [value]
-    if isinstance(value, list):
-        return [v for v in value if isinstance(v, str)]
-    return []
-
-
-def _hypothesis_refs_claim(hyp: dict, claim_id: str) -> bool:
-    """True if a hypothesis explicitly references claim_id in any standard ref field."""
-    for key in ("claim_ref", "target_claim_ref"):
-        if hyp.get(key) == claim_id:
-            return True
-    for key in ("claim_refs", "target_claim_refs", "affected_claims"):
-        if claim_id in _refs_from_field(hyp.get(key)):
-            return True
-    return False
-
-
-def detect_counterhypothesis_understeelman(ctx: CaseContext) -> list[dict]:
-    # Case-global prose quality of the steelman (assessment.md is not structured
-    # per-claim, so these prose checks are evaluated once and reused per claim).
-    steelman_present = "```steelman" in ctx.assessment_text
-    what_would_change = any(
-        re.search(p, ctx.assessment_text, flags=re.IGNORECASE) for p in WHAT_WOULD_CHANGE_PATTERNS
-    )
-    low_quality = False
-    for m in re.finditer(r"steelman[^0-9]{0,40}(0?\.\d+)", ctx.assessment_text, flags=re.IGNORECASE):
-        try:
-            if float(m.group(1)) < 0.3:
-                low_quality = True
-                break
-        except ValueError:  # pragma: no cover - defensive
-            continue
-    understeelman = (not steelman_present) or (not what_would_change) or low_quality
-    if not understeelman:
-        return []
-    reason = (
-        "no steelman block" if not steelman_present
-        else "steelman quality below 0.3" if low_quality
-        else "no 'what would change the verdict' statement"
-    )
-
-    signals: list[dict] = []
-    for claim in ctx.claims:
-        claim_id = claim.get("claim_id")
-        if not isinstance(claim_id, str):
-            continue
-        if claim.get("status") not in STRONG_STATUSES:
-            continue
-        if claim.get("claim_type") not in COUNTER_REQUIRING_TYPES:
-            continue
-        # Claim-local: only fire if THIS claim actually carries a counterhypothesis.
-        # A bare hypotheses.yml is not enough — the hypothesis must explicitly reference
-        # this claim via claim_ref / claim_refs / target_claim_ref / target_claim_refs /
-        # affected_claims. claim.counterclaims is always a valid local trigger.
-        has_counter = bool(claim.get("counterclaims") or []) or any(
-            _hypothesis_refs_claim(h, claim_id) for h in ctx.hypotheses
-        )
-        if not has_counter:
-            continue
-        observation = (
-            f"strong causal/motive claim {claim_id} carries a counterhypothesis "
-            f"but the steelman is under-developed ({reason})."
-        )
-        signals.append(
-            _build(
-                ctx,
-                signal_type="counterhypothesis_understeelman",
-                severity=0.70,
-                affected_claims=[claim_id],
-                detected_from=[f"claims.yml#{claim_id}", "assessment.md"],
-                observation=observation,
-            )
-        )
-    return signals
-
-
 DETECTORS = (
-    detect_assessment_verdict_mismatch,
     detect_relation_threshold_proximity,
     detect_source_weight_asymmetry,
     detect_reported_claim_world_pressure,
-    detect_comparative_claim_underframed,
     detect_redteam_pending_with_final_language,
-    detect_counterhypothesis_understeelman,
 )
 
 

@@ -16,8 +16,7 @@ The repository defines:
 - investigation integrity,
 - red-team requirements,
 - verdict discipline,
-- forbidden language,
-- status/prose consistency,
+- claim/receipt status consistency,
 - answer-receipt discipline,
 - refusal discipline,
 - aggregation discipline,
@@ -73,10 +72,8 @@ Agents must not:
 - smooth contradictions,
 - produce strong causal or motive verdicts without counterhypotheses,
 - claim final assessment without red-team/review status,
-- use any phrase listed in `docs/forbidden-language.md` outside the allowed
-  contexts defined there,
-- emit prose in `assessment.md` whose register diverges from the claim's
-  structured `status` (`docs/status-prose-consistency.md`),
+- emit receipt verdicts that contradict structured claim statuses
+  (`docs/answer-receipt-discipline.md`),
 - aggregate multiple `reported_claim`s into a `strongly_supported` or
   `established` world claim without bridge evidence
   (`docs/aggregation-discipline.md`),
@@ -89,8 +86,7 @@ If external research tools are unavailable:
 - provide the source classes needed for verification,
 - do not fall back to repo-only search unless the user asked a repo-navigation question,
 - in the answer receipt, set `external_research.background_knowledge_only: true`
-  and put the explicit phrase "background-knowledge-only, no external verification"
-  (or German equivalent) into `final_uncertainty_statement`.
+  and describe the actual limits in `final_uncertainty_statement` without a mandated phrase.
 
 ## Required assessment language
 For claim assessments, use the repository verdict vocabulary where an
@@ -108,9 +104,8 @@ When explaining in prose, you may additionally say that a claim is "untestable
 with current evidence", but do not use that phrase as an artifact verdict unless
 a schema explicitly supports it.
 
-The prose discussing a claim **must** use the register allowed for that claim's
-structured `status`, per `docs/status-prose-consistency.md`. The validator
-`scripts/validate_status_prose_consistency.py` rejects divergence.
+Structured claim and receipt verdicts must agree. Natural-language wording is
+not evidence of a verdict; no sentence is rejected by a word blacklist.
 
 Always state:
 - uncertainty,
@@ -128,9 +123,8 @@ artifact alongside the natural-language answer. See
 The receipt is mandatory. The validator `scripts/validate_answer_receipt.py`
 rejects answers that lack a parseable, schema-valid receipt with the required
 semantic checks satisfied:
-- banned-phrases self-scan (consistent with the actual answer text),
 - counterhypothesis floor for strong verdicts on causal/motive claims,
-- refusal-as-neutrality block,
+- structured refusal declaration checks,
 - external-research declaration,
 - source-cluster independence for strong verdicts,
 - oracle disclaimer affirmation,
@@ -157,25 +151,26 @@ does not itself implement runtime chat capture.
 Refusal is a structured event, not a stylistic escape. See
 `docs/refusal-discipline.md`.
 
-A refusal that hides as neutrality is mechanically rejected by
-`scripts/validate_refusal_discipline.py`. Permitted refusal types are:
+Declared refusal types and their metadata are mechanically checked by
+`scripts/validate_refusal_discipline.py`. No word choice establishes a hidden refusal.
+Permitted refusal types are:
 `out_of_scope`, `missing_tools`, `missing_evidence`, `capability`.
 Topic sensitivity, controversy, or political alignment are **not** valid
 refusal reasons.
 
-The agent never produces a "both sides have valid points" summary without a
-per-side burden-layer breakdown.
+When balanced framing is declared, the receipt records which burden layers were
+addressed. The presence of a phrase alone never triggers failure.
 
 ## Enforcement
 
 The validators are the contract for repository-resident artifacts. An agent that ships an answer:
 - without a receipt,
 - with a receipt that fails schema validation,
-- with a forbidden phrase outside an allowed context,
-- with prose diverging from structured `status`,
-- with a covert refusal,
+- with receipt verdicts inconsistent with structured claim `status`,
+- with contradictory declared refusal fields,
 - with reported→world aggregation closed without bridge evidence,
 
 is in breach of contract regardless of how compelling the natural-language
-answer reads. The fix is to re-draft until the validators pass — not to
-disable, skip, or argue with the validators.
+answer reads. The remedy is to correct the evidence or the validator itself. Demonstrably
+incorrect gates may be removed through a tested policy change, not evaded
+by paraphrasing.

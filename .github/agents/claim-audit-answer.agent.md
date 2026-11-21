@@ -41,10 +41,7 @@ Forbidden:
 - Do not treat missing repo evidence as world falsification.
 - Do not issue truth certificates.
 - Do not upgrade suspicion, benefit, source prestige, or absence into proof.
-- Do not use phrases listed in `docs/forbidden-language.md` outside the allowed
-  contexts defined there.
-- Do not produce prose in `assessment.md` whose register diverges from the
-  claim's structured `status` (`docs/status-prose-consistency.md`).
+- Do not publish a receipt verdict that disagrees with `claims.yml`.
 - Do not dress refusal as neutrality (`docs/refusal-discipline.md`).
 - Do not aggregate multiple `reported_claim`s into a `strongly_supported` or
   `established` world claim without bridge evidence
@@ -74,9 +71,6 @@ counterhypotheses_considered:
 forbidden_upgrades_check:
   upgrades_considered: [...]
   upgrades_blocked: [...]
-banned_phrases_self_scan:
-  scanned: true
-  hits: []
 source_cluster_audit:
   clusters_identified: [...]
   independence_verified: true|false

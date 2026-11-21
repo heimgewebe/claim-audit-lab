@@ -68,8 +68,6 @@ is `scripts/validate_answer_receipt.py`. The required top-level fields are:
   steelman_quality scores ≥ 0.5
 - `forbidden_upgrades_check` — explicit declaration of which upgrades were
   considered and blocked
-- `banned_phrases_self_scan` — declaration that the agent scanned its own
-  `answer_summary` against `docs/forbidden-language.md` and the result
 - `source_cluster_audit` — list of source clusters identified and an
   independence verdict
 - `refusal_check` — confirms the agent did not refuse a substantive task
@@ -85,9 +83,9 @@ is `scripts/validate_answer_receipt.py`. The required top-level fields are:
 Beyond schema validation, `scripts/validate_answer_receipt.py` runs these
 semantic checks:
 
-1. **Banned-phrases declaration**: `banned_phrases_self_scan.scanned` must be
-   `true` and `hits` must be a list. Phrase detection itself is enforced by
-   `scripts/validate_forbidden_language.py` on receipt free-text fields.
+1. **No lexical gate**: natural-language wording is never rejected solely
+   by a keyword. Older receipts may include the deprecated
+   `banned_phrases_self_scan` field; it is ignored, and new receipts omit it.
 2. **Counterhypothesis floor**: for any verdict ∈ {`strongly_supported`,
    `established`} on a `causal_claim` or `motive_claim`, at least 1
    `counterhypotheses_considered` entry with `steelman_quality ≥ 0.5`.
@@ -96,19 +94,15 @@ semantic checks:
    `final_uncertainty_statement` must say why a substantive answer was
    blocked (missing tools, missing evidence, etc.).
 4. **External-research declaration**: if
-   `external_research.tools_used` is empty AND
-   `task_classification` is not a repo-* type, the
-   `final_uncertainty_statement` must explicitly mark the answer as
-   "background-knowledge-only, no external verification."
+   `external_research.tools_used` is empty for a substantive task,
+   `external_research.background_knowledge_only` must be true.
+   The uncertainty statement describes missing verification in ordinary language.
 5. **Source-cluster independence**: if any verdict ∈
    {`strongly_supported`, `established`} is asserted, the
-   `source_cluster_audit.independence_verified` must be `true` OR
-   the receipt must list a `fragility_score` ≥ 0.7 with documented
-   reasoning.
-6. **Oracle disclaimer**: `oracle_disclaimer_present` must be `true`; the
-   `answer_summary` text must contain the disclaimer phrase
-   ("not a truth certificate" / "kein Wahrheitszertifikat") or the
-   `final_uncertainty_statement` must.
+   `source_cluster_audit.independence_verified` must be `true`. A high
+   `fragility_score` documents a weakness; it never substitutes for independence.
+6. **Oracle disclaimer**: `oracle_disclaimer_present` must be `true` as
+   an explicit declaration. No exact disclaimer phrase is required or scanned.
 7. **Receipt-presence gate for cases**: a case fails if no receipt is present
    while `assessment.md` exists or `lifecycle.status != draft`.
 8. **Receipt↔Claims consistency gate** (`scripts/validate_answer_receipt_claims_consistency.py`):

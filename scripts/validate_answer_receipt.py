@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import pathlib
-import re
 import sys
 
 import yaml
@@ -24,24 +23,6 @@ WEAK_STATUSES = {"weak", "speculative", "unresolved", "no_verdict_possible"}
 NON_FINAL_STATUSES = WEAK_STATUSES | {"plausible", "contradicted"}
 
 REPO_TASK_TYPES = {"repo_navigation", "repo_maintenance"}
-
-ORACLE_DISCLAIMER_MARKERS = (
-    "not a truth certificate",
-    "kein wahrheitszertifikat",
-    "evidence-structured judgment",
-    "evidenzstrukturiertes urteil",
-)
-
-CONTROVERSY_REFUSAL_MARKERS = (
-    "controversial",
-    "controversy",
-    "politically sensitive",
-    "kontrovers",
-    "politisch sensibel",
-    "umstritten",
-    "heikles thema",
-)
-
 
 def safe_load_yaml(path: pathlib.Path):
     try:
@@ -71,7 +52,6 @@ def semantic_checks(receipt: dict) -> list[str]:
     verdicts = receipt.get("verdicts_used", []) or []
     counter = receipt.get("counterhypotheses_considered", []) or []
     forbidden_check = receipt.get("forbidden_upgrades_check", {}) or {}
-    self_scan = receipt.get("banned_phrases_self_scan", {}) or {}
     refusal_check = receipt.get("refusal_check", {}) or {}
     external = receipt.get("external_research", {}) or {}
     answer_summary = receipt.get("answer_summary", "") or ""
@@ -79,13 +59,7 @@ def semantic_checks(receipt: dict) -> list[str]:
     oracle = receipt.get("oracle_disclaimer_present", False)
     what_change = receipt.get("what_would_change_assessment", "") or ""
 
-    # 1. Banned-phrases consistency: self-scan must be honest.
-    # (Note: validate_forbidden_language.py runs the deep regex scan.
-    # Here we just check that scanned=true and hits is an array.)
-    if not self_scan.get("scanned", False):
-        errors.append("banned_phrases_self_scan.scanned must be true")
-    if not isinstance(self_scan.get("hits", []), list):
-        errors.append("banned_phrases_self_scan.hits must be a list")
+    # Text is not audited by keyword lists; structure and evidence decide.
     if len(answer_summary) > 600:
         errors.append(
             "answer_summary exceeds 600 characters (maxLength enforcement for fallback schema validator)"
@@ -154,15 +128,6 @@ def semantic_checks(receipt: dict) -> list[str]:
                 "no_verdict_possible or unresolved"
             )
 
-    if refused:
-        # Refusal cannot cite controversy/sensitivity as reason
-        combined_unc = (final_unc + " " + refusal_check.get("notes", "")).lower()
-        for marker in CONTROVERSY_REFUSAL_MARKERS:
-            if marker in combined_unc:
-                errors.append(
-                    f"refusal_check cites '{marker}' as reason; controversy/sensitivity is not a valid refusal reason (see docs/refusal-discipline.md)"
-                )
-
     # 4. External-research declaration for non-repo tasks
     if task not in REPO_TASK_TYPES:
         tools = external.get("tools_used") or []
@@ -172,18 +137,6 @@ def semantic_checks(receipt: dict) -> list[str]:
                 f"task_classification={task}: external_research.tools_used is empty and "
                 "background_knowledge_only is not set; declare one or the other"
             )
-        if not tools and bg_only:
-            # require the final_uncertainty_statement to flag background-only
-            if not re.search(
-                r"background[-\s]?knowledge[-\s]?only|hintergrundwissen[-\s]?nur|no external verification|keine externe verifikation",
-                final_unc,
-                re.IGNORECASE,
-            ):
-                errors.append(
-                    "external_research.background_knowledge_only=true but final_uncertainty_statement does not "
-                    "explicitly label the answer as background-knowledge-only / no external verification"
-                )
-
     # 5. Source-cluster independence for strong verdicts
     has_strong = any(
         isinstance(v, dict) and v.get("status") in STRONG_STATUSES for v in verdicts
@@ -191,24 +144,15 @@ def semantic_checks(receipt: dict) -> list[str]:
     sc_audit = receipt.get("source_cluster_audit", {}) or {}
     if has_strong:
         indep = sc_audit.get("independence_verified", False)
-        fragility = sc_audit.get("fragility_score")
-        if not indep and not (isinstance(fragility, (int, float)) and fragility >= 0.7):
+        if not indep:
             errors.append(
                 "at least one verdict is strongly_supported/established but source_cluster_audit "
-                "neither verifies independence nor documents fragility_score >= 0.7"
+                "does not verify independence; high fragility is not evidence of independence"
             )
 
-    # 6. Oracle disclaimer
+    # 6. Oracle disclaimer is metadata, not a required incantation.
     if not oracle:
         errors.append("oracle_disclaimer_present must be true")
-    else:
-        combined = (answer_summary + " " + final_unc).lower()
-        if not any(marker in combined for marker in ORACLE_DISCLAIMER_MARKERS):
-            errors.append(
-                "oracle_disclaimer_present=true but neither answer_summary nor "
-                "final_uncertainty_statement contains the disclaimer phrase "
-                "('not a truth certificate' / 'kein Wahrheitszertifikat')"
-            )
 
     # 7. what_would_change_assessment required for non-established verdicts
     has_non_established = any(

@@ -12,7 +12,6 @@
     "verdicts_used",
     "counterhypotheses_considered",
     "forbidden_upgrades_check",
-    "banned_phrases_self_scan",
     "source_cluster_audit",
     "refusal_check",
     "external_research",
@@ -159,6 +158,8 @@
       }
     },
     "banned_phrases_self_scan": {
+      "description": "Deprecated compatibility field for historical receipts; ignored by validation. Omit from new receipts.",
+      "deprecated": true,
       "type": "object",
       "required": ["scanned", "hits"],
       "additionalProperties": false,
