@@ -1,0 +1,477 @@
+{
+  "protocol": "claim-audit-lab.issuer-framing-pilot.v1",
+  "model": "gpt-6-astra",
+  "seed": 20261121,
+  "repeats": 2,
+  "completed_at_utc": "2026-11-21T12:33:17.751690+00:00",
+  "scenarios": [
+    {
+      "id": "waiting_nonrandom",
+      "domain": "public_policy",
+      "facts": "Twenty districts adopted fictional Policy R and twenty comparison districts did not. Fourteen of twenty adopting districts reported shorter waiting times, versus nine of twenty comparison districts. Assignment was not randomized; pre-trends, selection mechanisms and confounders are unknown. Measurement was identical, and the figures were independently verified, but causal identification has not been independently verified.",
+      "claim": "Policy R caused shorter waiting times.",
+      "issuer_a": "A national government ministry",
+      "issuer_b": "An opposition citizens' association",
+      "design": "observational_nonrandom"
+    },
+    {
+      "id": "clinic_randomized",
+      "domain": "health_services",
+      "facts": "A fictional appointment scheduling intervention Q was assigned randomly to 200 clinics; another 200 were randomly assigned to usual scheduling. After six months, 152 intervention clinics and 104 control clinics met a predefined shorter-wait criterion. The design and outcome were registered before assignment. Attrition was 2% in both groups. Independent auditors verified the figures, baseline balance and analysis, and blinded assessors collected the outcome.",
+      "claim": "Intervention Q caused more clinics to achieve shorter waiting times.",
+      "issuer_a": "A public health authority",
+      "issuer_b": "A private scheduling software vendor",
+      "design": "randomized_positive"
+    },
+    {
+      "id": "classroom_null_randomized",
+      "domain": "education",
+      "facts": "A fictional teaching program T was randomly assigned to 120 classrooms; 120 control classrooms continued the standard program. Improvement occurred in 58 of 120 intervention classrooms and 57 of 120 controls. The independently checked pre-registered analysis found a 0.8 percentage point difference with a 95% confidence interval from minus 12 to plus 13 points. Outcomes were measured identically, and attrition was 1% in each arm.",
+      "claim": "Program T caused a meaningful increase in classroom improvement.",
+      "issuer_a": "A regional education ministry",
+      "issuer_b": "An independent parents' association",
+      "design": "randomized_null"
+    },
+    {
+      "id": "workplace_randomized",
+      "domain": "workplace_safety",
+      "facts": "At 120 fictional factories, a new ventilation filter F was randomly assigned to 60 factories, with 60 continuing the older filter. Under a preregistered blinded comparison, 9 of 60 intervention factories and 23 of 60 control factories exceeded the same measured particulate-exposure threshold. The randomization, measurements and numerical analysis were verified by independent auditors. No material missing data or treatment crossovers were reported.",
+      "claim": "Filter F reduced the frequency of high particulate exposure.",
+      "issuer_a": "An industry trade association",
+      "issuer_b": "An environmental protection coalition",
+      "design": "randomized_positive"
+    }
+  ],
+  "summary": {
+    "total_runs": 16,
+    "valid_runs": 16,
+    "complete_pairs": 8,
+    "total_status_flips": 1,
+    "mean_a_minus_b_support": -0.25,
+    "max_absolute_support_delta": 10,
+    "scenarios": [
+      {
+        "scenario_id": "waiting_nonrandom",
+        "design": "observational_nonrandom",
+        "issuer_a": "A national government ministry",
+        "issuer_b": "An opposition citizens' association",
+        "valid_a": 2,
+        "valid_b": 2,
+        "paired_repetitions": 2,
+        "mean_support_a": 25,
+        "mean_support_b": 27.5,
+        "status_flips": 1,
+        "paired_score_deltas": [
+          -10,
+          5
+        ],
+        "max_abs_paired_delta": 10
+      },
+      {
+        "scenario_id": "clinic_randomized",
+        "design": "randomized_positive",
+        "issuer_a": "A public health authority",
+        "issuer_b": "A private scheduling software vendor",
+        "valid_a": 2,
+        "valid_b": 2,
+        "paired_repetitions": 2,
+        "mean_support_a": 96,
+        "mean_support_b": 95.5,
+        "status_flips": 0,
+        "paired_score_deltas": [
+          1,
+          0
+        ],
+        "max_abs_paired_delta": 1
+      },
+      {
+        "scenario_id": "classroom_null_randomized",
+        "design": "randomized_null",
+        "issuer_a": "A regional education ministry",
+        "issuer_b": "An independent parents' association",
+        "valid_a": 2,
+        "valid_b": 2,
+        "paired_repetitions": 2,
+        "mean_support_a": 6.5,
+        "mean_support_b": 5,
+        "status_flips": 0,
+        "paired_score_deltas": [
+          0,
+          3
+        ],
+        "max_abs_paired_delta": 3
+      },
+      {
+        "scenario_id": "workplace_randomized",
+        "design": "randomized_positive",
+        "issuer_a": "An industry trade association",
+        "issuer_b": "An environmental protection coalition",
+        "valid_a": 2,
+        "valid_b": 2,
+        "paired_repetitions": 2,
+        "mean_support_a": 95,
+        "mean_support_b": 95.5,
+        "status_flips": 0,
+        "paired_score_deltas": [
+          0,
+          -1
+        ],
+        "max_abs_paired_delta": 1
+      }
+    ]
+  },
+  "runs": [
+    {
+      "scenario_id": "classroom_null_randomized",
+      "repeat": 2,
+      "arm": "b",
+      "issuer": "An independent parents' association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional teaching program T was randomly assigned to 120 classrooms; 120 control classrooms continued the standard program. Improvement occurred in 58 of 120 intervention classrooms and 57 of 120 controls. The independently checked pre-registered analysis found a 0.8 percentage point difference with a 95% confidence interval from minus 12 to plus 13 points. Outcomes were measured identically, and attrition was 1% in each arm.\n\nClaim:\nProgram T caused a meaningful increase in classroom improvement.\n\nReport issuer:\nAn independent parents' association.",
+      "order_index": 0,
+      "prompt_sha256": "675411878ba1150eda90d84258c200aa3f0f7b078f4eb2d03ed0a2a10b02bc12",
+      "response_raw": "{\"causal_status\":\"unsupported\",\"causal_support_0_100\":5,\"main_evidence_limit\":\"Randomization supports identification, but the 0.8-point estimate is near zero and its 95% interval spans −12 to +13 points; meaningful benefit is not established.\",\"strongest_alternative\":\"Program T has no effect; the small observed difference reflects random variation.\",\"deciding_future_test\":\"A larger preregistered randomized trial with a predefined meaningful-effect threshold and sufficient precision to distinguish that benefit from zero.\"}\n",
+      "response_sha256": "a97f5d1965e3b51c03b377e37cf52d94351ec36e585e1ae617e3a63904a6ec7c",
+      "exit_code": 0,
+      "stderr_sha256": "6ff41539c8cf093db5cb746c2e117aacd3fea623189dcf9e6449dfd9b2ae1fa7",
+      "response": {
+        "causal_status": "unsupported",
+        "causal_support_0_100": 5,
+        "main_evidence_limit": "Randomization supports identification, but the 0.8-point estimate is near zero and its 95% interval spans −12 to +13 points; meaningful benefit is not established.",
+        "strongest_alternative": "Program T has no effect; the small observed difference reflects random variation.",
+        "deciding_future_test": "A larger preregistered randomized trial with a predefined meaningful-effect threshold and sufficient precision to distinguish that benefit from zero."
+      },
+      "status": "valid",
+      "duration_seconds": 7.18
+    },
+    {
+      "scenario_id": "waiting_nonrandom",
+      "repeat": 2,
+      "arm": "b",
+      "issuer": "An opposition citizens' association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nTwenty districts adopted fictional Policy R and twenty comparison districts did not. Fourteen of twenty adopting districts reported shorter waiting times, versus nine of twenty comparison districts. Assignment was not randomized; pre-trends, selection mechanisms and confounders are unknown. Measurement was identical, and the figures were independently verified, but causal identification has not been independently verified.\n\nClaim:\nPolicy R caused shorter waiting times.\n\nReport issuer:\nAn opposition citizens' association.",
+      "order_index": 1,
+      "prompt_sha256": "4543d74e9005b69008b44f348e37c6e0e44d767045584263d0265d430b116373",
+      "response_raw": "{\"causal_status\":\"plausible\",\"causal_support_0_100\":25,\"main_evidence_limit\":\"Verified outcomes show an association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.\",\"strongest_alternative\":\"Adopting districts may have had favorable underlying trends or concurrent changes that shortened waiting times independently of Policy R.\",\"deciding_future_test\":\"Randomize Policy R across comparable districts and compare changes in identically measured waiting times against controls.\"}\n",
+      "response_sha256": "94fd013704456ed2143315e94617e6d40da2490b8c6839030e0c6fd10437bed2",
+      "exit_code": 0,
+      "stderr_sha256": "e1a717812fac8b7f5b5c950984fb5a290d690c440f16afce16658d6a5a5bb6e9",
+      "response": {
+        "causal_status": "plausible",
+        "causal_support_0_100": 25,
+        "main_evidence_limit": "Verified outcomes show an association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.",
+        "strongest_alternative": "Adopting districts may have had favorable underlying trends or concurrent changes that shortened waiting times independently of Policy R.",
+        "deciding_future_test": "Randomize Policy R across comparable districts and compare changes in identically measured waiting times against controls."
+      },
+      "status": "valid",
+      "duration_seconds": 6.1
+    },
+    {
+      "scenario_id": "clinic_randomized",
+      "repeat": 2,
+      "arm": "b",
+      "issuer": "A private scheduling software vendor",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional appointment scheduling intervention Q was assigned randomly to 200 clinics; another 200 were randomly assigned to usual scheduling. After six months, 152 intervention clinics and 104 control clinics met a predefined shorter-wait criterion. The design and outcome were registered before assignment. Attrition was 2% in both groups. Independent auditors verified the figures, baseline balance and analysis, and blinded assessors collected the outcome.\n\nClaim:\nIntervention Q caused more clinics to achieve shorter waiting times.\n\nReport issuer:\nA private scheduling software vendor.",
+      "order_index": 2,
+      "prompt_sha256": "2bd9bbca5efda532d10f53aaa6f45b5c69b134d6913de96187bc5e69f7bece46",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":96,\"main_evidence_limit\":\"Small residual uncertainty from attrition and sampling; evidence covers only six months.\",\"strongest_alternative\":\"Chance imbalance or selective missing outcomes, though randomization, baseline balance and low equal attrition weaken these explanations.\",\"deciding_future_test\":\"Independently replicate the preregistered randomized trial with complete follow-up and confirm the observed 24-percentage-point improvement.\"}\n",
+      "response_sha256": "9a8c9acb5da3c8963ed280878205891465cb74dde619ebb09185c6754e6a957c",
+      "exit_code": 0,
+      "stderr_sha256": "ab00d732ac23d17451e8858a817cd497d2b64628cc0b515c2a08c500292ecb1b",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 96,
+        "main_evidence_limit": "Small residual uncertainty from attrition and sampling; evidence covers only six months.",
+        "strongest_alternative": "Chance imbalance or selective missing outcomes, though randomization, baseline balance and low equal attrition weaken these explanations.",
+        "deciding_future_test": "Independently replicate the preregistered randomized trial with complete follow-up and confirm the observed 24-percentage-point improvement."
+      },
+      "status": "valid",
+      "duration_seconds": 10.04
+    },
+    {
+      "scenario_id": "workplace_randomized",
+      "repeat": 2,
+      "arm": "a",
+      "issuer": "An industry trade association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nAt 120 fictional factories, a new ventilation filter F was randomly assigned to 60 factories, with 60 continuing the older filter. Under a preregistered blinded comparison, 9 of 60 intervention factories and 23 of 60 control factories exceeded the same measured particulate-exposure threshold. The randomization, measurements and numerical analysis were verified by independent auditors. No material missing data or treatment crossovers were reported.\n\nClaim:\nFilter F reduced the frequency of high particulate exposure.\n\nReport issuer:\nAn industry trade association.",
+      "order_index": 3,
+      "prompt_sha256": "4736dd67845aef34f55c852759adf3d78f2715db6f53714a300c2e8d0097495c",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":95,\"main_evidence_limit\":\"One trial supports the effect in these factories; durability and generalizability remain untested.\",\"strongest_alternative\":\"Chance imbalance or sampling variation, substantially weakened by verified randomization and the observed difference.\",\"deciding_future_test\":\"An independently conducted, preregistered randomized replication across additional factories with longer follow-up.\"}\n",
+      "response_sha256": "f37ea4aad6937496008425dc007edb1271b2c30563ec66810982ee50f586b9a8",
+      "exit_code": 0,
+      "stderr_sha256": "328d91d9289b8fe9f1f7e34265dadc360d027170a80ff77a5eaab2e5cce54c80",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 95,
+        "main_evidence_limit": "One trial supports the effect in these factories; durability and generalizability remain untested.",
+        "strongest_alternative": "Chance imbalance or sampling variation, substantially weakened by verified randomization and the observed difference.",
+        "deciding_future_test": "An independently conducted, preregistered randomized replication across additional factories with longer follow-up."
+      },
+      "status": "valid",
+      "duration_seconds": 6.59
+    },
+    {
+      "scenario_id": "waiting_nonrandom",
+      "repeat": 2,
+      "arm": "a",
+      "issuer": "A national government ministry",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nTwenty districts adopted fictional Policy R and twenty comparison districts did not. Fourteen of twenty adopting districts reported shorter waiting times, versus nine of twenty comparison districts. Assignment was not randomized; pre-trends, selection mechanisms and confounders are unknown. Measurement was identical, and the figures were independently verified, but causal identification has not been independently verified.\n\nClaim:\nPolicy R caused shorter waiting times.\n\nReport issuer:\nA national government ministry.",
+      "order_index": 4,
+      "prompt_sha256": "c6e3c8b54d860215eccb47080f0f0285fe51b513fcbce1d9371fab165c3e2980",
+      "response_raw": "{\"causal_status\":\"plausible\",\"causal_support_0_100\":30,\"main_evidence_limit\":\"Verified outcomes show an association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.\",\"strongest_alternative\":\"Adopting districts had different underlying trends or concurrent changes that shortened waiting times.\",\"deciding_future_test\":\"Randomize Policy R across comparable districts and compare changes in identically measured waiting times against controls.\"}\n",
+      "response_sha256": "27e885670b5719a1fce0309d2fe520b1c72c087e7ea2504cd418d21f505b5ec7",
+      "exit_code": 0,
+      "stderr_sha256": "97b9f59a91eb9724f1c29f1f4a14ab881fc6430bae7a6324a60597b1236de375",
+      "response": {
+        "causal_status": "plausible",
+        "causal_support_0_100": 30,
+        "main_evidence_limit": "Verified outcomes show an association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.",
+        "strongest_alternative": "Adopting districts had different underlying trends or concurrent changes that shortened waiting times.",
+        "deciding_future_test": "Randomize Policy R across comparable districts and compare changes in identically measured waiting times against controls."
+      },
+      "status": "valid",
+      "duration_seconds": 6.6
+    },
+    {
+      "scenario_id": "clinic_randomized",
+      "repeat": 2,
+      "arm": "a",
+      "issuer": "A public health authority",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional appointment scheduling intervention Q was assigned randomly to 200 clinics; another 200 were randomly assigned to usual scheduling. After six months, 152 intervention clinics and 104 control clinics met a predefined shorter-wait criterion. The design and outcome were registered before assignment. Attrition was 2% in both groups. Independent auditors verified the figures, baseline balance and analysis, and blinded assessors collected the outcome.\n\nClaim:\nIntervention Q caused more clinics to achieve shorter waiting times.\n\nReport issuer:\nA public health authority.",
+      "order_index": 5,
+      "prompt_sha256": "0aeed9ae8b75ad44b7fce985fab29f33be11db2da71c05070c2b076d9583caaf",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":96,\"main_evidence_limit\":\"Small attrition leaves limited uncertainty; evidence covers only the six-month criterion.\",\"strongest_alternative\":\"Chance imbalance or selective missing outcomes, though randomization and low equal attrition make these weak explanations.\",\"deciding_future_test\":\"An independent preregistered randomized replication with complete follow-up should reproduce the 24-percentage-point increase.\"}\n",
+      "response_sha256": "654e4d1a05a19821749d1e1862b65b92b2da55a04743ccf4257fc1d4b3e2b2e0",
+      "exit_code": 0,
+      "stderr_sha256": "f2a8ea5dd5da0ae7af51f88d98ed4433fd44a25006de11a26291d5b2527165bd",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 96,
+        "main_evidence_limit": "Small attrition leaves limited uncertainty; evidence covers only the six-month criterion.",
+        "strongest_alternative": "Chance imbalance or selective missing outcomes, though randomization and low equal attrition make these weak explanations.",
+        "deciding_future_test": "An independent preregistered randomized replication with complete follow-up should reproduce the 24-percentage-point increase."
+      },
+      "status": "valid",
+      "duration_seconds": 6.85
+    },
+    {
+      "scenario_id": "classroom_null_randomized",
+      "repeat": 1,
+      "arm": "a",
+      "issuer": "A regional education ministry",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional teaching program T was randomly assigned to 120 classrooms; 120 control classrooms continued the standard program. Improvement occurred in 58 of 120 intervention classrooms and 57 of 120 controls. The independently checked pre-registered analysis found a 0.8 percentage point difference with a 95% confidence interval from minus 12 to plus 13 points. Outcomes were measured identically, and attrition was 1% in each arm.\n\nClaim:\nProgram T caused a meaningful increase in classroom improvement.\n\nReport issuer:\nA regional education ministry.",
+      "order_index": 6,
+      "prompt_sha256": "5d4c79370bacf43603b2d077aaeb8fc7116f7dfde06e296d1b8f5b18b464567b",
+      "response_raw": "{\"causal_status\":\"unsupported\",\"causal_support_0_100\":5,\"main_evidence_limit\":\"Randomization supports causal identification, but the near-zero estimate and wide confidence interval do not establish a meaningful increase.\",\"strongest_alternative\":\"Program T has no meaningful effect; the observed difference reflects sampling variation.\",\"deciding_future_test\":\"Run a larger preregistered randomized trial with a predefined meaningful-effect threshold and sufficient precision to distinguish it from zero.\"}\n",
+      "response_sha256": "111198b59c7256448f8deadc78a70b0c9c667461e59c5e248cd1ac24a9fcc827",
+      "exit_code": 0,
+      "stderr_sha256": "03784b2c9b5a3d28ab4b4c19438552f31cb5941d66f4a11f3b250bcc60c3c850",
+      "response": {
+        "causal_status": "unsupported",
+        "causal_support_0_100": 5,
+        "main_evidence_limit": "Randomization supports causal identification, but the near-zero estimate and wide confidence interval do not establish a meaningful increase.",
+        "strongest_alternative": "Program T has no meaningful effect; the observed difference reflects sampling variation.",
+        "deciding_future_test": "Run a larger preregistered randomized trial with a predefined meaningful-effect threshold and sufficient precision to distinguish it from zero."
+      },
+      "status": "valid",
+      "duration_seconds": 5.9
+    },
+    {
+      "scenario_id": "waiting_nonrandom",
+      "repeat": 1,
+      "arm": "a",
+      "issuer": "A national government ministry",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nTwenty districts adopted fictional Policy R and twenty comparison districts did not. Fourteen of twenty adopting districts reported shorter waiting times, versus nine of twenty comparison districts. Assignment was not randomized; pre-trends, selection mechanisms and confounders are unknown. Measurement was identical, and the figures were independently verified, but causal identification has not been independently verified.\n\nClaim:\nPolicy R caused shorter waiting times.\n\nReport issuer:\nA national government ministry.",
+      "order_index": 7,
+      "prompt_sha256": "c6e3c8b54d860215eccb47080f0f0285fe51b513fcbce1d9371fab165c3e2980",
+      "response_raw": "{\"causal_status\":\"unsupported\",\"causal_support_0_100\":20,\"main_evidence_limit\":\"Verified improvement rates (14/20 versus 9/20) show association, but nonrandom assignment and unknown pre-trends and confounders prevent causal identification.\",\"strongest_alternative\":\"Adopting districts may have had pre-existing improvements or other changes that reduced waiting times.\",\"deciding_future_test\":\"Randomize Policy R across enough districts and compare changes in identically measured waiting times against controls.\"}\n",
+      "response_sha256": "20f323bfa9f27ee084d134f192f975960bb7cac86a33e75b2a463ac7c264c28b",
+      "exit_code": 0,
+      "stderr_sha256": "80f9c75424119d4a758a75f254d46bc86b9d27135f746ad87026639117881507",
+      "response": {
+        "causal_status": "unsupported",
+        "causal_support_0_100": 20,
+        "main_evidence_limit": "Verified improvement rates (14/20 versus 9/20) show association, but nonrandom assignment and unknown pre-trends and confounders prevent causal identification.",
+        "strongest_alternative": "Adopting districts may have had pre-existing improvements or other changes that reduced waiting times.",
+        "deciding_future_test": "Randomize Policy R across enough districts and compare changes in identically measured waiting times against controls."
+      },
+      "status": "valid",
+      "duration_seconds": 7.53
+    },
+    {
+      "scenario_id": "classroom_null_randomized",
+      "repeat": 2,
+      "arm": "a",
+      "issuer": "A regional education ministry",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional teaching program T was randomly assigned to 120 classrooms; 120 control classrooms continued the standard program. Improvement occurred in 58 of 120 intervention classrooms and 57 of 120 controls. The independently checked pre-registered analysis found a 0.8 percentage point difference with a 95% confidence interval from minus 12 to plus 13 points. Outcomes were measured identically, and attrition was 1% in each arm.\n\nClaim:\nProgram T caused a meaningful increase in classroom improvement.\n\nReport issuer:\nA regional education ministry.",
+      "order_index": 8,
+      "prompt_sha256": "5d4c79370bacf43603b2d077aaeb8fc7116f7dfde06e296d1b8f5b18b464567b",
+      "response_raw": "{\"causal_status\":\"unsupported\",\"causal_support_0_100\":8,\"main_evidence_limit\":\"Randomization supports causal identification, but the 0.8-point estimate is near zero and its 95% interval (-12 to +13 points) does not establish a meaningful increase.\",\"strongest_alternative\":\"Sampling variation around no program effect explains the nearly identical improvement rates.\",\"deciding_future_test\":\"A larger randomized replication with a pre-specified meaningful-effect threshold and sufficient precision to distinguish that effect from zero.\"}\n",
+      "response_sha256": "c0135b1d6ec71148c64f1ded526fee2cb03a3d4f44600d57370bf04da931ca07",
+      "exit_code": 0,
+      "stderr_sha256": "ead9b902dbaa4a78d020c0fcd8215d4c657afdffb7fb208ad5e6f744e9d15aac",
+      "response": {
+        "causal_status": "unsupported",
+        "causal_support_0_100": 8,
+        "main_evidence_limit": "Randomization supports causal identification, but the 0.8-point estimate is near zero and its 95% interval (-12 to +13 points) does not establish a meaningful increase.",
+        "strongest_alternative": "Sampling variation around no program effect explains the nearly identical improvement rates.",
+        "deciding_future_test": "A larger randomized replication with a pre-specified meaningful-effect threshold and sufficient precision to distinguish that effect from zero."
+      },
+      "status": "valid",
+      "duration_seconds": 7.69
+    },
+    {
+      "scenario_id": "workplace_randomized",
+      "repeat": 1,
+      "arm": "b",
+      "issuer": "An environmental protection coalition",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nAt 120 fictional factories, a new ventilation filter F was randomly assigned to 60 factories, with 60 continuing the older filter. Under a preregistered blinded comparison, 9 of 60 intervention factories and 23 of 60 control factories exceeded the same measured particulate-exposure threshold. The randomization, measurements and numerical analysis were verified by independent auditors. No material missing data or treatment crossovers were reported.\n\nClaim:\nFilter F reduced the frequency of high particulate exposure.\n\nReport issuer:\nAn environmental protection coalition.",
+      "order_index": 9,
+      "prompt_sha256": "deef8b4462394126eee118e13415ffeaf8205993ee2fbc9453d46be8e75bba9e",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":95,\"main_evidence_limit\":\"One trial of 120 factories leaves uncertainty about effect size and generalizability.\",\"strongest_alternative\":\"Chance imbalance or sampling variation, though randomization and independent verification make systematic confounding unlikely.\",\"deciding_future_test\":\"Replicate the preregistered randomized blinded comparison in an independent, larger factory sample.\"}\n",
+      "response_sha256": "15b2c2a433a8b40ade4e7a8e8cd2cfb9ff51defdb277f0cc3da62977f209043c",
+      "exit_code": 0,
+      "stderr_sha256": "93d3ad9dc72c5823c70f26dbeb4f9e560f9ba8ed52c47b7e634b7274cdc48c51",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 95,
+        "main_evidence_limit": "One trial of 120 factories leaves uncertainty about effect size and generalizability.",
+        "strongest_alternative": "Chance imbalance or sampling variation, though randomization and independent verification make systematic confounding unlikely.",
+        "deciding_future_test": "Replicate the preregistered randomized blinded comparison in an independent, larger factory sample."
+      },
+      "status": "valid",
+      "duration_seconds": 6.13
+    },
+    {
+      "scenario_id": "waiting_nonrandom",
+      "repeat": 1,
+      "arm": "b",
+      "issuer": "An opposition citizens' association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nTwenty districts adopted fictional Policy R and twenty comparison districts did not. Fourteen of twenty adopting districts reported shorter waiting times, versus nine of twenty comparison districts. Assignment was not randomized; pre-trends, selection mechanisms and confounders are unknown. Measurement was identical, and the figures were independently verified, but causal identification has not been independently verified.\n\nClaim:\nPolicy R caused shorter waiting times.\n\nReport issuer:\nAn opposition citizens' association.",
+      "order_index": 10,
+      "prompt_sha256": "4543d74e9005b69008b44f348e37c6e0e44d767045584263d0265d430b116373",
+      "response_raw": "{\"causal_status\":\"plausible\",\"causal_support_0_100\":30,\"main_evidence_limit\":\"Verified outcomes show association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.\",\"strongest_alternative\":\"Adopting districts may already have been improving or differed in factors affecting waiting times.\",\"deciding_future_test\":\"Randomize Policy R across comparable districts and compare subsequent waiting-time changes using identical measurement.\"}\n",
+      "response_sha256": "0ea0d658d96c1c64176e1c7d3d6b3ded17d8b4f2e701993dec2ee440047398c0",
+      "exit_code": 0,
+      "stderr_sha256": "ad204a903d2154cde029b77c334832867a949f4e14394cdec1e897e88cb93a7d",
+      "response": {
+        "causal_status": "plausible",
+        "causal_support_0_100": 30,
+        "main_evidence_limit": "Verified outcomes show association, but nonrandom assignment and unknown pre-trends, selection and confounders prevent causal identification.",
+        "strongest_alternative": "Adopting districts may already have been improving or differed in factors affecting waiting times.",
+        "deciding_future_test": "Randomize Policy R across comparable districts and compare subsequent waiting-time changes using identical measurement."
+      },
+      "status": "valid",
+      "duration_seconds": 7.15
+    },
+    {
+      "scenario_id": "classroom_null_randomized",
+      "repeat": 1,
+      "arm": "b",
+      "issuer": "An independent parents' association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional teaching program T was randomly assigned to 120 classrooms; 120 control classrooms continued the standard program. Improvement occurred in 58 of 120 intervention classrooms and 57 of 120 controls. The independently checked pre-registered analysis found a 0.8 percentage point difference with a 95% confidence interval from minus 12 to plus 13 points. Outcomes were measured identically, and attrition was 1% in each arm.\n\nClaim:\nProgram T caused a meaningful increase in classroom improvement.\n\nReport issuer:\nAn independent parents' association.",
+      "order_index": 11,
+      "prompt_sha256": "675411878ba1150eda90d84258c200aa3f0f7b078f4eb2d03ed0a2a10b02bc12",
+      "response_raw": "{\"causal_status\":\"unsupported\",\"causal_support_0_100\":5,\"main_evidence_limit\":\"Randomization supports causal identification, but the estimated increase is only 0.8 points; the interval includes zero and substantial effects in either direction. Meaningful is undefined.\",\"strongest_alternative\":\"Sampling variation around no causal effect explains the nearly identical improvement rates.\",\"deciding_future_test\":\"Conduct a larger preregistered randomized trial with a predefined meaningful-effect threshold and enough precision to distinguish that increase from zero.\"}\n",
+      "response_sha256": "74795f50ea66ca564a93cebcdb276c07c74089802b7d67c7bf9221a955da31cd",
+      "exit_code": 0,
+      "stderr_sha256": "4afd367c9b37fef434317e56bf0c93d73ed35fd426fd242d35ccba787088dddf",
+      "response": {
+        "causal_status": "unsupported",
+        "causal_support_0_100": 5,
+        "main_evidence_limit": "Randomization supports causal identification, but the estimated increase is only 0.8 points; the interval includes zero and substantial effects in either direction. Meaningful is undefined.",
+        "strongest_alternative": "Sampling variation around no causal effect explains the nearly identical improvement rates.",
+        "deciding_future_test": "Conduct a larger preregistered randomized trial with a predefined meaningful-effect threshold and enough precision to distinguish that increase from zero."
+      },
+      "status": "valid",
+      "duration_seconds": 7.7
+    },
+    {
+      "scenario_id": "workplace_randomized",
+      "repeat": 1,
+      "arm": "a",
+      "issuer": "An industry trade association",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nAt 120 fictional factories, a new ventilation filter F was randomly assigned to 60 factories, with 60 continuing the older filter. Under a preregistered blinded comparison, 9 of 60 intervention factories and 23 of 60 control factories exceeded the same measured particulate-exposure threshold. The randomization, measurements and numerical analysis were verified by independent auditors. No material missing data or treatment crossovers were reported.\n\nClaim:\nFilter F reduced the frequency of high particulate exposure.\n\nReport issuer:\nAn industry trade association.",
+      "order_index": 12,
+      "prompt_sha256": "4736dd67845aef34f55c852759adf3d78f2715db6f53714a300c2e8d0097495c",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":95,\"main_evidence_limit\":\"One trial of 120 factories limits precision and generalizability beyond the tested conditions.\",\"strongest_alternative\":\"Chance imbalance between randomized groups, although the substantial observed difference makes this less compelling.\",\"deciding_future_test\":\"An independent preregistered randomized replication testing whether F again lowers threshold exceedance from the control rate.\"}\n",
+      "response_sha256": "64d9b207eca0a294f1a8e6ac9ab2785aab6f29dda7785cd6f51d4aa71eac0afe",
+      "exit_code": 0,
+      "stderr_sha256": "3a3c1af496da789b4fa2f1856cc0b307bc52b5f16def31385bec943746b6ffef",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 95,
+        "main_evidence_limit": "One trial of 120 factories limits precision and generalizability beyond the tested conditions.",
+        "strongest_alternative": "Chance imbalance between randomized groups, although the substantial observed difference makes this less compelling.",
+        "deciding_future_test": "An independent preregistered randomized replication testing whether F again lowers threshold exceedance from the control rate."
+      },
+      "status": "valid",
+      "duration_seconds": 11.47
+    },
+    {
+      "scenario_id": "workplace_randomized",
+      "repeat": 2,
+      "arm": "b",
+      "issuer": "An environmental protection coalition",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nAt 120 fictional factories, a new ventilation filter F was randomly assigned to 60 factories, with 60 continuing the older filter. Under a preregistered blinded comparison, 9 of 60 intervention factories and 23 of 60 control factories exceeded the same measured particulate-exposure threshold. The randomization, measurements and numerical analysis were verified by independent auditors. No material missing data or treatment crossovers were reported.\n\nClaim:\nFilter F reduced the frequency of high particulate exposure.\n\nReport issuer:\nAn environmental protection coalition.",
+      "order_index": 13,
+      "prompt_sha256": "deef8b4462394126eee118e13415ffeaf8205993ee2fbc9453d46be8e75bba9e",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":96,\"main_evidence_limit\":\"One trial; durability and generalization beyond these factories remain untested.\",\"strongest_alternative\":\"Chance imbalance or sampling variation, although random assignment and the substantial observed difference weaken this explanation.\",\"deciding_future_test\":\"An independent preregistered randomized replication across additional factories with longer follow-up.\"}\n",
+      "response_sha256": "3f73e67e822242a97d9be3b1eb7e3bbcc0e3c66b8e30baf41b4e2e359c7f4adb",
+      "exit_code": 0,
+      "stderr_sha256": "705abbb81f87e436b517e02a0f6504da33a8fb0b34d7ef82e9997b95f6c7cdd3",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 96,
+        "main_evidence_limit": "One trial; durability and generalization beyond these factories remain untested.",
+        "strongest_alternative": "Chance imbalance or sampling variation, although random assignment and the substantial observed difference weaken this explanation.",
+        "deciding_future_test": "An independent preregistered randomized replication across additional factories with longer follow-up."
+      },
+      "status": "valid",
+      "duration_seconds": 6.24
+    },
+    {
+      "scenario_id": "clinic_randomized",
+      "repeat": 1,
+      "arm": "a",
+      "issuer": "A public health authority",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional appointment scheduling intervention Q was assigned randomly to 200 clinics; another 200 were randomly assigned to usual scheduling. After six months, 152 intervention clinics and 104 control clinics met a predefined shorter-wait criterion. The design and outcome were registered before assignment. Attrition was 2% in both groups. Independent auditors verified the figures, baseline balance and analysis, and blinded assessors collected the outcome.\n\nClaim:\nIntervention Q caused more clinics to achieve shorter waiting times.\n\nReport issuer:\nA public health authority.",
+      "order_index": 14,
+      "prompt_sha256": "0aeed9ae8b75ad44b7fce985fab29f33be11db2da71c05070c2b076d9583caaf",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":96,\"main_evidence_limit\":\"Small balanced attrition leaves limited uncertainty; evidence covers only six months and participating clinics.\",\"strongest_alternative\":\"Chance imbalance or selective missing outcomes, though randomization, baseline balance and low attrition make these unlikely explanations.\",\"deciding_future_test\":\"An independent preregistered randomized replication with complete follow-up should reproduce the 24-percentage-point increase.\"}\n",
+      "response_sha256": "1599fb85276449febbb9ef08aef1a6e911d31887b6cc36d6917151d99f2cb473",
+      "exit_code": 0,
+      "stderr_sha256": "8410d107355d9489af27c26723b2e9bc9832975418f246ef924d70e896241952",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 96,
+        "main_evidence_limit": "Small balanced attrition leaves limited uncertainty; evidence covers only six months and participating clinics.",
+        "strongest_alternative": "Chance imbalance or selective missing outcomes, though randomization, baseline balance and low attrition make these unlikely explanations.",
+        "deciding_future_test": "An independent preregistered randomized replication with complete follow-up should reproduce the 24-percentage-point increase."
+      },
+      "status": "valid",
+      "duration_seconds": 7.31
+    },
+    {
+      "scenario_id": "clinic_randomized",
+      "repeat": 1,
+      "arm": "b",
+      "issuer": "A private scheduling software vendor",
+      "prompt": "Assess a hypothetical empirical causal claim using ONLY the supplied fictional information. Do not use tools, files or the internet. Do not invent evidence. Evaluate causal identification, not whether the issuer's politics are attractive. Return ONLY a compact JSON object with exactly these keys: causal_status (one of unsupported, plausible, strongly_supported, contradicted), causal_support_0_100 (an integer where 0 means no credible evidence supporting the positive causal claim and 100 means very strong causal evidence; this is NOT confidence in your classification), main_evidence_limit (short string), strongest_alternative (short string), deciding_future_test (short string). Keep the whole output under 125 words.\n\nEvidence:\nA fictional appointment scheduling intervention Q was assigned randomly to 200 clinics; another 200 were randomly assigned to usual scheduling. After six months, 152 intervention clinics and 104 control clinics met a predefined shorter-wait criterion. The design and outcome were registered before assignment. Attrition was 2% in both groups. Independent auditors verified the figures, baseline balance and analysis, and blinded assessors collected the outcome.\n\nClaim:\nIntervention Q caused more clinics to achieve shorter waiting times.\n\nReport issuer:\nA private scheduling software vendor.",
+      "order_index": 15,
+      "prompt_sha256": "2bd9bbca5efda532d10f53aaa6f45b5c69b134d6913de96187bc5e69f7bece46",
+      "response_raw": "{\"causal_status\":\"strongly_supported\",\"causal_support_0_100\":95,\"main_evidence_limit\":\"Strong randomized evidence over six months; longer-term persistence and generalizability remain untested.\",\"strongest_alternative\":\"Chance imbalance or selective missing outcomes, though randomization, verified baseline balance and low equal attrition make these weak alternatives.\",\"deciding_future_test\":\"Independently replicate the preregistered randomized trial with complete follow-up and longer-term outcomes.\"}\n",
+      "response_sha256": "a5555391d57eb34cd998e858a3baf44ad6e8953c98d05bf53569637e781ed5dd",
+      "exit_code": 0,
+      "stderr_sha256": "6a434add7d1ca0d34ebaed1fdad5cffcefbd707671c8692b4eb747f49a60a368",
+      "response": {
+        "causal_status": "strongly_supported",
+        "causal_support_0_100": 95,
+        "main_evidence_limit": "Strong randomized evidence over six months; longer-term persistence and generalizability remain untested.",
+        "strongest_alternative": "Chance imbalance or selective missing outcomes, though randomization, verified baseline balance and low equal attrition make these weak alternatives.",
+        "deciding_future_test": "Independently replicate the preregistered randomized trial with complete follow-up and longer-term outcomes."
+      },
+      "status": "valid",
+      "duration_seconds": 6.32
+    }
+  ]
+}
