@@ -15,7 +15,6 @@ validate:
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_no_fixture_language.py cases
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_mechanical_migration_discipline.py cases
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_claims.py cases
-	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_absence_language_scope.py cases
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_comparative_claim_profile.py cases
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_sources.py cases
 	$(PYTHONPATH_ENV) $(PYTHON) scripts/validate_reported_claim_world_effect.py cases
