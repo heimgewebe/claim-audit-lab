@@ -100,6 +100,7 @@ or `counterhypothesis_understeelman` from words in prose.
 An unsubstantiated strong claim can still be rhetorically misleading without
 a mechanical signal. Structural validation is not a substitute for independent
 substantive review.
+
 ## Validator gate
 
 `scripts/validate_bias_response.py` runs in two modes, keyed off `lifecycle.yml`

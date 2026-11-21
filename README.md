@@ -65,7 +65,8 @@ MVP 0.1-alpha validiert derzeit:
 Die verbliebenen Validatoren prüfen strukturierte Evidenz, Referenzen und
 Deklarationen. Sie schließen weder rhetorische Manipulation noch falsche
 Schlussfolgerungen aus. Wortlisten, Negationsheuristiken und Stilverbote
-sind keine Qualitäts- oder Neutralitätsnachweise.\nAuch Bias-Signale beruhen jetzt auf strukturierten Befunden; Wörter in Assessment-Prosa lösen kein Finalisierungsgate aus.
+sind keine Qualitäts- oder Neutralitätsnachweise.
+Auch Bias-Signale beruhen jetzt auf strukturierten Befunden; Wörter in Assessment-Prosa lösen kein Finalisierungsgate aus.
 
 Noch nicht implementiert:
 

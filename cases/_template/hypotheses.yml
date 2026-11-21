@@ -29,7 +29,8 @@ hypotheses:
     supporting_evidence: []
     weaknesses: []
 
-# Link hypotheses to the affected claim(s) explicitly for provenance and review.\n  - id: "h_example_linked"
+# Link hypotheses to the affected claim(s) explicitly for provenance and review.
+  - id: "h_example_linked"
     label: "alternative_causal_explanation"
     description: "Placeholder: an alternative explanation directly competing with c001."
     status: "speculative"
