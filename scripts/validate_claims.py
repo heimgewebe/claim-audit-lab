@@ -11,23 +11,6 @@ SCHEMA_PATH = pathlib.Path(__file__).parent.parent / "schemas" / "claim.v1.schem
 
 CAUSAL_CLAIM_MIN_COUNTERCLAIMS = 2
 STRONG_STATUSES = {"established", "strongly_supported"}
-ABSENCE_SCOPE_MARKERS = {
-    "evidence-pack",
-    "evidence pack",
-    "quelle",
-    "source",
-    "dataset",
-    "quellenset",
-    "source set",
-    "auditierte",
-    "audited",
-    "vorliegenden",
-    "vorliegend",
-    "within",
-    "in the reviewed",
-    "im untersuchten",
-    "in untersuchtem",
-}
 CO_CAUSATION_TERMS = (
     "mitverursachte",
     "mitverursacht",
@@ -53,13 +36,7 @@ def has_absence_scope(claim: dict) -> bool:
     if isinstance(explicit_scope, list) and any(isinstance(item, str) and item.strip() for item in explicit_scope):
         return True
 
-    text_parts = [
-        claim.get("statement", ""),
-        claim.get("notes", ""),
-        " ".join(item for item in claim.get("requires", []) if isinstance(item, str)),
-    ]
-    text = " ".join(text_parts).lower()
-    return any(marker in text for marker in ABSENCE_SCOPE_MARKERS)
+    return False
 
 
 def has_co_causation_language(claim: dict) -> bool:

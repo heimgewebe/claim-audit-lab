@@ -109,7 +109,7 @@ make test
 
 ## Enforcement-Layer
 
-**Keine pauschale Wortzensur:** Globale Verbotslisten, Refusal-Schlüsselwörter und stilistische Verdikt-Sperren sind entfernt. Claim-spezifische Heuristiken (etwa Abwesenheits- und Overclosure-Sprache) bestehen noch und ersetzen keine inhaltliche Evidenzprüfung. Aussagen werden anhand von Claim-Status, Quellen und Gegenbelegen bewertet.
+**Keine pauschale Wortzensur:** Globale Verbotslisten, Refusal-Schlüsselwörter und stilistische Verdikt-Sperren sind entfernt. Abwesenheits-Claims werden über explizite Struktur und Evidenzbezüge statt Auslöserwörter geprüft; die Overclosure-Heuristik bleibt gesondert zu reparieren und ersetzt keine inhaltliche Evidenzprüfung. Aussagen werden anhand von Claim-Status, Quellen und Gegenbelegen bewertet.
 
 Agents, die in diesem Repository operieren, unterliegen dem **bindenden
 Vertrag** in `docs/agent-contract.md`. Compliance ist für repository-residente Artefakte mechanisch: die
