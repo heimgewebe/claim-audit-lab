@@ -257,7 +257,7 @@ def test_co_causation_claim_is_not_automatically_contradicted_by_alternative_exp
     assert errors == []
 
 
-def test_co_causation_contradicted_requires_direct_incompatibility_basis(schema):
+def test_causal_wording_does_not_force_phrase_specific_basis(schema):
     claim = {
         "schema_version": "1.0",
         "claim_id": "c055",
@@ -275,7 +275,7 @@ def test_co_causation_contradicted_requires_direct_incompatibility_basis(schema)
         "notes": "A stronger primary explanation exists.",
     }
     errors = validate_claims.validate_claim(claim, schema)
-    assert any("direct_incompatibility_basis" in e for e in errors), errors
+    assert errors == [], errors
 
 
 def test_co_causation_contradicted_with_direct_incompatibility_basis_passes(schema):
@@ -299,7 +299,7 @@ def test_co_causation_contradicted_with_direct_incompatibility_basis_passes(sche
     assert errors == []
 
 
-def test_co_causation_negated_notes_do_not_satisfy_direct_incompatibility_basis(schema):
+def test_negated_causation_notes_are_not_magic_verdict_gates(schema):
     claim = {
         "schema_version": "1.0",
         "claim_id": "c057",
@@ -317,7 +317,30 @@ def test_co_causation_negated_notes_do_not_satisfy_direct_incompatibility_basis(
         "notes": "A stronger primary explanation exists, but direct incompatibility has not been documented.",
     }
     errors = validate_claims.validate_claim(claim, schema)
-    assert any("direct_incompatibility_basis" in e for e in errors), errors
+    assert errors == [], errors
+
+
+def test_typed_verdict_validator_still_requires_direct_contradiction(tmp_path):
+    import validate_verdict_discipline
+
+    claim = {
+        "schema_version": "1.0", "claim_id": "c099",
+        "claim_type": "causal_claim", "claim_kind": "causal_claim",
+        "statement": "A contributed to B alongside other causes.",
+        "status": "contradicted",
+        "burden_profile": "causal_chain",
+        "required_chain": [
+            {"id": "timeline", "requirement": "A before B", "status": "satisfied"}
+        ],
+    }
+    (tmp_path / "claims.yml").write_text(
+        yaml.safe_dump({"schema_version": "1.0", "claims": [claim]}),
+        encoding="utf-8",
+    )
+    errors = validate_verdict_discipline.validate_case(
+        tmp_path, validate_verdict_discipline.load_schema()
+    )
+    assert any("requires at least one evidence relation" in error for error in errors), errors
 
 
 def test_malformed_claims_yaml_reports_clean_error(tmp_path, capsys):

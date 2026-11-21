@@ -11,18 +11,6 @@ SCHEMA_PATH = pathlib.Path(__file__).parent.parent / "schemas" / "claim.v1.schem
 
 CAUSAL_CLAIM_MIN_COUNTERCLAIMS = 2
 STRONG_STATUSES = {"established", "strongly_supported"}
-CO_CAUSATION_TERMS = (
-    "mitverursachte",
-    "mitverursacht",
-    "contributed",
-    "contributes",
-    "co-cause",
-    "co-causal",
-    "partial cause",
-    "partly caused",
-)
-
-
 def load_schema():
     with open(SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
@@ -37,13 +25,6 @@ def has_absence_scope(claim: dict) -> bool:
         return True
 
     return False
-
-
-def has_co_causation_language(claim: dict) -> bool:
-    text = " ".join(
-        str(claim.get(key, "")) for key in ("statement", "notes")
-    ).lower()
-    return any(term in text for term in CO_CAUSATION_TERMS)
 
 
 def validate_claim(claim: dict, schema: dict) -> list[str]:
@@ -85,13 +66,6 @@ def validate_claim(claim: dict, schema: dict) -> list[str]:
         if "absence_of_evidence_to_falsehood" not in forbidden_upgrades:
             errors.append(
                 f"  absence_claim '{claim['claim_id']}' must include forbidden_upgrades: absence_of_evidence_to_falsehood."
-            )
-
-    if has_co_causation_language(claim) and status == "contradicted":
-        direct_basis = claim.get("direct_incompatibility_basis")
-        if not isinstance(direct_basis, str) or not direct_basis.strip():
-            errors.append(
-                f"  co-causation claim '{claim['claim_id']}' cannot be status='contradicted' from a stronger alternative explanation alone; set non-empty direct_incompatibility_basis."
             )
 
     is_source_report_claim = claim_kind == "reported_claim" and burden_profile == "source_report"

@@ -11,36 +11,6 @@ def fixture_errors(kind: str, name: str) -> list[str]:
     return validate_overclosure.validate_case(FIXTURE_ROOT / kind / name)
 
 
-def test_invalid_co_causation_stronger_alternative_only_fails():
-    errors = fixture_errors("invalid", "co_causation_stronger_alternative_only")
-    assert any("stronger alternative" in error or "stronger primary" in error for error in errors), errors
-    assert any("required_chain link" in error for error in errors), errors
-
-
-def test_invalid_co_causation_missing_positive_evidence_only_fails():
-    errors = fixture_errors("invalid", "co_causation_missing_positive_evidence_only")
-    assert any("stronger-alternative, missing-link, non-test, non-corroboration, method-gap, or absence" in error for error in errors), errors
-
-
-def test_invalid_co_causation_official_non_corroboration_only_fails():
-    errors = fixture_errors("invalid", "co_causation_official_non_corroboration_only")
-    assert any("non-corroboration" in error or "missing-link/alternative" in error for error in errors), errors
-
-
-def test_invalid_stand3_style_overclosure_fails():
-    errors = fixture_errors("invalid", "stand3_style_overclosure")
-    assert any("contradicts_directly" in error for error in errors), errors
-    assert any("world-causal" in error for error in errors), errors
-    assert any("required_chain link" in error for error in errors), errors
-
-
-def test_invalid_negated_exclusion_with_absence_language_fails():
-    errors = fixture_errors("invalid", "negated_exclusion_with_absence_language")
-    assert any("contradicts_directly" in error for error in errors), errors
-    assert any("world-causal" in error for error in errors), errors
-    assert any("required_chain link" in error for error in errors), errors
-
-
 def test_invalid_causal_chain_contradicted_without_required_chain_fails():
     errors = fixture_errors("invalid", "causal_chain_contradicted_without_required_chain")
     assert any("requires non-empty required_chain" in error for error in errors), errors
@@ -49,16 +19,6 @@ def test_invalid_causal_chain_contradicted_without_required_chain_fails():
 def test_invalid_claim_kind_causal_chain_without_required_chain_fails():
     errors = fixture_errors("invalid", "claim_kind_causal_chain_without_required_chain")
     assert any("requires non-empty required_chain" in error for error in errors), errors
-
-
-def test_invalid_world_causal_contradicted_without_direct_exclusion_fails():
-    errors = fixture_errors("invalid", "world_causal_contradicted_without_direct_exclusion")
-    assert any("requires a non-negated direct exclusion" in error for error in errors), errors
-
-
-def test_invalid_direct_contradiction_no_evidence_found_fails():
-    errors = fixture_errors("invalid", "direct_contradiction_no_evidence_found")
-    assert any("contradicts_directly" in error and "absence" in error for error in errors), errors
 
 
 def test_invalid_contradicted_with_unresolved_high_materiality_anomaly_fails():
@@ -571,6 +531,49 @@ def test_non_tested_path_low_materiality_still_validates_references(tmp_path):
     assert not any("claim 'c001'" in error and "nt-low" in error for error in errors), errors
 
 
+def test_timestamp_based_direct_incompatibility_needs_no_keyword(tmp_path):
+    import shutil
+    import yaml
+
+    copied = tmp_path / "real_time_contradiction"
+    shutil.copytree(
+        FIXTURE_ROOT / "valid" / "causal_temporal_exclusion_contradiction",
+        copied,
+    )
+    relation_path = copied / "evidence-relations.yml"
+    doc = yaml.safe_load(relation_path.read_text(encoding="utf-8"))
+    doc["relations"][0]["explanation"] = (
+        "Event B occurred at 12:00 UTC; the earliest recorded occurrence of A was 13:00 UTC."
+    )
+    doc["relations"][0]["incompatible_proposition"] = (
+        "The causal chain requires A before B, but A started one hour after B."
+    )
+    relation_path.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    assert validate_overclosure.validate_case(copied) == []
+
+
+def test_quoted_absence_and_explicit_direct_relation_are_not_word_gates(tmp_path):
+    import shutil
+    import yaml
+
+    copied = tmp_path / "quoted_statement"
+    shutil.copytree(
+        FIXTURE_ROOT / "valid" / "causal_temporal_exclusion_contradiction",
+        copied,
+    )
+    relation_path = copied / "evidence-relations.yml"
+    doc = yaml.safe_load(relation_path.read_text(encoding="utf-8"))
+    doc["relations"][0]["explanation"] = (
+        'The report states "absence of evidence is not proof"; it also establishes '
+        'B at 12:00 and A only at 13:00.'
+    )
+    doc["relations"][0]["incompatible_proposition"] = (
+        "The required sequence depends on A preceding B, but the source timestamps reverse it."
+    )
+    relation_path.write_text(yaml.safe_dump(doc), encoding="utf-8")
+    assert validate_overclosure.validate_case(copied) == []
+
+
 def test_valid_causal_temporal_exclusion_contradiction_passes():
     assert fixture_errors("valid", "causal_temporal_exclusion_contradiction") == []
 
@@ -584,7 +587,7 @@ def test_valid_reported_source_report_established_passes():
 
 
 def test_cli_reports_invalid_fixture(capsys):
-    exit_code = validate_overclosure.main(str(FIXTURE_ROOT / "invalid" / "co_causation_stronger_alternative_only"))
+    exit_code = validate_overclosure.main(str(FIXTURE_ROOT / "invalid" / "causal_chain_contradicted_without_required_chain"))
     captured = capsys.readouterr()
     assert exit_code == 1
     assert "FAIL" in captured.out
