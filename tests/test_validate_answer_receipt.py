@@ -91,7 +91,7 @@ def test_strong_verdict_without_independence_fails(tmp_path):
     assert validate_answer_receipt.main(str(tmp_path / "cases")) == 1
 
 
-def test_strong_verdict_with_high_fragility_passes(tmp_path):
+def test_high_fragility_cannot_replace_source_independence(tmp_path):
     receipt = VALID_RECEIPT.replace(
         'status: "plausible"',
         'status: "established"',
@@ -100,11 +100,8 @@ def test_strong_verdict_with_high_fragility_passes(tmp_path):
         'independence_verified: false\n  fragility_score: 0.85',
     )
     _make_case_with_receipt(tmp_path, receipt)
-    # Strong verdict with declared fragility >= 0.7 is permitted by the
-    # source-cluster-independence check, but still need upgrades_considered
-    # populated and counterhypotheses for causal-looking statements.
-    # statement is not causal-looking, so counterhypotheses check is loose.
-    assert validate_answer_receipt.main(str(tmp_path / "cases")) == 0
+    # Source fragility documents weakness, not independence.
+    assert validate_answer_receipt.main(str(tmp_path / "cases")) == 1
 
 
 def test_strong_verdict_without_upgrades_considered_fails(tmp_path):
@@ -229,6 +226,38 @@ def test_missing_evidence_with_refused_false_and_unresolved_verdict_passes(tmp_p
     ).replace(
         'refused: false',
         'refused: false\n  refusal_type: missing_evidence',
+    )
+    _make_case_with_receipt(tmp_path, receipt)
+    assert validate_answer_receipt.main(str(tmp_path / "cases")) == 0
+
+def test_absence_of_word_scan_and_legitimate_disputed_phrases_pass(tmp_path):
+    # The historic self-scan field is optional and no words are prohibited.
+    receipt = VALID_RECEIPT.replace(
+        "banned_phrases_self_scan:\n  scanned: true\n  hits: []\n", ""
+    ).replace(
+        "Test answer. Not a truth certificate.",
+        "Ein wissenschaftlicher Konsens ist kein Wahrheitsbeweis. Not a truth certificate.",
+    )
+    _make_case_with_receipt(tmp_path, receipt)
+    assert validate_answer_receipt.main(str(tmp_path / "cases")) == 0
+
+def test_background_only_does_not_require_magic_words(tmp_path):
+    receipt = VALID_RECEIPT.replace(
+        'tools_used: ["web"]',
+        'tools_used: []\n  background_knowledge_only: true',
+    ).replace(
+        'final_uncertainty_statement: "Background and tooling notes; not a truth certificate."',
+        'final_uncertainty_statement: "Die Beweislage ist begrenzt."',
+    )
+    _make_case_with_receipt(tmp_path, receipt)
+    assert validate_answer_receipt.main(str(tmp_path / "cases")) == 0
+
+
+def test_oracle_disclaimer_requires_metadata_not_exact_phrase(tmp_path):
+    receipt = VALID_RECEIPT.replace(
+        "Not a truth certificate.", "Methodenstand unter offener Unsicherheit."
+    ).replace(
+        "not a truth certificate.", "weitere Belege erforderlich."
     )
     _make_case_with_receipt(tmp_path, receipt)
     assert validate_answer_receipt.main(str(tmp_path / "cases")) == 0

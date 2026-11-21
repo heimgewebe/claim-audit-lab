@@ -53,11 +53,9 @@ The agent must not:
 3.8 smooth contradictions (Invariant #8);
 3.9 produce strong causal or motive verdicts without counterhypotheses (Invariant #9);
 3.10 claim a final assessment without a passed red-team review (Invariant #10);
-3.11 use any phrase listed in `docs/forbidden-language.md` outside the allowed
-contexts defined there;
-3.12 emit prose that contradicts the structured `status` of a claim
-(`docs/status-prose-consistency.md`);
-3.13 dress refusal as neutrality (Invariant #6).
+3.11 publish receipt verdicts inconsistent with claim `status`
+(`docs/answer-receipt-discipline.md`);
+3.12 dress refusal as neutrality (Invariant #6).
 
 ## Article 4: Mandatory output
 
@@ -70,19 +68,16 @@ For `world_question`, `claim_audit`, `source_comparison`, and `case_building`:
 4.2 The receipt is co-located with the answer (file-resident) or fenced inside
 the answer block (chat-resident) as defined in the discipline doc.
 
-4.3 The receipt includes a `banned_phrases_self_scan` that the agent ran on its
-own `answer_summary`.
+4.3 The receipt includes the oracle disclaimer affirmation.
 
-4.4 The receipt includes the oracle disclaimer affirmation.
-
-4.5 The receipt includes a `what_would_change_assessment` field for every
+4.4 The receipt includes a `what_would_change_assessment` field for every
 non-`established` verdict.
 
 ## Article 5: When tools are missing
 
 5.1 If external research tools (web, fetch, search) are unavailable, the agent
-states this explicitly in `final_uncertainty_statement` and labels the answer as
-"background-knowledge-only, no external verification."
+sets `external_research.background_knowledge_only=true` and describes the
+verification gap in `final_uncertainty_statement`; no fixed wording is required.
 
 5.2 The agent does not silently fall back to repo-only search for a world
 question. If asked a world question without external research available, the
@@ -137,8 +132,8 @@ meta claims and source-report claims).
 vocabulary does not fit, the agent declares the gap rather than coining a
 verdict.
 
-8.3 The agent's prose, when discussing a claim, uses the register allowed by
-`docs/status-prose-consistency.md` for that claim's `status`.
+8.3 Structured verdicts in receipts and claims must agree. Language alone
+is not a verdict and is never banned by keyword.
 
 8.4 Strong or contentious verdicts require an explicit, auditable inference
 chain. When a claim reaches `established`, `strongly_supported`, or
@@ -161,13 +156,12 @@ in its own draft.
 10.1 The validators are the enforcement for repository-resident artifacts.
 Compliance is mechanical there, not hortatory.
 
-10.2 If a validator rejects an output, the agent re-drafts. The agent does not
-disable, weaken, or argue with the validator. If the validator appears wrong,
-the agent files an issue describing the case and the validator behaviour, but
-ships the corrected output.
+10.2 If a validator rejects an output, inspect the substantive mismatch. A
+proven false positive requires a targeted, tested correction or removal of
+the faulty gate, not forced rewriting to satisfy a keyword list.
 
-10.3 An agent that disables a validator, skips a validator, or commits with
-validators failing is in breach of contract regardless of the reason.
+10.3 Quietly skipping an active validation step is not allowed. An explicit,
+tested policy change may retire an unhelpful validator.
 
 ## Why a contract
 

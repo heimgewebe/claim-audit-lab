@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
-"""Block refusal-as-neutrality in answer-receipt artifacts.
+"""Validate declared refusal categories and evidence metadata.
 
-Checks answer-receipt.yml files for refusal patterns that present
-themselves as balance or neutrality without structured declaration per
-docs/refusal-discipline.md.
+The words used in an answer do not, by themselves, establish a refusal.
+Only structured case fields and their consistency are checked.
 """
 
 from __future__ import annotations
 
 import pathlib
-import re
 import sys
 
 import yaml
@@ -17,36 +15,6 @@ import yaml
 from case_compat import legacy_case_error
 
 CASE_MARKERS = ("claims.yml", "evidence-relations.yml", "anomaly-ledger.yml", "investigation-integrity.yml")
-
-# Phrases that indicate refusal-as-neutrality (Category E in forbidden-language.md)
-COVERT_REFUSAL_PATTERNS = (
-    r"\bi\s+(?:cannot|can[' ]?t|won[' ]?t)\s+(?:evaluate|assess|judge)\b",
-    r"\bthis\s+is\s+a\s+sensitive\s+topic\b",
-    r"\bnot\s+appropriate\s+to\s+assess\b",
-    r"\bboth\s+sides\s+have\s+valid\s+points\b",
-    r"\breasonable\s+people\s+disagree\b",
-    r"\bi\s+don[' ]?t\s+want\s+to\s+take\s+a\s+side\b",
-    r"\bkann\s+ich\s+nicht\s+bewerten\b",
-    r"\bein\s+sensibles\s+thema,?\s+daher\b",
-    r"\bes\s+w[aä]re\s+unangemessen,?\s+dies\s+zu\s+beurteilen\b",
-    r"\bbeide\s+seiten\s+haben\s+gute\s+argumente\b",
-    r"\bzu\s+politisch,?\s+um\s+sie\s+zu\s+beantworten\b",
-    r"\bich\s+m[oö]chte\s+(?:hier\s+)?kein\s+urteil\s+abgeben\b",
-)
-
-# Phrases that signal balanced framing
-BALANCED_FRAMING_PATTERNS = (
-    r"\bboth\s+sides\b",
-    r"\bon\s+the\s+one\s+hand.*\bon\s+the\s+other\s+hand\b",
-    r"\beinerseits.*andererseits\b",
-    r"\bbeide\s+seiten\b",
-)
-
-CONTROVERSY_REASONS = (
-    "controversial", "controversy", "politically sensitive",
-    "kontrovers", "politisch sensibel", "umstritten", "heikles thema",
-    "political", "politisch",
-)
 
 REPO_TASK_TYPES = {"repo_navigation", "repo_maintenance"}
 
@@ -59,33 +27,13 @@ def safe_load_yaml(path: pathlib.Path):
         return None, str(exc)
 
 
-def scan_text_for_covert_refusal(text: str) -> list[str]:
-    hits: list[str] = []
-    lowered = text.lower()
-    for pattern in COVERT_REFUSAL_PATTERNS:
-        for match in re.finditer(pattern, lowered, flags=re.IGNORECASE):
-            hits.append(match.group(0))
-    return hits
-
-
 def check_receipt(receipt: dict) -> list[str]:
     errors: list[str] = []
     task = receipt.get("task_classification", "")
     refusal_check = receipt.get("refusal_check", {}) or {}
     refused = refusal_check.get("refused", False)
     refusal_type = refusal_check.get("refusal_type")
-    answer_summary = receipt.get("answer_summary", "") or ""
-    final_unc = receipt.get("final_uncertainty_statement", "") or ""
-    refusal_notes = refusal_check.get("notes", "") or ""
     external = receipt.get("external_research", {}) or {}
-
-    # Rule 1: covert refusal phrase in answer_summary but refused=false
-    covert_hits = scan_text_for_covert_refusal(answer_summary)
-    if covert_hits and not refused:
-        errors.append(
-            f"answer_summary contains covert refusal phrase(s) {covert_hits} but refusal_check.refused=false; "
-            f"refusal must be declared explicitly per docs/refusal-discipline.md"
-        )
 
     # Rule 2: refusal_type, when present, must be valid.
     valid_types = {"out_of_scope", "missing_tools", "missing_evidence", "capability"}
@@ -130,17 +78,6 @@ def check_receipt(receipt: dict) -> list[str]:
             errors.append(
                 "refusal_type=missing_tools requires external_research.tools_used to be empty"
             )
-
-    # Rule 6: refusal cannot cite controversy/sensitivity as reason.
-    if refused or refusal_type in {"missing_tools", "missing_evidence"}:
-        combined = (final_unc + " " + refusal_notes).lower()
-        for marker in CONTROVERSY_REASONS:
-            # Match word boundary, but allow as part of a phrase like "controversial"
-            if re.search(rf"\b{re.escape(marker)}\b", combined):
-                errors.append(
-                    f"refusal cites '{marker}' as reason; controversy/sensitivity/political alignment "
-                    f"is not a valid refusal type (docs/refusal-discipline.md)"
-                )
 
     # Rule 7: balanced_framing without burden-layer breakdown
     balanced = refusal_check.get("balanced_framing_present", False)

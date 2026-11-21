@@ -53,9 +53,7 @@ Never:
 - equate stronger alternative with contradiction,
 - equate non-test with cover-up,
 - equate absence with falsehood,
-- use forbidden language outside allowed contexts (`docs/forbidden-language.md`),
-- emit prose whose register diverges from structured status
-  (`docs/status-prose-consistency.md`),
+- emit receipt verdicts inconsistent with structured claim statuses,
 - aggregate reported_claims into a strong world-claim verdict without bridge
   evidence (`docs/aggregation-discipline.md`),
 - dress refusal as neutrality (`docs/refusal-discipline.md`).

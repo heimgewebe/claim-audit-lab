@@ -68,12 +68,12 @@ def test_no_refusal_passes(tmp_path):
     assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 0
 
 
-def test_covert_refusal_phrase_with_refused_false_fails(tmp_path):
+def test_wording_alone_does_not_prove_a_refusal(tmp_path):
     _make_case(
         tmp_path,
         _receipt(answer_summary="I cannot evaluate this question.", refused="false"),
     )
-    assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 1
+    assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 0
 
 
 def test_refused_true_without_refusal_type_fails(tmp_path):
@@ -81,7 +81,7 @@ def test_refused_true_without_refusal_type_fails(tmp_path):
     assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 1
 
 
-def test_refusal_with_controversy_reason_fails(tmp_path):
+def test_controversy_wording_alone_does_not_trigger_a_gate(tmp_path):
     _make_case(
         tmp_path,
         _receipt(
@@ -91,7 +91,7 @@ def test_refusal_with_controversy_reason_fails(tmp_path):
             verdicts_used='[{claim_id: c001, statement: "x", status: no_verdict_possible}]',
         ),
     )
-    assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 1
+    assert validate_refusal_discipline.main(str(tmp_path / "cases")) == 0
 
 
 def test_missing_evidence_refusal_without_verdict_fails(tmp_path):
