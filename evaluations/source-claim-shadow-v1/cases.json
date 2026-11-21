@@ -1,0 +1,207 @@
+{
+  "schema_version": "claim-audit-lab.semantic-shadow-holdout.v1",
+  "annotator": "single_operator_precommitted_not_independent_expert",
+  "retrieval_date": "2026-11-21",
+  "rubric": "Classify only whether the supplied excerpt supports, contradicts or is insufficient to determine the exact claim. A true claim absent from the excerpt is insufficient. Absence of evidence is not proof of absence.",
+  "design": "6 verified official-page excerpts × 3 independently prelabelled claims; split=3 development sources and 3 held-out sources; all gold labels established before any model calls",
+  "cases": [
+    {
+      "id": "moon-distance-s",
+      "split": "development",
+      "publisher": "NASA",
+      "source_title": "Modeling the Earth-Moon System",
+      "source_url": "https://www.jpl.nasa.gov/edu/resources/lesson-plan/modeling-the-earth-moon-system/",
+      "source_excerpt": "Earth and the Moon are an average of 384,400 kilometers (238,855 miles) apart.",
+      "claim": "The Moon's average distance from Earth is about 384,400 kilometres.",
+      "gold_label": "supported",
+      "gold_rationale": "The passage explicitly states the average distance in kilometers."
+    },
+    {
+      "id": "moon-distance-c",
+      "split": "development",
+      "publisher": "NASA",
+      "source_title": "Modeling the Earth-Moon System",
+      "source_url": "https://www.jpl.nasa.gov/edu/resources/lesson-plan/modeling-the-earth-moon-system/",
+      "source_excerpt": "Earth and the Moon are an average of 384,400 kilometers (238,855 miles) apart.",
+      "claim": "Die durchschnittliche Entfernung des Mondes beträgt laut Beleg 84.400 Kilometer.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The quoted average Earth-Moon distance is 384,400 km, not 84,400 km."
+    },
+    {
+      "id": "moon-distance-i",
+      "split": "development",
+      "publisher": "NASA",
+      "source_title": "Modeling the Earth-Moon System",
+      "source_url": "https://www.jpl.nasa.gov/edu/resources/lesson-plan/modeling-the-earth-moon-system/",
+      "source_excerpt": "Earth and the Moon are an average of 384,400 kilometers (238,855 miles) apart.",
+      "claim": "This excerpt establishes that the Moon takes 27.3 days to complete one orbit.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Orbital period is not given in the supplied passage."
+    },
+    {
+      "id": "ocean-cover-s",
+      "split": "development",
+      "publisher": "NOAA",
+      "source_title": "How much water is in the ocean?",
+      "source_url": "https://oceanservice.noaa.gov/facts/oceanwater.html",
+      "source_excerpt": "The ocean covers more than 70 percent of the surface of our planet.",
+      "claim": "More than 70 percent of Earth's surface is covered by the ocean.",
+      "gold_label": "supported",
+      "gold_rationale": "The passage explicitly asserts more than 70 percent surface coverage."
+    },
+    {
+      "id": "ocean-cover-c",
+      "split": "development",
+      "publisher": "NOAA",
+      "source_title": "How much water is in the ocean?",
+      "source_url": "https://oceanservice.noaa.gov/facts/oceanwater.html",
+      "source_excerpt": "The ocean covers more than 70 percent of the surface of our planet.",
+      "claim": "Weniger als die Hälfte der Erdoberfläche ist vom Ozean bedeckt.",
+      "gold_label": "contradicted",
+      "gold_rationale": "More than 70 percent contradicts less than one half."
+    },
+    {
+      "id": "ocean-cover-i",
+      "split": "development",
+      "publisher": "NOAA",
+      "source_title": "How much water is in the ocean?",
+      "source_url": "https://oceanservice.noaa.gov/facts/oceanwater.html",
+      "source_excerpt": "The ocean covers more than 70 percent of the surface of our planet.",
+      "claim": "According to this passage, the Pacific is the world's largest ocean by area.",
+      "gold_label": "insufficient",
+      "gold_rationale": "This passage gives only total ocean coverage, not individual ocean areas."
+    },
+    {
+      "id": "census-2020-s",
+      "split": "development",
+      "publisher": "U.S. Census Bureau",
+      "source_title": "2020 Census Apportionment Results Delivered to the President",
+      "source_url": "https://www.census.gov/newsroom/press-releases/2021/2020-census-apportionment-results.html",
+      "source_excerpt": "the 2020 Census shows the resident population of the United States on April 1, 2020, was 331,449,281.",
+      "claim": "The quoted 2020 Census resident count for the United States on April 1, 2020 is 331,449,281.",
+      "gold_label": "supported",
+      "gold_rationale": "The passage contains the same population, geography, and date."
+    },
+    {
+      "id": "census-2020-c",
+      "split": "development",
+      "publisher": "U.S. Census Bureau",
+      "source_title": "2020 Census Apportionment Results Delivered to the President",
+      "source_url": "https://www.census.gov/newsroom/press-releases/2021/2020-census-apportionment-results.html",
+      "source_excerpt": "the 2020 Census shows the resident population of the United States on April 1, 2020, was 331,449,281.",
+      "claim": "The quoted U.S. resident population on April 1, 2020 was 301,449,281.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt reports 331,449,281, not 301,449,281."
+    },
+    {
+      "id": "census-2020-i",
+      "split": "development",
+      "publisher": "U.S. Census Bureau",
+      "source_title": "2020 Census Apportionment Results Delivered to the President",
+      "source_url": "https://www.census.gov/newsroom/press-releases/2021/2020-census-apportionment-results.html",
+      "source_excerpt": "the 2020 Census shows the resident population of the United States on April 1, 2020, was 331,449,281.",
+      "claim": "The quoted Census excerpt confirms an increase of 7.4 percent from 2010.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt itself contains no previous comparison or growth percentage."
+    },
+    {
+      "id": "earthquake-magnitude-s",
+      "split": "holdout",
+      "publisher": "USGS",
+      "source_title": "Earthquake Magnitude, Energy Release, and Shaking Intensity",
+      "source_url": "https://www.usgs.gov/programs/earthquake-hazards/earthquake-magnitude-energy-release-and-shaking-intensity",
+      "source_excerpt": "each whole number increase in magnitude represents a tenfold increase in measured amplitude as measured on a seismogram.",
+      "claim": "A one-unit increase in earthquake magnitude corresponds to ten times the measured seismic amplitude.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly states a tenfold increase in measured amplitude."
+    },
+    {
+      "id": "earthquake-magnitude-c",
+      "split": "holdout",
+      "publisher": "USGS",
+      "source_title": "Earthquake Magnitude, Energy Release, and Shaking Intensity",
+      "source_url": "https://www.usgs.gov/programs/earthquake-hazards/earthquake-magnitude-energy-release-and-shaking-intensity",
+      "source_excerpt": "each whole number increase in magnitude represents a tenfold increase in measured amplitude as measured on a seismogram.",
+      "claim": "Bei einer Magnitudenzunahme um eine Einheit verdoppelt sich die gemessene Amplitude.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt states tenfold rather than twofold amplitude growth."
+    },
+    {
+      "id": "earthquake-magnitude-i",
+      "split": "holdout",
+      "publisher": "USGS",
+      "source_title": "Earthquake Magnitude, Energy Release, and Shaking Intensity",
+      "source_url": "https://www.usgs.gov/programs/earthquake-hazards/earthquake-magnitude-energy-release-and-shaking-intensity",
+      "source_excerpt": "each whole number increase in magnitude represents a tenfold increase in measured amplitude as measured on a seismogram.",
+      "claim": "The passage demonstrates that each magnitude increase releases exactly ten times as much energy.",
+      "gold_label": "insufficient",
+      "gold_rationale": "It describes measured amplitude, not the energy-release ratio."
+    },
+    {
+      "id": "si-second-s",
+      "split": "holdout",
+      "publisher": "NIST",
+      "source_title": "NIST Guide to the SI — Appendix A",
+      "source_url": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-definitions-si-base-units",
+      "source_excerpt": "The second is the duration of 9 192 631 770 periods of the radiation",
+      "claim": "A second corresponds to 9,192,631,770 periods of the radiation referred to in this definition.",
+      "gold_label": "supported",
+      "gold_rationale": "The number of radiation periods matches the source wording."
+    },
+    {
+      "id": "si-second-c",
+      "split": "holdout",
+      "publisher": "NIST",
+      "source_title": "NIST Guide to the SI — Appendix A",
+      "source_url": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-definitions-si-base-units",
+      "source_excerpt": "The second is the duration of 9 192 631 770 periods of the radiation",
+      "claim": "The passage defines a second using 9,192,631,771 periods of radiation.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt gives exactly 9,192,631,770 periods."
+    },
+    {
+      "id": "si-second-i",
+      "split": "holdout",
+      "publisher": "NIST",
+      "source_title": "NIST Guide to the SI — Appendix A",
+      "source_url": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-definitions-si-base-units",
+      "source_excerpt": "The second is the duration of 9 192 631 770 periods of the radiation",
+      "claim": "The passage identifies the emitting atom as cesium-133.",
+      "gold_label": "insufficient",
+      "gold_rationale": "No chemical element or isotope is named in this excerpt."
+    },
+    {
+      "id": "moon-life-s",
+      "split": "holdout",
+      "publisher": "NASA",
+      "source_title": "Moon Facts",
+      "source_url": "https://science.nasa.gov/moon/facts/",
+      "source_excerpt": "The many missions that have explored the Moon have found no evidence to suggest it has its own living things.",
+      "claim": "Die erwähnten Mondmissionen haben keine Hinweise auf dortiges eigenes Leben gefunden.",
+      "gold_label": "supported",
+      "gold_rationale": "The source reports no evidence found by those missions, not absolute absence."
+    },
+    {
+      "id": "moon-life-c",
+      "split": "holdout",
+      "publisher": "NASA",
+      "source_title": "Moon Facts",
+      "source_url": "https://science.nasa.gov/moon/facts/",
+      "source_excerpt": "The many missions that have explored the Moon have found no evidence to suggest it has its own living things.",
+      "claim": "The missions mentioned discovered positive evidence that the Moon harbors its own living things.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt states they have found no such evidence."
+    },
+    {
+      "id": "moon-life-i",
+      "split": "holdout",
+      "publisher": "NASA",
+      "source_title": "Moon Facts",
+      "source_url": "https://science.nasa.gov/moon/facts/",
+      "source_excerpt": "The many missions that have explored the Moon have found no evidence to suggest it has its own living things.",
+      "claim": "The quoted missions prove that no living organism exists anywhere on the Moon.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Absence of found evidence does not establish exhaustive absence of life."
+    }
+  ]
+}
