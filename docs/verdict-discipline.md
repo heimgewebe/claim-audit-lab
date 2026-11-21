@@ -100,7 +100,7 @@ High-materiality anomalies that affect a claim must be visible in `assessment.md
 
 `contradictions.yml` is the place where unresolved, weighted, scoped, or logically resolved conflicts remain visible. Its existence does not itself change a claim verdict; verdict movement still requires typed evidence relations and a compatible burden profile.
 
-For co-causation language such as “contributed,” “co-cause,” or “mitverursachte,” a stronger alternative explanation is not enough to mark the claim `contradicted`. Direct incompatibility must be documented explicitly with `direct_incompatibility_basis`; prose in `notes` is not sufficient.
+For any causal claim, a stronger alternative explanation is not enough to mark the claim `contradicted`. The typed verdict validator requires a `contradicts_directly` evidence relation with a non-empty `incompatible_proposition` and a compatible causal burden. A separate `direct_incompatibility_basis` remains available for substantive explanations, but its exact wording does not automatically prove or disprove the proposition.
 
 
 ## Source-cluster robustness
@@ -130,8 +130,8 @@ See `docs/inference-ledger.md` for the full schema, operations, and authoring gu
 
 ## Overclosure guard
 
-The overclosure validator blocks direct-negative verdicts that are really weaker operations under another label. `contradicts_directly` must not be used when the explanation or `incompatible_proposition` only says that a stronger alternative explanation exists, positive evidence was not found, a causal bridge is missing, an official source did not corroborate the proposition, or a method/non-test gap remains.
+The typed verdict validator distinguishes `contradicts_directly` from weaker relation types such as `weakens`, `undercuts`, `missing_link`, and `alternative_explanation`, and requires a non-empty `incompatible_proposition`. No expression such as “rules out” is required or sufficient by itself. A purported logical contradiction must be checked against the actual evidence and claim scope, not inferred from a text-pattern match.
 
-For co-causation claims marked `contradicted`, the case must identify a required-chain link and explain why that link is directly excluded, impossible, or incompatible. A stronger main cause can justify `weak` or `speculative`; it is not enough for negative closure.
+For causal-chain claims at strong or negative statuses, `required_chain` must identify the relevant links. A stronger main cause may justify lower confidence but is not automatically a direct contradiction. The existing typed relation, inference-ledger and evidence rules remain binding; the overclosure validator separately blocks closure while unresolved high-materiality anomalies and non-tested paths remain.
 
 If a high-materiality anomaly affects a contradicted world-causal claim, or an unresolved high-materiality non-tested path overlaps that claim through the investigation source cluster, negative closure requires explicit residual-path closure. The current validator emits a conservative targeted failure for overlapping non-tested paths because dedicated `affected_claims` and residual-path-closure fields are intentionally left for a later schema expansion.
