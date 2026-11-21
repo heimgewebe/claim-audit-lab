@@ -96,3 +96,31 @@ def test_mutated_reference_is_rejected_by_real_production_validators():
     assert record["observed"] == "reject", record["failures"] + record["crashes"]
     assert any("case_references" in name or "source" in name
                for name in record["rejecting_validators"]), record
+
+
+
+def test_repeated_run_uses_fresh_directory_and_preserves_prior_results(tmp_path):
+    first = fitness.output_directory(tmp_path / "first")
+    assert first.exists()
+    original = b'{"first_run":true}\n'
+    (first / "results.json").write_bytes(original)
+
+    with pytest.raises(SystemExit, match="choose a fresh --output-dir"):
+        fitness.output_directory(first)
+    assert (first / "results.json").read_bytes() == original
+
+    second = fitness.output_directory(tmp_path / "second")
+    assert second.is_dir()
+    assert second != first
+    assert (first / "results.json").read_bytes() == original
+
+
+def test_existing_report_alone_is_never_overwritten(tmp_path):
+    directory = tmp_path / "partial"
+    directory.mkdir()
+    report = directory / "report.md"
+    report.write_text("Earlier trial, not to be overwritten", encoding="utf-8")
+
+    with pytest.raises(SystemExit):
+        fitness.output_directory(directory)
+    assert report.read_text(encoding="utf-8") == "Earlier trial, not to be overwritten"
