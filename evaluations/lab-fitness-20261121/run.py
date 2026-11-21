@@ -339,9 +339,22 @@ def report(data: dict) -> str:
     return "\n".join(text)
 
 
+def output_directory(requested: Path | None) -> Path:
+    folder = (
+        Path(__file__).resolve().parent
+        if requested is None else requested.expanduser().resolve()
+    )
+    if any((folder / name).exists() for name in ("results.json", "report.md")):
+        raise SystemExit("Output already exists; choose a fresh --output-dir.")
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--output-dir", type=Path,
+                        help="Fresh directory for a repeated trial; never overwrite measurements")
     args = parser.parse_args()
     commands = validator_commands()
     source_commit = subprocess.run(
@@ -356,9 +369,7 @@ def main() -> None:
                        "purpose": x.purpose} for x in CHALLENGES],
         }, ensure_ascii=False, indent=2))
         return
-    output_path = Path(__file__).resolve().parent / "results.json"
-    if output_path.exists():
-        raise SystemExit("Results already exist. Original evidence must not be overwritten.")
+    output_path = output_directory(args.output_dir) / "results.json"
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
         records = list(pool.map(lambda c: execute_case(c, commands), CHALLENGES))
     payload = {
