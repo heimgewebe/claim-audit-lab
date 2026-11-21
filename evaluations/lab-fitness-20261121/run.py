@@ -229,7 +229,9 @@ def execute_case(case: Challenge, commands: tuple[tuple[str, bool], ...]) -> dic
         after = tree_hashes(folder)
         failures, crashes = [], []
         for filename, check in commands:
-            argv = [sys.executable, str(ROOT / filename), str(folder)]
+            # Most production CLIs discover case *children* below a root.
+            # Passing the case directory itself silently skips some validators.
+            argv = [sys.executable, str(ROOT / filename), str(folder.parent)]
             if check:
                 argv.append("--check")
             try:
@@ -237,6 +239,16 @@ def execute_case(case: Challenge, commands: tuple[tuple[str, bool], ...]) -> dic
                     argv, cwd=ROOT, stdin=subprocess.DEVNULL,
                     capture_output=True, text=True, timeout=20, check=False
                 )
+                # Probe case enumeration explicitly. A vacuous 0 exit must
+                # not masquerade as acceptance of a challenge.
+                if filename == "scripts/validate_case_references.py" and str(folder) not in result.stdout:
+                    crashes.append({"validator": filename,
+                                    "error": "target_case_not_discovered",
+                                    "diagnostic": result.stdout[-300:]})
+                if "No case directories found" in result.stdout:
+                    crashes.append({"validator": filename,
+                                    "error": "empty_discovery",
+                                    "diagnostic": result.stdout[-300:]})
                 if result.returncode:
                     raw = (result.stdout + "\n" + result.stderr).strip()
                     entry = {

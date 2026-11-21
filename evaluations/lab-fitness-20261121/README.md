@@ -41,3 +41,6 @@ Der erste Aufruf ist ein kostenfreier Dry-Run mit allen festgelegten Erwartungen
 Eine korrekt verkettete Belegreferenz beweist **nicht**, dass der Inhalt der referenzierten Quelle die behauptete Schlussfolgerung trägt. Zwei formal kompatible Akten können gegensätzliche Tatsachen behaupten. Ein rein struktureller Validator kann diesen Widerspruch übersehen, ohne seinen dokumentierten Vertrag zu verletzen.
 
 Deshalb werden Struktur- und Wahrheitskontrollen **niemals zu einer einzigen irreführenden Erfolgsquote addiert**. Der Test soll blinde Flecken sichtbar machen, nicht neue Sprachverbote erfinden. Die nächste empirische Ausbaustufe wäre eine kleine, extern annotierte Sammlung echter Primärquellen mit unabhängigen menschlichen Gegenbewertungen.
+## Transparenz über einen Test-Harness-Fehler
+
+Der erste Lauf lieferte ein irreführendes Teilresultat, weil bei mindestens einem produktiven Validator der Fall selbst statt seines übergeordneten Suchordners übergeben wurde. Die originale Messung ist unter `diagnostic-v0-skipped-case.json` gesondert erhalten und ausdrücklich **ungültig**. Der korrigierte Runner übergibt den Elternordner und wertet eine ausbleibende Fallentdeckung als technischen Fehler. Die ursprünglichen 16 Sollfälle und ihre erwarteten Reaktionen blieben unverändert.
