@@ -146,7 +146,7 @@ def parse_response(raw: str) -> dict:
         "strongest_alternative", "deciding_future_test"
     }:
         raise ValueError("unexpected JSON keys")
-    if data["causal_status"] not in {
+    if not isinstance(data["causal_status"], str) or data["causal_status"] not in {
         "unsupported", "plausible", "strongly_supported", "contradicted"
     }:
         raise ValueError("invalid causal_status")
@@ -189,8 +189,22 @@ def execute(item: dict) -> dict:
                     record["status"] = "valid"
                 except (ValueError, json.JSONDecodeError):
                     record["error"] = "invalid_json"
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
+            # Python may return bytes even when the child used text=True.
+            partial_stdout = exc.stdout or b""
+            partial_stderr = exc.stderr or b""
+            if isinstance(partial_stdout, bytes):
+                partial_stdout = partial_stdout.decode("utf-8", errors="replace")
+            if isinstance(partial_stderr, bytes):
+                partial_stderr = partial_stderr.decode("utf-8", errors="replace")
+            record["response_raw"] = partial_stdout
+            record["response_sha256"] = sha(partial_stdout)
+            record["stderr_sha256"] = sha(partial_stderr)
             record["error"] = "timeout"
+            record["exit_code"] = None
+        except OSError as exc:
+            record["error"] = "cli_invocation_failed"
+            record["exception_type"] = type(exc).__name__
             record["exit_code"] = None
     record["duration_seconds"] = round(time.monotonic() - started, 2)
     return record

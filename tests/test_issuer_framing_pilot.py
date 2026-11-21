@@ -79,3 +79,55 @@ def test_summary_reports_pair_flips_without_claiming_statistical_significance():
     assert summary["total_status_flips"] == 2
     assert summary["max_absolute_support_delta"] == 40
     assert "single-model" in report
+
+def test_unhashable_causal_status_is_an_invalid_response():
+    data = {
+        "causal_status": ["unsupported"],
+        "causal_support_0_100": 12,
+        "main_evidence_limit": "nonrandom",
+        "strongest_alternative": "selection",
+        "deciding_future_test": "randomize",
+    }
+    with pytest.raises(ValueError):
+        pilot.parse_response(json.dumps(data))
+    data["causal_status"] = {"not_a_real_status": True}
+    with pytest.raises(ValueError):
+        pilot.parse_response(json.dumps(data))
+
+
+def test_model_timeout_preserves_verbatim_partial_output(monkeypatch):
+    import subprocess
+
+    partial_response = b'{"causal_status":"plausible","score":'
+    partial_stderr = b"interrupted before final output"
+
+    def fake_run(*args, **kwargs):
+        raise subprocess.TimeoutExpired(
+            cmd=["codex"], timeout=100,
+            output=partial_response, stderr=partial_stderr,
+        )
+
+    monkeypatch.setattr(pilot.subprocess, "run", fake_run)
+    result = pilot.execute(pilot.assignments()[0])
+    assert result["error"] == "timeout"
+    assert result["response_raw"] == partial_response.decode()
+    assert result["response_sha256"] == pilot.sha(partial_response.decode())
+    assert result["stderr_sha256"] == pilot.sha(partial_stderr.decode())
+    assert result["exit_code"] is None
+
+
+def test_malformed_status_is_saved_as_failed_sample(monkeypatch):
+    import subprocess
+
+    raw = '{"causal_status":[],"causal_support_0_100":50,"main_evidence_limit":"x","strongest_alternative":"y","deciding_future_test":"z"}'
+    def fake_run(*args, **kwargs):
+        return subprocess.CompletedProcess(
+            args=["codex"], returncode=0, stdout=raw, stderr=""
+        )
+
+    monkeypatch.setattr(pilot.subprocess, "run", fake_run)
+    result = pilot.execute(pilot.assignments()[0])
+    assert result.get("status") != "valid"
+    assert result["error"] == "invalid_json"
+    assert result["response_raw"] == raw
+    assert result["response_sha256"] == pilot.sha(raw)

@@ -27,3 +27,16 @@ These are synthetic prompts from **one model provider**, with two repetitions pe
 The pilot produced a usable, audited negative result for a broad claim of obvious issuer effects, together with a small classification-instability finding. **Do not activate a new mandatory bias gate** on this basis. A later test should include an independent provider and larger counterbalanced sample if the objective is to identify more subtle or systematic shifts. Until that is possible, source-aware review remains more useful than adding automated language rules.
 
 Raw prompts, verbatim answers, run order, parsed scores, success/failure outcomes and their SHA-256 values are in `results.json`. The file SHA-256 is `7192e5256b5e5bc466cff676705674c47d9b5def836213690849a19f746dfbb9` (calculated locally after the pilot).
+
+
+## Review corrections after data collection
+
+GitHub code review identified two exception-handling defects in the experiment
+runner: non-string status values could crash parsing, and timed-out processes
+could lose already captured partial output. Those **failure-path** cases were
+repaired with no-network regression tests **after** the 16 completed sessions.
+The original preregistration is retained as commit
+`abbe49decc53591d883919c60c59d12385d6e62e`, and the first outcome
+commit remains `dc0c9847f82bb28766b7aac118b5dd9de60cf080`.
+No prompts, model answers, run order, scoring scheme or result objects were
+regenerated or silently changed by these follow-up corrections.
