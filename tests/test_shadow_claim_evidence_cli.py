@@ -33,6 +33,8 @@ def test_correct_quote_and_prompt_reuse(monkeypatch):
             "response_sha256": cli.digest('{"label":"contradicted"}'),
             "provider_response_sha256": "local-response-digest",
             "prompt_eval_count": 120,
+            "model_digest": "a" * 64,
+            "model_native_context_tokens": 40960,
         }
 
     monkeypatch.setattr(cli.shadow, "run_ollama_one", fake_ollama)
@@ -51,6 +53,8 @@ def test_correct_quote_and_prompt_reuse(monkeypatch):
     assert result["prompt_sha256"] == cli.digest(sample["prompt"])
     assert result["provider_response_sha256"] == "local-response-digest"
     assert result["prompt_eval_count"] == 120
+    assert result["model_digest"] == "a" * 64
+    assert result["model_native_context_tokens"] == 40960
     assert result["context_window_tokens"] == cli.shadow.OLLAMA_NUM_CTX
 
 

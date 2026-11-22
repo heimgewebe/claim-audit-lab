@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 import random
+import re
 import shutil
 import subprocess
 import sys
@@ -172,6 +173,64 @@ def run_one(sample: dict, excerpt: str) -> dict:
 
 
 
+def verify_local_ollama_model(opener, model_name: str) -> dict:
+    """Verify Ollama local model metadata and context before submitting claim text."""
+    api = LOCAL_URL.rsplit("/", 1)[0]
+    with opener.open(api + "/tags", timeout=10) as response:
+        tags = json.loads(response.read())
+    available = tags.get("models") if isinstance(tags, dict) else None
+    if not isinstance(available, list):
+        return {"error": "model_locality_unverified"}
+    matches = [
+        item for item in available
+        if isinstance(item, dict) and item.get("name") == model_name
+    ]
+    if len(matches) != 1:
+        return {"error": "model_not_installed_locally"}
+    item = matches[0]
+    if (
+        model_name.lower().endswith(":cloud")
+        or model_name.lower().endswith("-cloud")
+        or item.get("remote_host")
+        or item.get("remote_model")
+    ):
+        return {"error": "cloud_model_forbidden"}
+    digest = item.get("digest")
+    if (
+        type(item.get("size")) is not int
+        or item["size"] <= 0
+        or not isinstance(digest, str)
+        or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+    ):
+        return {"error": "model_locality_unverified"}
+    show_request = urllib.request.Request(
+        api + "/show",
+        data=json.dumps({"model": model_name}).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with opener.open(show_request, timeout=10) as response:
+        shown = json.loads(response.read())
+    if not isinstance(shown, dict):
+        return {"error": "model_locality_unverified"}
+    if shown.get("remote_host") or shown.get("remote_model"):
+        return {"error": "cloud_model_forbidden"}
+    model_info = shown.get("model_info")
+    if not isinstance(model_info, dict):
+        return {"error": "model_context_unverified"}
+    limits = [
+        value for key, value in model_info.items()
+        if isinstance(key, str) and key.endswith(".context_length")
+        and type(value) is int and value > 0
+    ]
+    if not limits:
+        return {"error": "model_context_unverified"}
+    native_context = min(limits)
+    if native_context < OLLAMA_NUM_CTX:
+        return {"error": "model_context_too_small", "model_native_context_tokens": native_context}
+    return {"model_digest": digest, "model_native_context_tokens": native_context}
+
+
 def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
     """Call an already running, loopback-only Ollama model; never download one."""
     result = dict(sample)
@@ -184,6 +243,8 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
         "format": "json",
         "options": {"temperature": 0, "num_predict": 256, "num_ctx": OLLAMA_NUM_CTX},
         "keep_alive": "3m",
+        "truncate": False,
+        "shift": False,
     }
     request = urllib.request.Request(
         LOCAL_URL,
@@ -196,6 +257,13 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
         # forward even 127.0.0.1 requests through HTTP_PROXY if NO_PROXY is
         # absent, leaking the excerpt and claim outside the local host.
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        preflight = verify_local_ollama_model(opener, model_name)
+        if preflight.get("error"):
+            result.update(preflight)
+            result["exit_code"] = None
+            result["duration_seconds"] = round(time.monotonic() - started, 2)
+            return result
+        result.update(preflight)
         with opener.open(request, timeout=105) as response:
             raw_api = response.read().decode("utf-8")
         data = json.loads(raw_api)
@@ -227,6 +295,14 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
             except (ValueError, json.JSONDecodeError) as exc:
                 result["error"] = "invalid_output"
                 result["parser_error"] = str(exc)
+    except urllib.error.HTTPError as exc:
+        result["exit_code"] = None
+        result["http_status"] = exc.code
+        diagnostic = exc.read(4096).decode("utf-8", errors="replace")
+        if exc.code == 400 and "exceeds the available context size" in diagnostic:
+            result["error"] = "prompt_context_exceeded"
+        else:
+            result["error"] = "local_request_rejected"
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         result["exit_code"] = None
         result["error"] = "local_provider_unreachable"
