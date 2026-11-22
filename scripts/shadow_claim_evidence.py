@@ -82,7 +82,9 @@ def main() -> None:
                         help="Already installed local Ollama model")
     args = parser.parse_args()
     try:
-        excerpt = args.excerpt_file.read_text(encoding="utf-8")
+        # Bound decoding before input validation: a mistaken huge file must not exhaust RAM.
+        with args.excerpt_file.open("r", encoding="utf-8") as stream:
+            excerpt = stream.read(MAX_EXCERPT_CHARS + 1)
         output = evaluate(args.claim, excerpt, args.model)
     except (OSError, UnicodeError, ValueError) as exc:
         parser.error(str(exc))

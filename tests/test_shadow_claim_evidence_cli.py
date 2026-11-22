@@ -124,3 +124,23 @@ def test_cli_reports_provider_error_and_nonzero_exit(tmp_path, monkeypatch, caps
         cli.main()
     assert exc.value.code == 2
     assert json.loads(capsys.readouterr().out)["verdict"] is None
+
+def test_cli_bounds_input_read_before_rejecting_oversized_file(tmp_path, monkeypatch, capsys):
+    file = tmp_path / "oversized.txt"
+    file.write_text("A" * (cli.MAX_EXCERPT_CHARS + 100), encoding="utf-8")
+
+    def must_not_use_unbounded_reader(*args, **kwargs):
+        raise AssertionError("Unbounded Path.read_text was called")
+
+    monkeypatch.setattr(Path, "read_text", must_not_use_unbounded_reader)
+    monkeypatch.setattr(cli.shadow, "run_ollama_one",
+                        lambda *args: (_ for _ in ()).throw(
+                            AssertionError("model called for oversized input")))
+    monkeypatch.setattr(sys, "argv", [
+        "shadow_claim_evidence.py", "--claim", "Claim X",
+        "--excerpt-file", str(file),
+    ])
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+    assert exc.value.code == 2
+    assert "choose a bounded" in capsys.readouterr().err
