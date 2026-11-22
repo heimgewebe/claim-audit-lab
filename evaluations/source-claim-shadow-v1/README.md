@@ -40,9 +40,10 @@ Gemessen werden Drei-Klassen-Trefferrate, getrennte Entwicklungs-/Holdout-Treffe
 ```bash
 python evaluations/source-claim-shadow-v1/run.py
 python evaluations/source-claim-shadow-v1/run.py --execute --output-dir /tmp/claim-shadow-pilot-001
+python evaluations/source-claim-shadow-v1/run.py --execute --backend ollama --local-model qwen3:14b --output-dir /tmp/claim-shadow-local-qwen3-001
 ```
 
-Der erste Aufruf zeigt nur die deterministisch gemischten 18 Fallkennungen, Splits und Prompt-Hashes. Die zweite Variante startet Abonnement-CLI-Aufrufe im vorhandenen Kontingent und schreibt `results.json` und `report.md` unter ein **neues** Verzeichnis. Ein bereits bestehendes Verzeichnis wird nicht überschrieben. Zur Wiederholung muss ein neuer Ausgabeort gewählt werden.
+Der erste Aufruf zeigt nur die deterministisch gemischten 18 Fallkennungen, Splits und Prompt-Hashes. Die letzte Variante verwendet ausschließlich die **bereits laufende lokale Ollama-API** auf `127.0.0.1:11434` und das bereits installierte Modell `qwen3:14b`: dieselben vorregistrierten Prompts, Textbelege, Goldlabels, Splits und Auswertungsformeln; keine Cloud-Anmeldung, kein Download, keine neue Infrastruktur und kein Produktions-Gate. Gespeichert werden unveränderte Modellantworten sowie der Hash der Original-API-Antwort. Lokale Modellantworten sind eine **andere Modellfamilie** und dürfen weder als GPT-6-Astra-Leistung noch als unabhängige menschliche Beurteilung ausgegeben werden. Die zweite Variante startet Abonnement-CLI-Aufrufe im vorhandenen Kontingent und schreibt `results.json` und `report.md` unter ein **neues** Verzeichnis. Ein bereits bestehendes Verzeichnis wird nicht überschrieben. Zur Wiederholung muss ein neuer Ausgabeort gewählt werden.
 
 *Die CLI verwendet das bestehende Abonnement. Ob daraus zusätzliche Kosten, Nutzungslimits oder Provider-Sperren entstehen, richtet sich nach dem jeweiligen Kontingent.*
 
@@ -64,4 +65,4 @@ Die erste Ausführung vom 21. November 2026 ist unter `diagnostic-expired-auth-2
 
 Die CLI ist daraufhin minimal verbessert worden: Nach dem ersten eindeutigen Authentifizierungs-, Quota- oder CLI-Ausfall werden die weiteren 17 Modellaufrufe **nicht mehr gestartet**. Der Bericht enthält dann keine erfundene Modell-Genauigkeit (`accuracy=null`) und kennzeichnet die Messung als unbrauchbar. Falltexte, Goldlabels, Splits, Promptinhalt und die feste zufällige Reihenfolge blieben unangetastet.
 
-Sobald die **bestehende Codex-Anmeldung** wieder funktioniert, kann der Blindtest mit einem neuen `--output-dir` ausgeführt werden. Ein kurzer zusätzlicher Claude-Pro-Smoke-Test zeigte ebenfalls eine bloß formal positive `claude auth status`-Anzeige, während eine echte Generierung `Not logged in · Please run /login` zurückgab. Auch Claude steht daher gegenwärtig **nicht** als überprüft funktionsfähiger Ersatzanbieter bereit. Das Experiment benötigt keinen API-Schlüssel, keine neue Infrastruktur und kein zusätzliches Freigabegate.
+Die Codex-Anmeldung bleibt für eine künftige **separate** Vergleichsmessung offen. Bis dahin kann der lokale Ollama-Backendpfad den festgelegten Blindtest ohne diese Zugangsdaten durchführen. Ein kurzer zusätzlicher Claude-Pro-Smoke-Test zeigte ebenfalls eine bloß formal positive `claude auth status`-Anzeige, während eine echte Generierung `Not logged in · Please run /login` zurückgab. Auch Claude steht daher gegenwärtig **nicht** als überprüft funktionsfähiger Ersatzanbieter bereit. Das Experiment benötigt keinen API-Schlüssel, keine neue Infrastruktur und kein zusätzliches Freigabegate.

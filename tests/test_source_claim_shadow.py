@@ -173,3 +173,84 @@ def test_first_cli_failure_aborts_remaining_17_without_false_accuracy(monkeypatc
     assert result["metrics"]["split_metrics"]["holdout"]["accuracy"] is None
     assert sum(r["error"] == "not_run_after_provider_failure" for r in result["runs"]) == 17
     assert "UNUSABLE MODEL TRIAL" in (tmp_path / "failed-run" / "report.md").read_text()
+
+
+def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monkeypatch):
+    import io
+
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+    quoted = case["source_excerpt"][:25]
+    model_response = json.dumps({
+        "label": "supported",
+        "evidence_span": quoted,
+        "reason": "The quoted source passage directly provides this evidence.",
+    })
+    raw_api = json.dumps({
+        "model": "qwen3:14b",
+        "response": model_response,
+        "done": True,
+        "eval_count": 44,
+    })
+    observed = []
+
+    def fake_urlopen(request, timeout=None):
+        observed.append((request.full_url, timeout, json.loads(request.data)))
+        return io.BytesIO(raw_api.encode("utf-8"))
+
+    monkeypatch.setattr(shadow.urllib.request, "urlopen", fake_urlopen)
+    output = shadow.run_ollama_one(sample, case["source_excerpt"], "qwen3:14b")
+    assert output["status"] == "valid"
+    assert output["judgment"]["label"] == "supported"
+    assert output["response_sha256"] == shadow.sha(model_response)
+    assert output["provider_response_sha256"] == shadow.sha(raw_api)
+    url, timeout, payload = observed[0]
+    assert url == "http://127.0.0.1:11434/api/generate"
+    assert payload["prompt"] == sample["prompt"]
+    assert payload["model"] == "qwen3:14b"
+    assert payload["think"] is False
+    assert payload["stream"] is False
+    assert payload["options"]["temperature"] == 0
+    assert len(observed) == 1
+
+
+def test_local_unavailable_model_returns_explicit_error(monkeypatch):
+    from urllib.error import URLError
+
+    def refused(request, timeout=None):
+        raise URLError("connection refused")
+
+    monkeypatch.setattr(shadow.urllib.request, "urlopen", refused)
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+    result = shadow.run_ollama_one(sample, case["source_excerpt"], "qwen3:14b")
+    assert result["error"] == "local_provider_unreachable"
+    assert "judgment" not in result
+    assert "raw_response" not in result
+
+
+def test_local_backend_driver_never_leaks_gold_or_reuses_old_output(monkeypatch, tmp_path):
+    observed = []
+
+    def local_model(sample, excerpt, model_name):
+        observed.append((sample["id"], model_name))
+        return {**sample, "error": "local_provider_unreachable"}
+
+    monkeypatch.setattr(shadow, "run_ollama_one", local_model)
+    output_dir = tmp_path / "ollama-failed"
+    monkeypatch.setattr(sys, "argv", [
+        "run.py", "--execute", "--backend", "ollama",
+        "--local-model", "qwen3:14b", "--output-dir", str(output_dir),
+    ])
+    with pytest.raises(SystemExit, match="Incomplete model run"):
+        shadow.main()
+    assert len(observed) == 1
+    assert observed[0][1] == "qwen3:14b"
+    recorded = json.loads((output_dir / "results.json").read_text())
+    assert recorded["backend"] == "ollama"
+    assert recorded["model"] == "qwen3:14b"
+    assert recorded["metrics"]["attempted_calls"] == 1
+    assert recorded["metrics"]["split_metrics"]["holdout"]["accuracy"] is None
+    assert sum(x["error"] == "not_run_after_provider_failure" for x in recorded["runs"]) == 17
+    with pytest.raises(SystemExit, match="exists"):
+        shadow.main()
