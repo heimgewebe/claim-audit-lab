@@ -14,12 +14,15 @@ import sys
 ROOT = Path(__file__).resolve().parent
 SHADOW_PATH = ROOT.parents[1] / "evaluations" / "source-claim-shadow-v1" / "run.py"
 SCHEMA = "claim-audit-lab.uncertainty-boundary-v1"
+FROZEN_CASES_SHA256 = "c05be1632fbb888ff4bfd6689ed88700d367fbd8a231b1cdb2432cd9169c8de8"
 LABELS = {"supported", "contradicted", "insufficient"}
 
 
 def load_cases() -> tuple[dict, str]:
     raw = (ROOT / "cases.json").read_bytes()
     data = json.loads(raw)
+    if hashlib.sha256(raw).hexdigest() != FROZEN_CASES_SHA256:
+        raise ValueError("The preregistered gold file changed; create a new benchmark version")
     if data.get("schema_version") != SCHEMA:
         raise ValueError("Wrong case schema")
     cases = data.get("cases")
