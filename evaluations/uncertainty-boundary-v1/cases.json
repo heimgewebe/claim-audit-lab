@@ -1,0 +1,171 @@
+{
+  "schema_version": "claim-audit-lab.uncertainty-boundary-v1",
+  "gold_source": "single-operator-precommitted-synthetic",
+  "seed": 20261122,
+  "model_runner": "evaluations/source-claim-shadow-v1/run.py:run_ollama_one",
+  "frozen_split": "development+holdout",
+  "cases": [
+    {
+      "id": "d01-causation-unmeasured",
+      "split": "development",
+      "family": "observational-study",
+      "source_excerpt": "Die Beobachtungsstudie fand einen statistischen Zusammenhang zwischen Stoff A und Symptom B. Eine Ursache-Wirkungs-Beziehung wurde nicht untersucht.",
+      "claim": "Stoff A verursachte Symptom B.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Eine Korrelation ohne Kausalitätsprüfung belegt oder widerlegt die Ursache nicht."
+    },
+    {
+      "id": "d02-study-says-no-causal-proof",
+      "split": "development",
+      "family": "trial-method",
+      "source_excerpt": "Im Studienbericht steht: Wir untersuchten nur zeitliche Korrelationen und leiten ausdrücklich keinen kausalen Nachweis ab.",
+      "claim": "Der Studienbericht behauptet, einen kausalen Nachweis erbracht zu haben.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Die Behauptung über den Bericht selbst ist mit dessen ausdrücklicher Verneinung unvereinbar."
+    },
+    {
+      "id": "d03-ph-measured",
+      "split": "development",
+      "family": "chemistry",
+      "source_excerpt": "Das Laborprotokoll weist für Probe C einen gemessenen pH-Wert von 6,4 aus.",
+      "claim": "Für Probe C wurde ein pH-Wert von 6,4 gemessen.",
+      "gold_label": "supported",
+      "gold_rationale": "Der berichtete Messwert entspricht genau der Behauptung."
+    },
+    {
+      "id": "d04-donation-motive-unknown",
+      "split": "development",
+      "family": "political-record",
+      "source_excerpt": "Das veröffentlichte Register dokumentiert eine Spende des Unternehmens X an die Stiftung Y im Jahr 2022. Zu Motiven und politischen Entscheidungen enthält der Auszug keine Feststellungen.",
+      "claim": "Die Spende beweist, dass Unternehmen X eine bestimmte politische Entscheidung erkaufen wollte.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Eine dokumentierte Spende ohne Motiv- oder Entscheidungsevidenz rechtfertigt keinen Motivnachweis."
+    },
+    {
+      "id": "d05-count-contradiction",
+      "split": "development",
+      "family": "census",
+      "source_excerpt": "Die Liste der abgegebenen Stimmen enthält genau zwölf gültige Stimmen.",
+      "claim": "Die Liste enthält genau dreizehn gültige Stimmen.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Zwölf und dreizehn sind für dieselbe vollständige Liste ein expliziter Zahlwiderspruch."
+    },
+    {
+      "id": "d06-random-assignment",
+      "split": "development",
+      "family": "experiment-design",
+      "source_excerpt": "Participants were allocated to treatment and control groups using a computer-generated random sequence.",
+      "claim": "Die Zuteilung auf die Gruppen erfolgte zufällig.",
+      "gold_label": "supported",
+      "gold_rationale": "Eine computergenerierte Zufallsfolge stützt die Aussage der zufälligen Zuteilung."
+    },
+    {
+      "id": "d07-emission-inference",
+      "split": "development",
+      "family": "energy-statistics",
+      "source_excerpt": "Die erzeugte Strommenge erhöhte sich im zweiten Quartal um acht Prozent. Der Bericht nennt keine Emissionsdaten.",
+      "claim": "Der Kohlendioxidausstoß sank im zweiten Quartal um acht Prozent.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Erzeugte Strommenge erlaubt keine Folgerung über den angegebenen Emissionstrend."
+    },
+    {
+      "id": "d08-timeline-contradiction",
+      "split": "development",
+      "family": "meeting-minutes",
+      "source_excerpt": "The meeting started at 13:00 local time and ended at 14:10.",
+      "claim": "The meeting started at 15:00 local time.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Die aufgezeichnete Startzeit widerspricht der Behauptung bei identischer Zeitzone."
+    },
+    {
+      "id": "d09-no-decision-recorded",
+      "split": "development",
+      "family": "council-minutes",
+      "source_excerpt": "Die Niederschrift verzeichnet eine Debatte über das Bauvorhaben; zu einem Beschluss kam es in dieser Sitzung nicht.",
+      "claim": "In dieser Sitzung wurde kein Beschluss über das Bauvorhaben gefasst.",
+      "gold_label": "supported",
+      "gold_rationale": "Die Niederschrift bestätigt explizit die Nichtbeschlussfassung."
+    },
+    {
+      "id": "h01-exposure-not-measured",
+      "split": "holdout",
+      "family": "toxicology",
+      "source_excerpt": "The toxicology investigation measured blood concentrations but did not assess whether exposure caused the reported neurological symptoms.",
+      "claim": "The exposure caused the neurological symptoms.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Die Ursache wurde nicht untersucht; eine medizinische Kausalbehauptung bleibt offen."
+    },
+    {
+      "id": "h02-earthquake-magnitude-measured",
+      "split": "holdout",
+      "family": "seismology",
+      "source_excerpt": "Die Messstation registrierte am Ort M um 03:21 UTC ein Erdbeben der Magnitude 4,2.",
+      "claim": "Die registrierte Magnitude des Erdbebens betrug 4,2.",
+      "gold_label": "supported",
+      "gold_rationale": "Die Magnitude wird ausdrücklich angegeben."
+    },
+    {
+      "id": "h03-earthquake-magnitude-conflict",
+      "split": "holdout",
+      "family": "seismic-catalogue",
+      "source_excerpt": "Das Ereignisverzeichnis gibt für das Beben am Ort Z die Magnitude 3,8 an.",
+      "claim": "Das Ereignisverzeichnis gibt für dasselbe Beben die Magnitude 5,8 an.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Der Claim über den konkreten Katalogeintrag ist durch dessen anderen Wert widerlegt."
+    },
+    {
+      "id": "h04-no-evidence-of-vote-buying",
+      "split": "holdout",
+      "family": "corruption-inquiry",
+      "source_excerpt": "Die Untersuchung konnte keine Aussage darüber treffen, ob die Zahlung an Person Q eine spätere Abstimmung beeinflusste. Der Einfluss wurde nicht geprüft.",
+      "claim": "Die Zahlung an Person Q beeinflusste die spätere Abstimmung.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Ein nicht untersuchter Einfluss ist weder bestätigt noch ausgeschlossen."
+    },
+    {
+      "id": "h05-radiology-negative",
+      "split": "holdout",
+      "family": "radiology",
+      "source_excerpt": "Im beurteilten CT wurden keine Frakturen der linken Speiche festgestellt; die Aufnahme war diagnostisch verwertbar.",
+      "claim": "Im beurteilten CT wurde eine Fraktur der linken Speiche nachgewiesen.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Der berichtete Befund verneint ausdrücklich die behauptete Fraktur."
+    },
+    {
+      "id": "h06-software-released",
+      "split": "holdout",
+      "family": "software-release",
+      "source_excerpt": "Das Release-Protokoll bestätigt, dass Version 2.4.1 am Donnerstag veröffentlicht wurde.",
+      "claim": "Version 2.4.1 wurde am Donnerstag veröffentlicht.",
+      "gold_label": "supported",
+      "gold_rationale": "Das Protokoll nennt genau die behauptete Version und den Wochentag."
+    },
+    {
+      "id": "h07-no-safety-evaluation",
+      "split": "holdout",
+      "family": "safety-report",
+      "source_excerpt": "Der Prüfbericht untersuchte die elektrische Leitfähigkeit und den Wärmewiderstand des Bauteils. Ob das Bauteil langfristig gesundheitsschädlich ist, war nicht Gegenstand der Untersuchung.",
+      "claim": "Das Bauteil ist langfristig gesundheitsschädlich.",
+      "gold_label": "insufficient",
+      "gold_rationale": "Die gesundheitliche Langzeitwirkung wurde nicht geprüft."
+    },
+    {
+      "id": "h08-historical-departure",
+      "split": "holdout",
+      "family": "shipping-log",
+      "source_excerpt": "Das Fahrtenbuch hält fest: Schiff Aurora verließ den Hafen am 17. Mai 1912.",
+      "claim": "Das Schiff Aurora verließ den Hafen am 17. Mai 1912.",
+      "gold_label": "supported",
+      "gold_rationale": "Der Auszug berichtet die behauptete Abfahrt und das Datum."
+    },
+    {
+      "id": "h09-historical-not-departed",
+      "split": "holdout",
+      "family": "railway-log",
+      "source_excerpt": "Die Zugliste verzeichnet die Abfahrt des Zuges R um 08:20 Uhr; eine Abfahrt um 07:20 Uhr ist für denselben Zug nicht aufgeführt.",
+      "claim": "Die Zugliste verzeichnet die Abfahrt des Zuges R um 07:20 Uhr.",
+      "gold_label": "contradicted",
+      "gold_rationale": "Die Quelle belegt eine andere Abfahrtszeit und verneint den behaupteten Katalogeintrag."
+    }
+  ]
+}

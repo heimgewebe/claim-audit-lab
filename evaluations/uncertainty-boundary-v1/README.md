@@ -1,0 +1,1 @@
+Pre-registered synthetic logical evidence boundaries. Exactly 9 development/9 holdout, each class 3+3. Gold authored before any model calls; no external source authenticity claims. Evaluate no-evidence vs contradiction, explicit contradicting evidence, ordinary support. DO NOT rewrite gold after evaluation; change as separate version.
