@@ -14,10 +14,14 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.error
+import urllib.request
 
 ROOT = Path(__file__).resolve().parent
 CASES_PATH = ROOT / "cases.json"
 MODEL = "gpt-6-astra"
+LOCAL_MODEL = "qwen3:14b"
+LOCAL_URL = "http://127.0.0.1:11434/api/generate"
 SEED = 20261121
 LABELS = ("supported", "contradicted", "insufficient")
 MAX_WORKERS = 3
@@ -164,6 +168,64 @@ def run_one(sample: dict, excerpt: str) -> dict:
     return result
 
 
+
+def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
+    """Call an already running, loopback-only Ollama model; never download one."""
+    result = dict(sample)
+    started = time.monotonic()
+    payload = {
+        "model": model_name,
+        "prompt": sample["prompt"],
+        "stream": False,
+        "think": False,
+        "format": "json",
+        "options": {"temperature": 0, "num_predict": 256, "num_ctx": 4096},
+        "keep_alive": "3m",
+    }
+    request = urllib.request.Request(
+        LOCAL_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        # Use an explicit proxy-free opener. urllib's default opener can
+        # forward even 127.0.0.1 requests through HTTP_PROXY if NO_PROXY is
+        # absent, leaking the excerpt and claim outside the local host.
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(request, timeout=105) as response:
+            raw_api = response.read().decode("utf-8")
+        data = json.loads(raw_api)
+        model_text = data.get("response")
+        if not isinstance(model_text, str):
+            raise ValueError("Ollama response lacks model-generated text")
+        result["raw_response"] = model_text
+        result["response_sha256"] = sha(model_text)
+        result["provider_response_sha256"] = sha(raw_api)
+        result["model_used"] = data.get("model", "")
+        result["eval_count"] = data.get("eval_count")
+        result["exit_code"] = 0 if data.get("done") is True else None
+        if data.get("done") is not True:
+            result["error"] = "incomplete_local_generation"
+        else:
+            try:
+                result["judgment"] = parse_response(model_text, excerpt)
+                result["status"] = "valid"
+            except (ValueError, json.JSONDecodeError) as exc:
+                result["error"] = "invalid_output"
+                result["parser_error"] = str(exc)
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        result["exit_code"] = None
+        result["error"] = "local_provider_unreachable"
+        result["error_type"] = type(exc).__name__
+    except (ValueError, json.JSONDecodeError) as exc:
+        result["exit_code"] = None
+        result["error"] = "invalid_local_response"
+        result["parser_error"] = str(exc)
+    result["duration_seconds"] = round(time.monotonic() - started, 2)
+    return result
+
+
 def measurements(cases: list[dict], results: list[dict]) -> dict:
     index = {row["id"]: row for row in results}
     if len(index) != len(cases) or set(index) != {c["id"] for c in cases}:
@@ -222,7 +284,7 @@ def measurements(cases: list[dict], results: list[dict]) -> dict:
     }
 
 
-def render_report(metrics: dict, cases: list[dict], rows: list[dict]) -> str:
+def render_report(metrics: dict, cases: list[dict], rows: list[dict], model_name: str = MODEL) -> str:
     by_id = {r["id"]: r for r in rows}
     lines = [
         "# Source excerpt → claim semantic shadow assessment",
@@ -231,7 +293,7 @@ def render_report(metrics: dict, cases: list[dict], rows: list[dict]) -> str:
         "No web access was granted to the reviewer and these judgments do not certify",
         "the authenticity of the cited web pages or factual claims outside each excerpt.",
         "",
-        f"- Model: {MODEL}; seed: {SEED}",
+        f"- Model: {model_name}; seed: {SEED}",
         f"- Valid responses: {metrics['valid']}/{metrics['cases']}",
         f"- Model calls actually attempted: {metrics['attempted_calls']}",
         f"- Accuracy among valid responses (not measurable if none): {metrics['split_metrics']['all']['accuracy']}",
@@ -281,12 +343,17 @@ def main() -> None:
                         help="Call the existing subscribed Codex model (opt-in)")
     parser.add_argument("--output-dir", type=Path,
                         help="Must be a new directory when --execute is selected")
+    parser.add_argument("--backend", choices=("codex", "ollama"), default="codex",
+                        help="Optional local Ollama; no model downloads or new services")
+    parser.add_argument("--local-model", default=LOCAL_MODEL,
+                        help="Already installed Ollama model tag (only with --backend ollama)")
     args = parser.parse_args()
     cases = load_cases()
     samples = assignments(cases)
     if not args.execute:
         print(json.dumps({
-            "model": MODEL, "seed": SEED, "total": len(samples),
+            "model": args.local_model if args.backend == "ollama" else MODEL,
+            "backend": args.backend, "seed": SEED, "total": len(samples),
             "case_plan": [
                 {"id": x["id"], "split": x["split"], "order": x["order"],
                  "prompt_sha256": x["prompt_sha256"]}
@@ -306,10 +373,16 @@ def main() -> None:
     # One actual first sample detects expired authentication or a dead provider
     # before the other 17 CLI requests are launched. The prompt/order stays
     # preregistered, and skipped samples remain explicit invalid outcomes.
-    first = run_one(samples[0], by_id[samples[0]["id"]]["source_excerpt"])
+    infer = (
+        (lambda item: run_ollama_one(item, by_id[item["id"]]["source_excerpt"], args.local_model))
+        if args.backend == "ollama" else
+        (lambda item: run_one(item, by_id[item["id"]]["source_excerpt"]))
+    )
+    first = infer(samples[0])
     if first.get("error") in {
         "authentication_expired", "quota_or_rate_limit",
         "model_or_cli_failure", "cli_unavailable",
+        "local_provider_unreachable", "invalid_local_response",
     }:
         rows = [first] + [
             {**sample, "error": "not_run_after_provider_failure", "status": "not_run"}
@@ -318,14 +391,15 @@ def main() -> None:
     else:
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             rows = [first] + list(executor.map(
-                lambda item: run_one(item, by_id[item["id"]]["source_excerpt"]),
+                infer,
                 samples[1:],
             ))
     metrics = measurements(cases, rows)
     output = {
         "schema_version": SCHEMA,
         "source_file_sha256": hashlib.sha256(CASES_PATH.read_bytes()).hexdigest(),
-        "model": MODEL, "seed": SEED,
+        "model": args.local_model if args.backend == "ollama" else MODEL,
+        "backend": args.backend, "seed": SEED,
         "completed_at_utc": datetime.now(timezone.utc).isoformat(),
         "reference_annotation": "single_operator_precommitted_not_independent_expert",
         "metrics": metrics,
@@ -334,7 +408,7 @@ def main() -> None:
     }
     for file, text in (
         ("results.json", json.dumps(output, ensure_ascii=False, indent=2) + "\n"),
-        ("report.md", render_report(metrics, cases, rows))
+        ("report.md", render_report(metrics, cases, rows, output["model"]))
     ):
         path = output_dir / file
         temp = output_dir / (file + ".tmp")
