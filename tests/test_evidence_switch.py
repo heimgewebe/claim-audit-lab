@@ -78,3 +78,30 @@ def test_second_run_refuses_overwrite_without_model_call(monkeypatch, tmp_path):
         runner.main()
     assert exc.value.code == 2
     assert destination.read_text() == "immutable"
+
+
+def test_saved_trial_responses_match_exact_prompts_gold_and_metric_counts():
+    """Every retained model verdict is hash-bound to the frozen prompt and output."""
+    protocol, cases = runner.read_protocol()
+    for file in sorted(runner.ROOT.glob("run-*.json")):
+        saved = json.loads(file.read_text(encoding="utf-8"))
+        assert saved["cases_sha256"] == runner.CASES_SHA256
+        assert saved["protocol_sha256"] == runner.PROTOCOL_SHA256
+        assert saved["source_authenticity_verified"] is False
+        assert saved["advisory_only"] is True
+        subset = {case["id"]: case for case in cases if case["split"] == saved["split"]}
+        reviewer = runner.reviewer_module(saved["condition"], protocol)
+        assert saved["instruction_sha256"] == reviewer.sha(reviewer.INSTRUCTION)
+        assert {row["id"] for row in saved["rows"]}.issubset(subset)
+        for row in saved["rows"]:
+            case = subset[row["id"]]
+            assert row["prompt_sha256"] == reviewer.sha(reviewer.prompt_for(case))
+            if row["status"] != "valid":
+                continue
+            raw = row["raw_response"]
+            assert isinstance(raw, str)
+            assert hashlib.sha256(raw.encode("utf-8")).hexdigest() == row["response_sha256"]
+            parsed = reviewer.parse_response(raw, case["source_excerpt"])
+            assert parsed["label"] == row["label"]
+            assert parsed["evidence_span"] == row["evidence_span"]
+        assert saved["metrics"] == runner.summarize(saved["rows"], list(subset.values()))
