@@ -122,3 +122,51 @@ def test_committed_manifest_contains_hashes_not_copyrighted_abstracts():
     for sample in manifest["samples"]:
         assert set(sample) == expected_keys
         assert len(sample["abstract_sha256"]) == len(sample["claim_sha256"]) == 64
+
+
+def test_continue_only_verbatim_quote_format_failure_with_bound_original_result():
+    shadow = bench.load_shadow()
+    by_claim = {1: "The original study measured a specific treatment effect."}
+    doc = {
+        2: {"abstract": [
+            "The study measured an outcome in trial A and found a clearly reported result.",
+            "It did not evaluate the proposed treatment effect in the final analysis.",
+        ]}
+    }
+    excerpt = bench.source_text(doc[2])
+    prompt = shadow.prompt_for({"claim": by_claim[1], "source_excerpt": excerpt})
+    raw = json.dumps({"label": "contradicted", "evidence_span": "a fabricated quote",
+                      "reason": "Unsupported citation."})
+    row = {
+        "id": "1:2", "status": "error", "error": "invalid_output",
+        "label": None, "evidence_span": None, "raw_response": raw,
+        "prompt_sha256": shadow.sha(prompt), "response_sha256": bench.sha(raw.encode()),
+    }
+    selected = [{"id": "1:2", "claim_id": 1, "doc_id": 2},
+                {"id": "4:5", "claim_id": 4, "doc_id": 5}]
+    previous = {
+        "release_sha256": bench.RELEASE_SHA256, "manifest_sha256": "m" * 64,
+        "split": "development", "model": "qwen3:14b", "condition": "lab",
+        "backend_sha256": bench.sha(bench.SHADOW.read_bytes()),
+        "instruction_sha256": shadow.sha(shadow.INSTRUCTION),
+        "rows": [row],
+    }
+    accepted = bench.verified_resume_prefix(
+        previous, "m" * 64, "development", "qwen3:14b", "lab",
+        selected, by_claim, doc, shadow,
+    )
+    assert accepted == [row]
+    tampered = json.loads(json.dumps(previous))
+    tampered["rows"][0]["response_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="hash"):
+        bench.verified_resume_prefix(
+            tampered, "m" * 64, "development", "qwen3:14b", "lab",
+            selected, by_claim, doc, shadow,
+        )
+    tampered = json.loads(json.dumps(previous))
+    tampered["condition"] = "minimal"
+    with pytest.raises(ValueError, match="identity"):
+        bench.verified_resume_prefix(
+            tampered, "m" * 64, "development", "qwen3:14b", "lab",
+            selected, by_claim, doc, shadow,
+        )

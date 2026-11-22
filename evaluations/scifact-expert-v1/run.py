@@ -181,7 +181,57 @@ def select_instruction(shadow, condition: str) -> None:
         shadow.INSTRUCTION = protocol["treatments"]["minimal"]
 
 
-def evaluate_split(archive: Path, split: str, model: str, condition: str) -> dict:
+def verified_resume_prefix(
+    previous: dict, manifest_hash: str, split: str, model: str,
+    condition: str, selected: list[dict], by_claim: dict[int, str],
+    corpus: dict[int, dict], shadow,
+) -> list[dict]:
+    if any(previous.get(key) != value for key, value in {
+        "release_sha256": RELEASE_SHA256, "manifest_sha256": manifest_hash,
+        "split": split, "model": model, "condition": condition,
+        "backend_sha256": sha(SHADOW.read_bytes()),
+        "instruction_sha256": shadow.sha(shadow.INSTRUCTION),
+    }.items()):
+        raise ValueError("Original trial identity does not match current source and prompt")
+    rows = previous.get("rows")
+    if not isinstance(rows, list) or not 0 < len(rows) < len(selected):
+        raise ValueError("Original trial is not a nonempty incomplete prefix")
+    if rows[-1].get("error") != "invalid_output":
+        raise ValueError("Only a model citation/format failure may be continued")
+    for index, row in enumerate(rows):
+        sample = selected[index]
+        if row.get("id") != sample["id"]:
+            raise ValueError("Earlier model inputs do not match frozen order")
+        excerpt = source_text(corpus[sample["doc_id"]])
+        prompt = shadow.prompt_for({
+            "claim": by_claim[sample["claim_id"]], "source_excerpt": excerpt,
+        })
+        raw = row.get("raw_response")
+        if (row.get("prompt_sha256") != shadow.sha(prompt)
+            or not isinstance(raw, str)
+            or row.get("response_sha256") != sha(raw.encode())):
+            raise ValueError("Earlier model input or output hash is not valid")
+        if row.get("status") == "valid":
+            parsed = shadow.parse_response(raw, excerpt)
+            if (parsed["label"] != row.get("label")
+                or parsed["evidence_span"] != row.get("evidence_span")):
+                raise ValueError("Earlier valid result is inconsistent")
+        elif index != len(rows) - 1 or row.get("error") != "invalid_output":
+            raise ValueError("Only the final saved row may have a format error")
+        else:
+            try:
+                shadow.parse_response(raw, excerpt)
+            except ValueError:
+                pass
+            else:
+                raise ValueError("Claimed format failure parses as valid")
+    return rows
+
+
+def evaluate_split(
+    archive: Path, split: str, model: str, condition: str,
+    resume_from: Path | None = None,
+) -> dict:
     claims, corpus = load_release(archive)
     manifest, manifest_hash = locked_manifest(claims, corpus)
     by_claim = {claim["id"]: claim["claim"] for claim in claims}
@@ -189,8 +239,17 @@ def evaluate_split(archive: Path, split: str, model: str, condition: str) -> dic
     select_instruction(shadow, condition)
     selected = [sample for sample in manifest["samples"] if sample["split"] == split]
     random.Random(SEED).shuffle(selected)
+    original_sha = None
     rows: list[dict] = []
-    for sample in selected:
+    if resume_from is not None:
+        raw = resume_from.read_bytes()
+        previous = json.loads(raw)
+        rows = verified_resume_prefix(
+            previous, manifest_hash, split, model, condition,
+            selected, by_claim, corpus, shadow,
+        ).copy()
+        original_sha = sha(raw)
+    for sample in selected[len(rows):]:
         claim = by_claim[sample["claim_id"]]
         excerpt = source_text(corpus[sample["doc_id"]])
         if sha(claim.encode()) != sample["claim_sha256"] or sha(excerpt.encode()) != sample["abstract_sha256"]:
@@ -211,7 +270,9 @@ def evaluate_split(archive: Path, split: str, model: str, condition: str) -> dic
         rows.append(row)
         print(json.dumps({"id": sample["id"], "status": row["status"],
                           "label": row["label"], "error": row["error"]}), flush=True)
-        if row["status"] != "valid":
+        # Citation formatting is a measurable model fault, not a provider outage.
+        # Continue the fixed sample sequence without silently accepting the quote.
+        if row["status"] != "valid" and row["error"] != "invalid_output":
             break
     metrics = measurements(rows, selected)
     return {
@@ -224,6 +285,8 @@ def evaluate_split(archive: Path, split: str, model: str, condition: str) -> dic
         "expert_labels_only_for_annotated_pairs": True,
         "cited_unannotated_is_not_nei_gold": True,
         "underlying_paper_truth_verified": False,
+        "continuation_from_sha256": original_sha,
+        "methods_amended_after_development_format_failure": True,
         "metrics": metrics, "rows": rows,
     }
 
@@ -262,6 +325,7 @@ def main() -> None:
     trial.add_argument("--split", choices=SPLITS, required=True)
     trial.add_argument("--model", choices=MODELS, required=True)
     trial.add_argument("--condition", choices=CONDITIONS, required=True)
+    trial.add_argument("--resume-from", type=Path)
     args = parser.parse_args()
     if args.command == "build-manifest":
         path = ROOT / "manifest.json"
@@ -275,10 +339,14 @@ def main() -> None:
         print(json.dumps({"manifest": str(path), "sha256": sha(path.read_bytes()),
                           "samples": manifest["sample_count"]}), flush=True)
     else:
-        path = ROOT / f"run-{args.split}-{args.model.replace(':','-')}-{args.condition}.json"
+        suffix = "-resumed" if args.resume_from is not None else ""
+        path = ROOT / f"run-{args.split}-{args.model.replace(':','-')}-{args.condition}{suffix}.json"
         if path.exists():
             parser.error(f"Existing trial evidence cannot be overwritten: {path}")
-        output = evaluate_split(args.archive, args.split, args.model, args.condition)
+        output = evaluate_split(
+            args.archive, args.split, args.model, args.condition,
+            resume_from=args.resume_from,
+        )
         with path.open("x", encoding="utf-8") as f:
             json.dump(output, f, ensure_ascii=False, indent=2)
             f.write("\n")
