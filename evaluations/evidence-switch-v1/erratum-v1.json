@@ -1,0 +1,30 @@
+{
+  "schema_version": "claim-audit-lab.evidence-switch-erratum.v1",
+  "original_cases_sha256": "19995409ae52c5de4495f6431a9816a3b9b3575eaa09d9bec850703d6dbabd5c",
+  "review_origin": "https://github.com/heimgewebe/claim-audit-lab/pull/40",
+  "review_thread_id": "PRRT_kwDOSYbkJM66jDIE",
+  "interpretation_status": "posthoc_review_supported_not_independently_human_annotated",
+  "handling": "Do not alter original committed gold or relabel the old results. Exclude entire affected families only for a clearly post-hoc sensitivity analysis; construct a fresh v2 with new gold before future model testing.",
+  "affected": [
+    {
+      "case_id": "d05-political-payment-purpose--insufficient",
+      "family": "d05-political-payment-purpose",
+      "split": "development",
+      "original_gold_label": "insufficient",
+      "review_supported_reinterpretation": "contradicted",
+      "reason": "The claim is about what the internal note explicitly says. The excerpt says the note states no purpose; this contradicts the asserted explicit influence purpose, not merely the possible underlying motive.",
+      "claim_sha256": "c3bf623adb70645a4b9ede6c3e02b9c171d92c8f416069a8ddf13bcba8b4400e",
+      "source_excerpt_sha256": "282ae30dc43df97694887c0e9770f09e7bedf94f8e296bfc371f77d965b7e1a6"
+    },
+    {
+      "case_id": "h06-radiology--insufficient",
+      "family": "h06-radiology",
+      "split": "holdout",
+      "original_gold_label": "insufficient",
+      "review_supported_reinterpretation": "contradicted",
+      "reason": "The claim says a left-radius fracture was found in the evaluated CT image. The excerpt says that CT only imaged the right knee and did not image the radius; it contradicts identification in that CT, although it says nothing conclusive about the patient's real fracture status.",
+      "claim_sha256": "31ceeef76ad4079fd469217049d7abbc80c3a4870e29df112d6db71a9485ee59",
+      "source_excerpt_sha256": "aa6faeb103d6c4e252a6eb60a73eef3643c28c3135e2acbb464805ccab67c6cf"
+    }
+  ]
+}

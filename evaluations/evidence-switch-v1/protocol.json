@@ -1,0 +1,26 @@
+{
+  "schema_version": "claim-audit-lab.evidence-switch-protocol.v1",
+  "dataset_sha256": "19995409ae52c5de4495f6431a9816a3b9b3575eaa09d9bec850703d6dbabd5c",
+  "protocol_type": "paired_prompt_ablation_with_counterfactual_source_swap",
+  "random_seed": 20261122,
+  "treatments": {
+    "minimal": "Assess whether the supplied source excerpt supports, contradicts, or does not decide the claim. Return ONLY JSON with exactly these keys: label ('supported', 'contradicted', or 'insufficient'), evidence_span (an exact contiguous substring of the excerpt, or empty if none is decisive), and reason (one concise sentence). Do not add any other keys.",
+    "lab": "existing_unmodified_evaluations/source-claim-shadow-v1/run.py:INSTRUCTION"
+  },
+  "models": [
+    "gemma4:12b",
+    "qwen3:14b"
+  ],
+  "run_order": "random.Random(20261122).shuffle(cases) separately per model and treatment; treatment ordering alternating per model; development first, holdout after development metrics frozen",
+  "metrics": [
+    "valid_responses",
+    "correct_labels",
+    "false_contradictions_on_noncontradictions",
+    "missed_explicit_contradictions",
+    "complete_three_state_family_vectors",
+    "provider_errors_separately"
+  ],
+  "success_test": "Scientific lab prompt is beneficial on these constructed cases only if holdout improves at least one error or complete family without increasing false contradictions or missing explicit contradictions; not a claim of population performance.",
+  "constraints": "No model output sees family, split, gold label or rationale; no model downloads/network; no new CI/merge gate; no model prompt tuning based on holdout.",
+  "limits": "Single-operator constructed synthetic excerpts and subjective gold rationale; evidence switching measures logical excerpt responsiveness, not source authenticity or independent human scientific analysis."
+}
