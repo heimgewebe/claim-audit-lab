@@ -7,7 +7,25 @@ The exact same claim was tested with supporting, explicitly contradicting and in
 - Single operator-authored synthetic cases; no independent human gold annotator, source authenticity or claims of real-world accuracy.
 - The minimal prompt kept the output format and local backend; only the scientific discipline instruction differed.
 
-## Precommitted paired results
+## Reviewer-discovered gold errors and post-hoc sensitivity
+
+Two original gold labels were semantically wrong; the immutable 36-case corpus and all 144 original model replies are retained. d05-political-payment-purpose--insufficient asks whether the note expressly names a motive, but the excerpt explicitly states that the note names no purpose. h06-radiology--insufficient asks what the evaluated CT image identified, but the excerpt says the CT did not image that bone. These CONTRADICT the document/image-content claims; they do not disprove the corresponding real-world motive or patient condition.
+
+The following **post-hoc** sensitivity analysis excludes the entire affected 3-state family in each split, rather than relabeling original gold after seeing the outputs. It is NOT a new blind holdout, and the original 18-case numbers below are historical and invalid as unqualified performance estimates.
+
+| Split | Model | Minimal correct | Lab correct | False contradictions minimal to lab | 3/3 families minimal to lab |
+|---|---|---:|---:|---:|---:|
+| development | gemma4:12b | 10/15 | 14/15 | 5 to 1 | 0/5 to 4/5 |
+| development | qwen3:14b | 11/15 | 13/15 | 4 to 2 | 1/5 to 3/5 |
+| holdout | gemma4:12b | 13/15 | 13/15 | 2 to 2 | 3/5 to 3/5 |
+| holdout | qwen3:14b | 11/15 | 11/15 | 4 to 4 | 1/5 to 1/5 |
+
+After removing the contaminated full families, the lab instructions still show improvement only in development, not holdout. Remaining jointly wrong labels cannot be cured by a mere model-agreement rule. Original prompt/response files and original labels are preserved for forensic reproducibility. Independent human gold annotation remains missing.
+
+Review origin: https://github.com/heimgewebe/claim-audit-lab/pull/40 ; authoritative correction description: erratum-v1.json ; original cases SHA-256: 19995409ae52c5de4495f6431a9816a3b9b3575eaa09d9bec850703d6dbabd5c
+
+
+## Original preregistered metrics (contaminated by gold errors)
 
 | Split | Model | Minimal correct | Lab correct | False contradictions minimal to lab | Correct 3-state families minimal to lab |
 |---|---|---:|---:|---:|---:|
@@ -20,7 +38,7 @@ Both models and prompts recognized all six explicit contradictions per split. Th
 
 Interpretation: Lab instructions improved development performance for both models but produced zero label improvements on the disjoint holdout. This does not demonstrate a transferable benefit from more prompt instructions, nor prove they are useless on other tasks. No new prompt expansion or mandatory gate is justified.
 
-## Exploratory model disagreement (not a prospectively validated second opinion)
+## Original exploratory disagreement (includes two wrong gold labels; do not use as accuracy evidence)
 
 - development: models disagreed on 1/18; Qwen-only mistakes 1, shared mistakes 2.
 - Shared mistakes: d03-publisher-conclusion--insufficient, d05-political-payment-purpose--insufficient.

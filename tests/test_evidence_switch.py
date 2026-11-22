@@ -105,3 +105,71 @@ def test_saved_trial_responses_match_exact_prompts_gold_and_metric_counts():
             assert parsed["label"] == row["label"]
             assert parsed["evidence_span"] == row["evidence_span"]
         assert saved["metrics"] == runner.summarize(saved["rows"], list(subset.values()))
+
+
+def test_review_erratum_does_not_relabel_gold_and_marks_posthoc_sensitivity():
+    """Known wrong reference cases must remain visible instead of rewriting history."""
+    root = runner.ROOT
+    erratum = json.loads((root / "erratum-v1.json").read_text(encoding="utf-8"))
+    raw = (root / "cases.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == erratum["original_cases_sha256"]
+    data = json.loads(raw)
+    by_id = {c["id"]: c for c in data["cases"]}
+    impacted = {item["case_id"] for item in erratum["affected"]}
+    assert impacted == {
+        "d05-political-payment-purpose--insufficient",
+        "h06-radiology--insufficient",
+    }
+    excluded = {item["family"] for item in erratum["affected"]}
+    assert len(excluded) == 2
+    for item in erratum["affected"]:
+        case = by_id[item["case_id"]]
+        assert case["gold_label"] == item["original_gold_label"] == "insufficient"
+        assert item["review_supported_reinterpretation"] == "contradicted"
+        assert item["family"] == case["family"]
+        assert hashlib.sha256(case["claim"].encode()).hexdigest() == item["claim_sha256"]
+        assert hashlib.sha256(case["source_excerpt"].encode()).hexdigest() == item["source_excerpt_sha256"]
+    report = (root / "report.md").read_text(encoding="utf-8")
+    assert "post-hoc" in report.lower()
+    assert "invalid" in report.lower() or "wrong gold" in report.lower()
+    for split in runner.SPLITS:
+        eligible = [c for c in data["cases"]
+                    if c["split"] == split and c["family"] not in excluded]
+        assert len(eligible) == 15
+        for model in runner.MODELS:
+            for condition in runner.CONDITIONS:
+                file = root / f"run-{split}-{model.replace(':', '-')}-{condition}.json"
+                saved = json.loads(file.read_text(encoding="utf-8"))
+                filtered = [row for row in saved["rows"]
+                            if by_id[row["id"]]["family"] not in excluded]
+                assert len(filtered) == 15
+                assert all(row["status"] == "valid" for row in filtered)
+
+
+def test_posthoc_sensitivity_table_matches_raw_responses_without_relabeling():
+    root = runner.ROOT
+    erratum = json.loads((root / "erratum-v1.json").read_text(encoding="utf-8"))
+    excluded = {item["family"] for item in erratum["affected"]}
+    _, data = runner.read_protocol()
+    report = (root / "report.md").read_text(encoding="utf-8")
+    for split in runner.SPLITS:
+        eligible = [case for case in data if case["split"] == split
+                    and case["family"] not in excluded]
+        assert len(eligible) == 15
+        for model in runner.MODELS:
+            metrics = []
+            for condition in runner.CONDITIONS:
+                path = root / f"run-{split}-{model.replace(':', '-')}-{condition}.json"
+                saved = json.loads(path.read_text(encoding="utf-8"))
+                ids = {case["id"] for case in eligible}
+                filtered = [row for row in saved["rows"] if row["id"] in ids]
+                metrics.append(runner.summarize(filtered, eligible))
+            minimum, lab = metrics
+            table_line = (
+                f"| {split} | {model} | {minimum['correct']}/15 | "
+                f"{lab['correct']}/15 | "
+                f"{minimum['false_contradictions']} to {lab['false_contradictions']} | "
+                f"{minimum['complete_three_state_families']}/5 to "
+                f"{lab['complete_three_state_families']}/5 |"
+            )
+            assert table_line in report
