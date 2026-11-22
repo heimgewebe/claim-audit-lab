@@ -189,7 +189,11 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=105) as response:
+        # Use an explicit proxy-free opener. urllib's default opener can
+        # forward even 127.0.0.1 requests through HTTP_PROXY if NO_PROXY is
+        # absent, leaking the excerpt and claim outside the local host.
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(request, timeout=105) as response:
             raw_api = response.read().decode("utf-8")
         data = json.loads(raw_api)
         model_text = data.get("response")

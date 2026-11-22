@@ -194,11 +194,21 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
     })
     observed = []
 
-    def fake_urlopen(request, timeout=None):
-        observed.append((request.full_url, timeout, json.loads(request.data)))
-        return io.BytesIO(raw_api.encode("utf-8"))
+    class LocalOpener:
+        def open(self, request, timeout=None):
+            observed.append((request.full_url, timeout, json.loads(request.data)))
+            return io.BytesIO(raw_api.encode("utf-8"))
 
-    monkeypatch.setattr(shadow.urllib.request, "urlopen", fake_urlopen)
+    def fake_build_opener(*handlers):
+        assert len(handlers) == 1
+        assert isinstance(handlers[0], shadow.urllib.request.ProxyHandler)
+        assert handlers[0].proxies == {}
+        return LocalOpener()
+
+    # A hostile proxy configuration must not receive private source excerpts.
+    monkeypatch.setenv("HTTP_PROXY", "http://proxy.invalid:3128")
+    monkeypatch.delenv("NO_PROXY", raising=False)
+    monkeypatch.setattr(shadow.urllib.request, "build_opener", fake_build_opener)
     output = shadow.run_ollama_one(sample, case["source_excerpt"], "qwen3:14b")
     assert output["status"] == "valid"
     assert output["judgment"]["label"] == "supported"
@@ -217,10 +227,15 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
 def test_local_unavailable_model_returns_explicit_error(monkeypatch):
     from urllib.error import URLError
 
-    def refused(request, timeout=None):
-        raise URLError("connection refused")
+    class UnavailableOpener:
+        def open(self, request, timeout=None):
+            raise URLError("connection refused")
 
-    monkeypatch.setattr(shadow.urllib.request, "urlopen", refused)
+    def fake_build_opener(*handlers):
+        assert len(handlers) == 1 and handlers[0].proxies == {}
+        return UnavailableOpener()
+
+    monkeypatch.setattr(shadow.urllib.request, "build_opener", fake_build_opener)
     case = shadow.load_cases()[0]
     sample = shadow.assignments([case])[0]
     result = shadow.run_ollama_one(sample, case["source_excerpt"], "qwen3:14b")
