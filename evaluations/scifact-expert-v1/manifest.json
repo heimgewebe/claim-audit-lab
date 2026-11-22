@@ -1,0 +1,412 @@
+{
+  "schema_version": "claim-audit-lab.scifact-expert-manifest-v1",
+  "release_url": "https://scifact.s3-us-west-2.amazonaws.com/release/latest/data.tar.gz",
+  "release_sha256": "11c621288d41ac144d29b13b0f8503b3820b7d6e8b1f6ff24dff335c196d76be",
+  "provenance": "allenai/scifact claims_dev.jsonl + corpus.jsonl",
+  "seed": 20261122,
+  "samples_per_class_per_split": 5,
+  "gold_semantics": {
+    "SUPPORT": "Expert-annotated source abstract supports claim",
+    "CONTRADICT": "Expert-annotated source abstract contradicts claim",
+    "CITED_NO_ANNOTATED_RATIONALE": "No published positive annotation in this cited abstract: exploratory only, NOT an expert NEI gold label"
+  },
+  "sample_count": 30,
+  "samples": [
+    {
+      "id": "132:7975937",
+      "claim_id": 132,
+      "doc_id": 7975937,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "4216d9d958d10391a1a37caf20f35592af8ed6835761ffb280c9cc0505dc5c93",
+      "abstract_sha256": "d5e4afc0ea0cad482907fca03d7c4555a357ab5994b9da5473055fde71bdc456",
+      "rationale_sentence_indices": [],
+      "paper_title": "Cyclooxygenase-Dependent Tumor Growth through Evasion of Immunity",
+      "split": "development"
+    },
+    {
+      "id": "690:18750453",
+      "claim_id": 690,
+      "doc_id": 18750453,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "cfcc0d53b231c48c0b2fc6b6cd6674d67fbc68c0da8fe0d688e749f99e74e089",
+      "abstract_sha256": "4c16420c6d64581535bc820133ede2c4584dc143e33a9a30566ee735283a211d",
+      "rationale_sentence_indices": [],
+      "paper_title": "Assessment of Volume Depletion in Children with Malaria",
+      "split": "development"
+    },
+    {
+      "id": "1175:31272411",
+      "claim_id": 1175,
+      "doc_id": 31272411,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "ba58f9b4867234765aed2630997a27b03a174a31fb3dd70fc1d61aaac19a7b06",
+      "abstract_sha256": "0b4fa0c92e243267e7aa5157c721f29196f0131f34634505fa614fd0be86bfa1",
+      "rationale_sentence_indices": [],
+      "paper_title": "Immune signaling by RIG-I-like receptors.",
+      "split": "development"
+    },
+    {
+      "id": "1200:3441524",
+      "claim_id": 1200,
+      "doc_id": 3441524,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "163587b0d68c2ffb03ba87db0a13dea2adbaafeecb2e3503e1850694163a6d67",
+      "abstract_sha256": "9e6934a1c24128e4a725f6caa7039e12ceac52d0a05e01030297204ab236637e",
+      "rationale_sentence_indices": [],
+      "paper_title": "Human TRPML1 channel structures in open and closed conformations",
+      "split": "development"
+    },
+    {
+      "id": "1282:23649163",
+      "claim_id": 1282,
+      "doc_id": 23649163,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "3646829da12da657bc7c6898038959d43661fa2647dc26a701213bbfc86bd444",
+      "abstract_sha256": "a376f8d7355b0702e3e379a6b8cc5d56c01983e12f3308fb4b1741bd2881ef25",
+      "rationale_sentence_indices": [],
+      "paper_title": "Clinical features and treatment of peristomal pyoderma gangrenosum.",
+      "split": "development"
+    },
+    {
+      "id": "42:18174210",
+      "claim_id": 42,
+      "doc_id": 18174210,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "e2bef1ded41f8664fc02e556fabb4cbd8eb768d513adc5778b756528bbd468f6",
+      "abstract_sha256": "091d25a1f7c13e16211f9255522c1b2aa08a579228d8df51b2de9dec0730bbe9",
+      "rationale_sentence_indices": [
+        1,
+        9,
+        10
+      ],
+      "paper_title": "Increased Microerythrocyte Count in Homozygous α+-Thalassaemia Contributes to Protection against Severe Malarial Anaemia",
+      "split": "development"
+    },
+    {
+      "id": "249:1568684",
+      "claim_id": 249,
+      "doc_id": 1568684,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "c27e99d504bfe060fea34d6f8a67136eeb2fed4e8f7843502061bbd2af2423d9",
+      "abstract_sha256": "c6f09a0514ea28cf41986b47c30d60e8119fba1a085502ce16835c216903532b",
+      "rationale_sentence_indices": [
+        1,
+        3,
+        4
+      ],
+      "paper_title": "The Bile Acid Chenodeoxycholic Acid Increases Human Brown Adipose Tissue Activity.",
+      "split": "development"
+    },
+    {
+      "id": "578:8764879",
+      "claim_id": 578,
+      "doc_id": 8764879,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "914ea55ea00322859cb309928aeddc165b21ff7f8d01bc74edae51a3b34b0b1a",
+      "abstract_sha256": "7af47f5fc628235c51663d8c1f40cb69a57692beb51c3df7b8f66ab88f377e61",
+      "rationale_sentence_indices": [
+        5,
+        7,
+        8
+      ],
+      "paper_title": "PU.1-mediated upregulation of CSF1R is crucial for leukemia stem cell potential induced by MOZ-TIF2",
+      "split": "development"
+    },
+    {
+      "id": "873:1180972",
+      "claim_id": 873,
+      "doc_id": 1180972,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "8c6e0029144db00c95dbad301074ea503fb47a026fbf78e78cae4184984a6123",
+      "abstract_sha256": "cadb87ae40c437f1bcb6675bdf7399b599d50fe9af23bd149175622d5fdf70c3",
+      "rationale_sentence_indices": [
+        3,
+        4,
+        6,
+        7
+      ],
+      "paper_title": "Genetics of obesity in adult adoptees and their biological siblings.",
+      "split": "development"
+    },
+    {
+      "id": "1270:13900610",
+      "claim_id": 1270,
+      "doc_id": 13900610,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "3449d724533d32b9c7580393b39bde2b519d4a68fadc2f382ddfaf4a7bb93e14",
+      "abstract_sha256": "d767604b936232e3c9b4797f588357da8d8e10bf39cd15855e795ac93cb0b9d5",
+      "rationale_sentence_indices": [
+        7,
+        8
+      ],
+      "paper_title": "Self-harm in prisons in England and Wales: an epidemiological study of prevalence, risk factors, clustering, and subsequent suicide",
+      "split": "development"
+    },
+    {
+      "id": "124:4883040",
+      "claim_id": 124,
+      "doc_id": 4883040,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "ccd0d90bba24df8b44ae83b21296f81a40856af5ab57823a188b033d004a03aa",
+      "abstract_sha256": "0b6cce5800492180364538a2dcb0d2ccec7f4258de6e673656d178baf8f73f40",
+      "rationale_sentence_indices": [
+        8,
+        10
+      ],
+      "paper_title": "Antiretroviral Therapy for Prevention of Tuberculosis in Adults with HIV: A Systematic Review and Meta-Analysis",
+      "split": "development"
+    },
+    {
+      "id": "179:16322674",
+      "claim_id": 179,
+      "doc_id": 16322674,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "fdf5d41bf9320988be9b9d21f7e611a36bd184528617c7387b89c92cc050d0ab",
+      "abstract_sha256": "3514eea77c4950bf296f463e38376849e389a7a1b4e720f38c37272461046ae7",
+      "rationale_sentence_indices": [
+        5,
+        6,
+        11
+      ],
+      "paper_title": "Birth Size and Breast Cancer Risk: Re-analysis of Individual Participant Data from 32 Studies",
+      "split": "development"
+    },
+    {
+      "id": "967:8997410",
+      "claim_id": 967,
+      "doc_id": 8997410,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "ee088cb38b79cc04a0ff7379e8640b41eccbe05f67fce49514d194fee7838c73",
+      "abstract_sha256": "71bf98ba65f5d390d62347b812456ef262fc1baf7e561550c365b80f7bacaa38",
+      "rationale_sentence_indices": [
+        2
+      ],
+      "paper_title": "Arp2/3 complex inhibition radically alters lamellipodial actin architecture, suspended cell shape, and the cell spreading process",
+      "split": "development"
+    },
+    {
+      "id": "1146:13906581",
+      "claim_id": 1146,
+      "doc_id": 13906581,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "6ce4b82a274ffff0543c99c4ab5c55681902ff32ef14e1bfd9816cab36ba0e75",
+      "abstract_sha256": "6900dc6689b150cee8a2989052a56fec4fa104079c6c15e7436d9e18bb818419",
+      "rationale_sentence_indices": [
+        6,
+        12,
+        13
+      ],
+      "paper_title": "Patient Outcomes with Teaching Versus Nonteaching Healthcare: A Systematic Review",
+      "split": "development"
+    },
+    {
+      "id": "1337:20231138",
+      "claim_id": 1337,
+      "doc_id": 20231138,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "048ffde412f0a6588b56ed0bdab67206800509d5e40c8bc6659637e1c10d484c",
+      "abstract_sha256": "e9ebf53753f626071f6256174af77e505f7135f05b7e1eb3319ed2905a9ba4de",
+      "rationale_sentence_indices": [
+        4
+      ],
+      "paper_title": "Replication Fork Slowing and Reversal upon DNA Damage Require PCNA Polyubiquitination and ZRANB3 DNA Translocase Activity",
+      "split": "development"
+    },
+    {
+      "id": "440:4423559",
+      "claim_id": 440,
+      "doc_id": 4423559,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "9e5464f5e3d3f8c0462bf741c77036fc290997beb6d1fdb427417d47d4790a73",
+      "abstract_sha256": "b0f12f452563ee5e57d3c67514fa16cd403327e7dc368174641b7bf76d9d1879",
+      "rationale_sentence_indices": [],
+      "paper_title": "Planar cell polarity signalling couples cell division and morphogenesis during neurulation",
+      "split": "holdout"
+    },
+    {
+      "id": "544:24221369",
+      "claim_id": 544,
+      "doc_id": 24221369,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "4263ed6587ebb771d8fd4abe7d794d9db3316f516b43a9dba677c79281e7e4ab",
+      "abstract_sha256": "d77eeffbb9a7359e7e399ba8c58a9b490ed3ed7fc45e824de39fc8717e0f5149",
+      "rationale_sentence_indices": [],
+      "paper_title": "A Conserved Histidine in the RNA Sensor RIG-I Controls Immune Tolerance to N1-2'O-Methylated Self RNA.",
+      "split": "holdout"
+    },
+    {
+      "id": "975:5304891",
+      "claim_id": 975,
+      "doc_id": 5304891,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "ec1c83ccfa8ce1fa26d7fb0e678c68ec65fb15e6a2a9f56053dd6365f026a475",
+      "abstract_sha256": "4cf3e0de52cb4b4b80773b66e8a6ef3e8007ee0f485dc86eb9f3b4a269768bb1",
+      "rationale_sentence_indices": [],
+      "paper_title": "Inter-individual variability and genetic influences on cytokine responses to bacteria and fungi",
+      "split": "holdout"
+    },
+    {
+      "id": "1226:13777138",
+      "claim_id": 1226,
+      "doc_id": 13777138,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "a066d01687a529c484d449068afb3f7f80514803adcdfbfff800ae621c58a9db",
+      "abstract_sha256": "15b196dcbaed30d8a1b3ff8fc554bacd4ad5f82544f2de7737811f56b4b414e4",
+      "rationale_sentence_indices": [],
+      "paper_title": "Tet1 and Tet2 regulate 5-hydroxymethylcytosine production and cell lineage specification in mouse embryonic stem cells.",
+      "split": "holdout"
+    },
+    {
+      "id": "1280:4387784",
+      "claim_id": 1280,
+      "doc_id": 4387784,
+      "reference_label": "CITED_NO_ANNOTATED_RATIONALE",
+      "claim_sha256": "9d48389bb7594cf1c6572b77717ab1b55c80d0d4ef4d96691bfd2c67936119fb",
+      "abstract_sha256": "d3275bb6b62be44aa017712f69af41bde2494d550f14cb66372a2e091bbae3f7",
+      "rationale_sentence_indices": [],
+      "paper_title": "Structure of the proton-gated urea channel from the gastric pathogen Helicobacter pylori",
+      "split": "holdout"
+    },
+    {
+      "id": "54:49556906",
+      "claim_id": 54,
+      "doc_id": 49556906,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "3302315065db282a5a26c69859b6e9b5549da1b69ff085989ce142f55a0241f1",
+      "abstract_sha256": "fcaa1afaab0642bf7d49d755e56a5a9876b861f8120929227f95cca656bc90ac",
+      "rationale_sentence_indices": [
+        5,
+        6,
+        7
+      ],
+      "paper_title": "Metformin reverses established lung fibrosis in a bleomycin model",
+      "split": "holdout"
+    },
+    {
+      "id": "759:1805641",
+      "claim_id": 759,
+      "doc_id": 1805641,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "b1c90d8f755c8d7c10c85f3c72b10d221e729739f05689a45e08e913b31b6366",
+      "abstract_sha256": "e9ae6252f3f61d00b4bc025dd5e264a1324072342b6f418fedbd7128a54a124a",
+      "rationale_sentence_indices": [
+        13
+      ],
+      "paper_title": "Modelling the Impact of Artemisinin Combination Therapy and Long-Acting Treatments on Malaria Transmission Intensity",
+      "split": "holdout"
+    },
+    {
+      "id": "1088:37549932",
+      "claim_id": 1088,
+      "doc_id": 37549932,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "3fe686fe7956a53d3ddb2effb35141851fa65f5d17ed344d46e5caff346e8f14",
+      "abstract_sha256": "4c19784dafbd0fe72d37c9f13dac9ea4927d53ac733fa91742e492d4112b5b3e",
+      "rationale_sentence_indices": [
+        3
+      ],
+      "paper_title": "Antiapoptotic BCL-2 is required for maintenance of a model leukemia.",
+      "split": "holdout"
+    },
+    {
+      "id": "1144:10071552",
+      "claim_id": 1144,
+      "doc_id": 10071552,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "a612d156ae7518d1358ca696352252a5e031bd88c572c234009e91e3266f5dcd",
+      "abstract_sha256": "c8ad359125aa1d14d9fabe1253ae7d863b2d76e234da6ac58c8690d5a2aa9d1f",
+      "rationale_sentence_indices": [
+        4,
+        5,
+        8
+      ],
+      "paper_title": "Averting Obesity and Type 2 Diabetes in India through Sugar-Sweetened Beverage Taxation: An Economic-Epidemiologic Modeling Study",
+      "split": "holdout"
+    },
+    {
+      "id": "1232:13905670",
+      "claim_id": 1232,
+      "doc_id": 13905670,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "1a0f37f74dc9c5cae79e230ccf5baf4fbcd7a7a7317cd91f529141f925806626",
+      "abstract_sha256": "10241aac942c30adc827106c39da9bdd0343a809782e63df5e9fc8f57c1f7c37",
+      "rationale_sentence_indices": [
+        3
+      ],
+      "paper_title": "Human SNP Links Differential Outcomes in Inflammatory and Infectious Disease to a FOXO3-Regulated Pathway",
+      "split": "holdout"
+    },
+    {
+      "id": "133:16280642",
+      "claim_id": 133,
+      "doc_id": 16280642,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "b23a4d971446ae76c5fe1ffb3fc9e619aa7b59ac5264efc18f7c0967f5b8d1e0",
+      "abstract_sha256": "731c675df860767f55640599c0ff961b5f2a6c265d2051afb133f2d22bc65bed",
+      "rationale_sentence_indices": [
+        3,
+        4
+      ],
+      "paper_title": "Sequential signals toward podosome formation in NIH-src cells",
+      "split": "holdout"
+    },
+    {
+      "id": "218:21366394",
+      "claim_id": 218,
+      "doc_id": 21366394,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "4dfe7fcaa3554095d6a39168e6d37872a0471372288ad6f93696a26de8ec8794",
+      "abstract_sha256": "547573393daac8fa5c09580c5c63e86ddb2a85544fbad58e45ad9f8bbf17d42f",
+      "rationale_sentence_indices": [
+        2,
+        3,
+        5
+      ],
+      "paper_title": "CX3CR1 is required for airway inflammation by promoting T helper cell survival and maintenance in inflamed lung",
+      "split": "holdout"
+    },
+    {
+      "id": "343:5884524",
+      "claim_id": 343,
+      "doc_id": 5884524,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "cfbebbe3773f1bf78de402e8811ba1df6f2e048152e8b44e76268d707a8947d9",
+      "abstract_sha256": "c7683cbf68ecd987a71163cab7fff92ae31356cf6e1b52aa31b907019143add8",
+      "rationale_sentence_indices": [
+        5
+      ],
+      "paper_title": "Impact of diabetes on long-term prognosis in patients with unstable angina and non-Q-wave myocardial infarction: results of the OASIS (Organization to Assess Strategies for Ischemic Syndromes) Registry.",
+      "split": "holdout"
+    },
+    {
+      "id": "399:791050",
+      "claim_id": 399,
+      "doc_id": 791050,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "f038df3fc330e53b7d7770c09ff4a5df888628cd24931f13d15fa01da987ed6a",
+      "abstract_sha256": "1aa78e42a38e0342f32b32b2c216f977000dc03b8567c009a7baf254a3601a12",
+      "rationale_sentence_indices": [
+        7,
+        11
+      ],
+      "paper_title": "The relation between past exposure to fine particulate air pollution and prevalent anxiety: observational cohort study",
+      "split": "holdout"
+    },
+    {
+      "id": "1104:3898784",
+      "claim_id": 1104,
+      "doc_id": 3898784,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "ad58517d2428923cd868c1d9e5c94d26d3a19c45f1a8ce9bdebb644da14e59b8",
+      "abstract_sha256": "66e5c08d93650842fe27a02dd5b73e7fb70157c7057861cd084b07976c72d390",
+      "rationale_sentence_indices": [
+        8,
+        9,
+        10,
+        13
+      ],
+      "paper_title": "Association of Intracerebral Hemorrhage Among Patients Taking Non–Vitamin K Antagonist vs Vitamin K Antagonist Oral Anticoagulants With In-Hospital Mortality",
+      "split": "holdout"
+    }
+  ]
+}
