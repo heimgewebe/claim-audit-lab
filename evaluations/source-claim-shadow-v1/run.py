@@ -118,11 +118,12 @@ def parse_response(raw: str, excerpt: str) -> dict:
     span = value["evidence_span"]
     if len(value["reason"]) > 500 or not value["reason"].strip():
         raise ValueError("Missing or unbounded explanation")
-    if value["label"] == "insufficient":
-        if span:
-            raise ValueError("Insufficient judgment should not fabricate decisive evidence span")
-    elif not span or span not in excerpt:
+    if span and span not in excerpt:
         raise ValueError("Judgment must cite a verbatim contiguous source span")
+    if value["label"] != "insufficient" and not span:
+        raise ValueError("Supported/contradicted judgments require a verbatim source span")
+    # An insufficient judgment may quote a verbatim limitation in the excerpt.
+    # Quoting "causality was not studied" does not refute real-world causality.
     return value
 
 
