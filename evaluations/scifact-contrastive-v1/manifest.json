@@ -1,0 +1,222 @@
+{
+  "schema_version": "claim-audit-lab.scifact-contrast-manifest-v1",
+  "seed": 2026112202,
+  "original_scifact_release_sha256": "11c621288d41ac144d29b13b0f8503b3820b7d6e8b1f6ff24dff335c196d76be",
+  "original_scifact_manifest_sha256": "727fed187d5d925d3c94ca640c7525cc2df73bb343053b656cc86e16a330e6be",
+  "selection": "SHA-sort unused published expert SUPPORT/CONTRADICT, no reused claims/docs versus SciFact v1",
+  "per_class_per_split": 4,
+  "samples": [
+    {
+      "id": "1029:13923140",
+      "claim_id": 1029,
+      "doc_id": 13923140,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "93ae53e6501bc2e921e55df8213f0e1f65209176410cab6b4bc9283c01958db4",
+      "abstract_sha256": "9a02bfb717b010184931e39036c244a376119f0d245044638a6a4155e5425c03",
+      "rationale_sentence_indices": [
+        2,
+        3
+      ],
+      "paper_title": "Interleukin-2 gene variation impairs regulatory T cell function and causes autoimmunity",
+      "split": "development"
+    },
+    {
+      "id": "142:10582939",
+      "claim_id": 142,
+      "doc_id": 10582939,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "44624185b5aaa7d0cb873db38b1ffc4d5f0abad5eade16e6bb28483ecfa04e49",
+      "abstract_sha256": "729485cf5ce569f1d6d749a78b08328ef3b956690431480c508a6b642af7484e",
+      "rationale_sentence_indices": [
+        12
+      ],
+      "paper_title": "Induction therapy with autologous mesenchymal stem cells in living-related kidney transplants: a randomized controlled trial.",
+      "split": "development"
+    },
+    {
+      "id": "674:2095573",
+      "claim_id": 674,
+      "doc_id": 2095573,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "cad856721fbd27e00dd7c84ec9371c133df67b655f055742fe7f6dc5687908b3",
+      "abstract_sha256": "ede2a9bf5b505f23fad405b274d428e1c23b10ca97a98724c41aa733038ac7af",
+      "rationale_sentence_indices": [
+        0
+      ],
+      "paper_title": "LDL-cholesterol concentrations: a genome-wide association study",
+      "split": "development"
+    },
+    {
+      "id": "743:32159283",
+      "claim_id": 743,
+      "doc_id": 32159283,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "d3f06967755e3dac374b0d34c5aa87b217104286b83f9bfe545af1ab552ad590",
+      "abstract_sha256": "3c6d5711fdc4d4e720db103076e5a0d8db5e38ea26269dfd7123e1a9c905699a",
+      "rationale_sentence_indices": [
+        8
+      ],
+      "paper_title": "Antibiotics and risk of subsequent first-time acute myocardial infarction.",
+      "split": "development"
+    },
+    {
+      "id": "261:1122279",
+      "claim_id": 261,
+      "doc_id": 1122279,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "a38e5b153fe118baef382ad00edc70313d5d1811fad8e7a5d27e693f76e2dd24",
+      "abstract_sha256": "3712fac0aec27c8b812e22c54d4cefe8335fd1f7d656bf5c7bdc71837abba012",
+      "rationale_sentence_indices": [
+        5,
+        10
+      ],
+      "paper_title": "Endothelium-mediated relaxation of porcine collateral-dependent arterioles is improved by exercise training.",
+      "split": "development"
+    },
+    {
+      "id": "386:16495649",
+      "claim_id": 386,
+      "doc_id": 16495649,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "ab576c20bcad14c0c8c29c80ff78ed257a5c4c92a248b21ecad670d027002309",
+      "abstract_sha256": "9ca02f99bf814ff9a3b3393645c0b7e07d0fe73fbdf7da0adeca837889d84e0b",
+      "rationale_sentence_indices": [
+        8,
+        11
+      ],
+      "paper_title": "Ethnographic study of incidence and severity of intravenous drug errors.",
+      "split": "development"
+    },
+    {
+      "id": "597:12779444",
+      "claim_id": 597,
+      "doc_id": 12779444,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "a36bfcf73eaad604f6af903095cab6b8ff101f97ebcd90ca1211790203edabb2",
+      "abstract_sha256": "1bd3c6d864657c0ac775e70cc62758192cfd7a83c82d9024268583a24bd9c4a3",
+      "rationale_sentence_indices": [
+        0
+      ],
+      "paper_title": "Effect of screening on cervical cancer mortality in England and Wales: analysis of trends with an age period cohort model.",
+      "split": "development"
+    },
+    {
+      "id": "636:24294572",
+      "claim_id": 636,
+      "doc_id": 24294572,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "69c042bfdaad584f12039ce69b35fa6141dab56dc919671617c83b12f49e725a",
+      "abstract_sha256": "9eefd332f73d9c1d46026b318d12ce021c70e359f33a09080428eb8267b52468",
+      "rationale_sentence_indices": [
+        4
+      ],
+      "paper_title": "PTEN Regulates PI(3,4)P2 Signaling Downstream of Class I PI3K",
+      "split": "development"
+    },
+    {
+      "id": "1130:17997584",
+      "claim_id": 1130,
+      "doc_id": 17997584,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "8d0b9d31ee487ea7a39a2dfa0e8c24a51db2bddeb943674f0f1d3f75528c71b1",
+      "abstract_sha256": "8c83e2c514348041f4d5f97f9c7417223dcfbc631b15f0b58315bf4c6c84e536",
+      "rationale_sentence_indices": [
+        3
+      ],
+      "paper_title": "Integrin αvβ8-Mediated TGF-β Activation by Effector Regulatory T Cells Is Essential for Suppression of T-Cell-Mediated Inflammation",
+      "split": "holdout"
+    },
+    {
+      "id": "598:25742130",
+      "claim_id": 598,
+      "doc_id": 25742130,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "dc417054d77fe758b7a23b4274322d6774557cd9902370dc730f13aa40f86e2d",
+      "abstract_sha256": "09cfc52e2f81d60234e95f4faf036b3163e2dc12ced5305cc6b8fbc0dc22807c",
+      "rationale_sentence_indices": [
+        6,
+        9
+      ],
+      "paper_title": "Mass screening programmes and trends in cervical cancer in Finland and the Netherlands.",
+      "split": "holdout"
+    },
+    {
+      "id": "793:8551160",
+      "claim_id": 793,
+      "doc_id": 8551160,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "7e0b51e0b1775e2b69053acece16ff094b207ed894ecd6ab108935e7d50e5d90",
+      "abstract_sha256": "1d54dacbfe5ee9868f3e9ee7d135d3417dc97a3fceecb2f166a50d7d8acca042",
+      "rationale_sentence_indices": [
+        1
+      ],
+      "paper_title": "Mitochondria: Dynamic Organelles in Disease, Aging, and Development",
+      "split": "holdout"
+    },
+    {
+      "id": "882:14803797",
+      "claim_id": 882,
+      "doc_id": 14803797,
+      "reference_label": "CONTRADICT",
+      "claim_sha256": "621181ac70182efee9180f93bd0f5d66cdeae4201928843ce43b98f15f31b8c8",
+      "abstract_sha256": "93075d0682e4f423255e5825cd261ee5113116f3822554cc2ccd2a1c4a64364b",
+      "rationale_sentence_indices": [
+        2
+      ],
+      "paper_title": "Intestinal microbiota metabolism of L-carnitine, a nutrient in red meat, promotes atherosclerosis",
+      "split": "holdout"
+    },
+    {
+      "id": "1024:5373138",
+      "claim_id": 1024,
+      "doc_id": 5373138,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "132009378ca61e6b8f57892b3e76da4880f0ce0170be7e4f687da29cc42856bf",
+      "abstract_sha256": "df00e5b03ab2cbe619f1cefe97765c4576b5e44412b84bc2bde205604409cab8",
+      "rationale_sentence_indices": [
+        4
+      ],
+      "paper_title": "3D Chromosome Regulatory Landscape of Human Pluripotent Cells.",
+      "split": "holdout"
+    },
+    {
+      "id": "1187:52873726",
+      "claim_id": 1187,
+      "doc_id": 52873726,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "950daf7be6d4c1d64be2260f6d75efbe75fc26fa70093e2ae24633f122021273",
+      "abstract_sha256": "11995d3e2c06d0750aa87ccaaf688e49c2290226a3661382e2606d5419deb9fd",
+      "rationale_sentence_indices": [
+        3
+      ],
+      "paper_title": "Regulation of Hippo pathway transcription factor TEAD by p38 MAPK-induced cytoplasmic translocation",
+      "split": "holdout"
+    },
+    {
+      "id": "1262:44172171",
+      "claim_id": 1262,
+      "doc_id": 44172171,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "a966720c1e72c85f4125421c94b3acd475cd63f9384423e9d6c8d8f83c877912",
+      "abstract_sha256": "d5ca3c5903313bb0b4d72edc8507cef913a10c021b70f47d9d0278c78262e102",
+      "rationale_sentence_indices": [
+        4
+      ],
+      "paper_title": "Kinetics and Fidelity of the Repair of Cas9-Induced Double-Strand DNA Breaks",
+      "split": "holdout"
+    },
+    {
+      "id": "756:2831620",
+      "claim_id": 756,
+      "doc_id": 2831620,
+      "reference_label": "SUPPORT",
+      "claim_sha256": "7541482281368eb5372e015385051c865ec50f9919811102e866e6301f3d7347",
+      "abstract_sha256": "ecd1ab06d1bf25619b54b2609a3da68b0bd975ecbd9708a85ebee30fb6bcb435",
+      "rationale_sentence_indices": [
+        0
+      ],
+      "paper_title": "Protein Lysine Acetylated/Deacetylated Enzymes and the Metabolism-Related Diseases",
+      "split": "holdout"
+    }
+  ]
+}
