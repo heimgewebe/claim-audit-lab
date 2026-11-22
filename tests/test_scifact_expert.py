@@ -170,3 +170,43 @@ def test_continue_only_verbatim_quote_format_failure_with_bound_original_result(
             tampered, "m" * 64, "development", "qwen3:14b", "lab",
             selected, by_claim, doc, shadow,
         )
+
+
+def test_saved_trial_responses_are_sha_bound_and_gold_is_scored_separately():
+    import random
+
+    manifest_path = bench.ROOT / "manifest.json"
+    if not manifest_path.exists():
+        pytest.skip("No externally derived sample manifest")
+    raw = manifest_path.read_bytes()
+    manifest = json.loads(raw)
+    manifest_sha = bench.sha(raw)
+    for file in sorted(bench.ROOT.glob("run-*.json")):
+        saved = json.loads(file.read_text(encoding="utf-8"))
+        assert saved["release_sha256"] == bench.RELEASE_SHA256
+        assert saved["manifest_sha256"] == manifest_sha
+        assert saved["expert_labels_only_for_annotated_pairs"] is True
+        assert saved["cited_unannotated_is_not_nei_gold"] is True
+        samples = [s for s in manifest["samples"] if s["split"] == saved["split"]]
+        random.Random(bench.SEED).shuffle(samples)
+        rows = saved["rows"]
+        assert [r["id"] for r in rows] == [s["id"] for s in samples[:len(rows)]]
+        for row in rows:
+            assert isinstance(row["raw_response"], str)
+            assert bench.sha(row["raw_response"].encode()) == row["response_sha256"]
+            assert isinstance(row["prompt_sha256"], str) and len(row["prompt_sha256"]) == 64
+        assert saved["metrics"] == bench.measurements(rows, samples)
+
+
+def test_resumed_trial_preserves_original_invalid_citation_without_relabeling():
+    old = bench.ROOT / "run-development-qwen3-14b-lab.json"
+    resumed = bench.ROOT / "run-development-qwen3-14b-lab-resumed.json"
+    if not resumed.exists():
+        pytest.skip("No completed continuation yet")
+    a, b = json.loads(old.read_text()), json.loads(resumed.read_text())
+    assert b["continuation_from_sha256"] == bench.sha(old.read_bytes())
+    assert b["rows"][:len(a["rows"])] == a["rows"]
+    assert len(b["rows"]) == 15
+    assert b["metrics"]["invalid_or_unattempted"] == 1
+    assert b["metrics"]["expert_expected"] == 10
+    assert b["metrics"]["expert_valid"] == 9
