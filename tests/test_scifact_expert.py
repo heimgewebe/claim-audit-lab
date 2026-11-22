@@ -210,3 +210,33 @@ def test_resumed_trial_preserves_original_invalid_citation_without_relabeling():
     assert b["metrics"]["invalid_or_unattempted"] == 1
     assert b["metrics"]["expert_expected"] == 10
     assert b["metrics"]["expert_valid"] == 9
+
+
+def test_report_expert_scores_and_invalid_denominators_match_original_files():
+    root = bench.ROOT
+    report = root / "report.md"
+    if not report.exists():
+        pytest.skip("Final report not yet compiled")
+    body = report.read_text(encoding="utf-8")
+    totals = {"minimal": 0, "lab": 0}
+    for split in ("development", "holdout"):
+        for model in ("qwen3:14b", "gemma4:12b"):
+            metrics = {}
+            for variant in ("minimal", "lab"):
+                suffix = "-resumed" if split == "development" and model == "qwen3:14b" and variant == "lab" else ""
+                name = f"run-{split}-{model.replace(':', '-')}-{variant}{suffix}.json"
+                score = json.loads((root / name).read_text(encoding="utf-8"))["metrics"]
+                assert score["expert_expected"] == 10
+                metrics[variant] = score
+                totals[variant] += score["expert_correct"]
+            a, b = metrics["minimal"], metrics["lab"]
+            row = (
+                f"| {split} | {model} | {a['expert_correct']}/10 | {b['expert_correct']}/10 "
+                f"| {10 - a['expert_valid']} / {10 - b['expert_valid']} | "
+                f"{a['missed_expert_refute']} / {b['missed_expert_refute']} |"
+            )
+            assert row in body
+    assert totals == {"minimal": 34, "lab": 31}
+    assert "34/40" in body and "31/40" in body
+    assert "descriptive controls" in body
+    assert "**not** expert-labeled NOT_ENOUGH_INFO gold" in body
