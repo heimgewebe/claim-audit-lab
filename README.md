@@ -98,6 +98,19 @@ make validate
 make test
 ```
 
+## Optional: Einzelbehauptung gegen Belegauszug prüfen
+
+Für eine **freiwillige semantische Zweitmeinung** statt eines weiteren Prüf- oder Freigabegates:
+
+```bash
+printf '%s\n' 'Originales Ereignisprotokoll: A um 11:00 Uhr.' > /tmp/lab-beleg.txt
+python scripts/shadow_claim_evidence.py \
+  --claim 'Ereignis A fand um 10:00 Uhr statt.' \
+  --excerpt-file /tmp/lab-beleg.txt --model gemma4:12b
+```
+
+Der Befehl nutzt ausschließlich das **bereits laufende lokale Ollama** und gibt ein JSON-Urteil (`supported`, `contradicted`, `insufficient`) mit exakt zitierter Belegstelle und SHA-256 des Eingabetexts aus. Es werden **keine externen Quellen abgerufen oder authentifiziert**; die Ausgabe ist nur eine aus dem selbst gelieferten Text begründete Einschätzung, keine geprüfte Wahrheit. Der Befehl schreibt keine Case-Dateien um und beeinflusst weder `make validate` noch CI.
+
 ## Nicht-Ziele
 
 - Kein Wahrheitsorakel
