@@ -98,6 +98,23 @@ make validate
 make test
 ```
 
+## Optional: Einzelbehauptung gegen Belegauszug prüfen
+
+Für eine **freiwillige semantische Zweitmeinung** statt eines weiteren Prüf- oder Freigabegates:
+
+```bash
+printf '%s\n' 'Originales Ereignisprotokoll: A um 11:00 Uhr.' > /tmp/lab-beleg.txt
+python scripts/shadow_claim_evidence.py \
+  --claim 'Ereignis A fand um 10:00 Uhr statt.' \
+  --excerpt-file /tmp/lab-beleg.txt --model gemma4:12b
+```
+
+Der Befehl nutzt ausschließlich das **bereits laufende lokale Ollama** und gibt ein JSON-Urteil (`supported`, `contradicted`, `insufficient`) mit exakt zitierter Belegstelle und SHA-256 des Eingabetexts aus. Es werden **keine externen Quellen abgerufen oder authentifiziert**; die Ausgabe ist nur eine aus dem selbst gelieferten Text begründete Einschätzung, keine geprüfte Wahrheit. Der Befehl schreibt keine Case-Dateien um und beeinflusst weder `make validate` noch CI.
+
+Vor dem Senden von Claim und Belegauszug prüft die CLI die lokale Modellinstallation anhand der Ollama-Endpunkte /api/tags und /api/show, einschließlich Cloud-Herkunft und nativer Kontextgrenze. Ein nur über Ollama-Cloud verfügbares Modell wird abgelehnt; das Modell-Digest wird als reproduzierbare Kennung mit ausgegeben. Die Anfrage untersagt explizit Prompt-Trunkierung und Kontextverschiebung. Die tatsächliche Laufzeitkontextgröße kann dennoch von der Modellmetadaten-Grenze abweichen: Überschreitet der Prompt den verfügbaren Laufzeitkontext, muss Ollama ihn wegen abgeschalteter Trunkierung als Fehler zurückweisen (prompt_context_exceeded). Dies wurde mit einem deutlich überlangen Testprompt am lokalen Ollama geprüft. Auch diese Transportprüfung zertifiziert nicht die sachliche Richtigkeit der Quelle.
+
+Ist die Vollständigkeit des vom Modell verarbeiteten Quelltextes nicht prüfbar oder das Token-Kontextfenster nahezu ausgeschöpft, liefert der lokale Prüfer **kein gültiges Urteil**, sondern einen expliziten Fehler (`prompt_coverage_unverified`, `prompt_context_near_limit` oder `generation_truncated`). Den Belegauszug dann eingrenzen und erneut prüfen; keine starke Schlussfolgerung aus potenziell gekürzten Belegen ableiten.
+
 ## Nicht-Ziele
 
 - Kein Wahrheitsorakel

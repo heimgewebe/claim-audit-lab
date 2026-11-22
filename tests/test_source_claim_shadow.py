@@ -175,8 +175,33 @@ def test_first_cli_failure_aborts_remaining_17_without_false_accuracy(monkeypatc
     assert "UNUSABLE MODEL TRIAL" in (tmp_path / "failed-run" / "report.md").read_text()
 
 
-def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monkeypatch):
+def _fake_ollama_http(request, final_response, *, model="qwen3:14b",
+                      tag_overrides=None, show_overrides=None):
     import io
+
+    def response(data):
+        return io.BytesIO(json.dumps(data).encode("utf-8"))
+
+    url = request if isinstance(request, str) else request.full_url
+    if url.endswith("/api/tags"):
+        item = {
+            "name": model,
+            "size": 9000000000,
+            "digest": "a" * 64,
+            "remote_host": "",
+            "remote_model": "",
+        }
+        item.update(tag_overrides or {})
+        return response({"models": [item]})
+    if url.endswith("/api/show"):
+        shown = {"model_info": {"qwen3.context_length": 40960}}
+        shown.update(show_overrides or {})
+        return response(shown)
+    assert url.endswith("/api/generate")
+    return io.BytesIO(final_response.encode("utf-8"))
+
+
+def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monkeypatch):
 
     case = shadow.load_cases()[0]
     sample = shadow.assignments([case])[0]
@@ -191,13 +216,18 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
         "response": model_response,
         "done": True,
         "eval_count": 44,
+        "prompt_eval_count": 120,
     })
     observed = []
 
     class LocalOpener:
         def open(self, request, timeout=None):
-            observed.append((request.full_url, timeout, json.loads(request.data)))
-            return io.BytesIO(raw_api.encode("utf-8"))
+            observed.append((
+                request if isinstance(request, str) else request.full_url,
+                timeout,
+                json.loads(request.data) if not isinstance(request, str) and request.data else None,
+            ))
+            return _fake_ollama_http(request, raw_api)
 
     def fake_build_opener(*handlers):
         assert len(handlers) == 1
@@ -214,14 +244,133 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
     assert output["judgment"]["label"] == "supported"
     assert output["response_sha256"] == shadow.sha(model_response)
     assert output["provider_response_sha256"] == shadow.sha(raw_api)
-    url, timeout, payload = observed[0]
+    assert [row[0].rsplit("/", 1)[-1] for row in observed] == [
+        "tags", "show", "generate"
+    ]
+    assert observed[0][2] is None
+    assert observed[1][2] == {"model": "qwen3:14b"}
+    url, timeout, payload = observed[2]
     assert url == "http://127.0.0.1:11434/api/generate"
     assert payload["prompt"] == sample["prompt"]
     assert payload["model"] == "qwen3:14b"
     assert payload["think"] is False
     assert payload["stream"] is False
     assert payload["options"]["temperature"] == 0
-    assert len(observed) == 1
+    assert payload["truncate"] is False and payload["shift"] is False
+    assert output["model_digest"] == "a" * 64
+    assert output["model_native_context_tokens"] == 40960
+    assert len(observed) == 3
+
+
+@pytest.mark.parametrize(
+    "prompt_tokens,done_reason,expected_error", [
+        (None, "stop", "prompt_coverage_unverified"),
+        (4096, "stop", "prompt_context_near_limit"),
+        (100, "length", "generation_truncated"),
+    ],
+)
+def test_local_ollama_never_accepts_incomplete_source_coverage(
+    monkeypatch, prompt_tokens, done_reason, expected_error
+):
+
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+    fake_response = json.dumps({
+        "label": "supported",
+        "evidence_span": case["source_excerpt"][:25],
+        "reason": "The quoted source passage supports the claim.",
+    })
+    fake_api = json.dumps({
+        "model": "qwen3:14b",
+        "done": True,
+        "done_reason": done_reason,
+        "prompt_eval_count": prompt_tokens,
+        "response": fake_response,
+    })
+
+    class LocalOpener:
+        def open(self, request, timeout=None):
+            return _fake_ollama_http(request, fake_api)
+
+    monkeypatch.setattr(
+        shadow.urllib.request, "build_opener", lambda *args: LocalOpener()
+    )
+    output = shadow.run_ollama_one(
+        sample, case["source_excerpt"], "qwen3:14b"
+    )
+    assert output["error"] == expected_error
+    assert output["prompt_eval_count"] == prompt_tokens
+    assert "judgment" not in output
+    assert output.get("status") != "valid"
+
+
+@pytest.mark.parametrize(
+    "model,tag,show,expected_error", [
+        ("qwen3:14b", {"remote_host": "https://ollama.com"}, {}, "cloud_model_forbidden"),
+        ("qwen3:14b", {"remote_model": "cloud-upstream"}, {}, "cloud_model_forbidden"),
+        ("qwen3:cloud", {}, {}, "cloud_model_forbidden"),
+        ("qwen3:14b", {"size": 0}, {}, "model_locality_unverified"),
+        ("qwen3:14b", {}, {"model_info": {"qwen3.context_length": 2048}}, "model_context_too_small"),
+        ("qwen3:14b", {}, {"model_info": {}}, "model_context_unverified"),
+        ("qwen3:14b", {}, {"remote_host": "https://ollama.com"}, "cloud_model_forbidden"),
+    ],
+)
+def test_local_ollama_rejects_cloud_and_insufficient_native_context_before_claim(
+    monkeypatch, model, tag, show, expected_error
+):
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+    seen = []
+
+    class LocalOpener:
+        def open(self, request, timeout=None):
+            url = request if isinstance(request, str) else request.full_url
+            data = b"" if isinstance(request, str) else (request.data or b"")
+            seen.append((url, data))
+            assert not url.endswith("/api/generate"), (
+                "No source or claim may reach a model before locality/context verification"
+            )
+            return _fake_ollama_http(
+                request, "{}", model=model,
+                tag_overrides=tag, show_overrides=show
+            )
+
+    monkeypatch.setattr(
+        shadow.urllib.request, "build_opener", lambda *args: LocalOpener()
+    )
+    out = shadow.run_ollama_one(sample, case["source_excerpt"], model)
+    assert out["error"] == expected_error
+    assert out.get("status") != "valid"
+    assert "judgment" not in out
+    assert "raw_response" not in out
+    for _, body in seen:
+        assert case["source_excerpt"].encode() not in body
+        assert case["claim"].encode() not in body
+
+
+def test_ollama_context_overflow_http_400_is_not_a_provider_outage(monkeypatch):
+    import io
+    from urllib.error import HTTPError
+
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+
+    class LocalOpener:
+        def open(self, request, timeout=None):
+            url = request if isinstance(request, str) else request.full_url
+            if url.endswith("/api/generate"):
+                body = b'{"error":"request (18013 tokens) exceeds the available context size (4096 tokens)"}'
+                raise HTTPError(url, 400, "Bad Request", None, io.BytesIO(body))
+            return _fake_ollama_http(request, "{}")
+
+    monkeypatch.setattr(
+        shadow.urllib.request, "build_opener", lambda *args: LocalOpener()
+    )
+    out = shadow.run_ollama_one(sample, case["source_excerpt"], "qwen3:14b")
+    assert out["error"] == "prompt_context_exceeded"
+    assert out["http_status"] == 400
+    assert out.get("status") != "valid"
+    assert "judgment" not in out
 
 
 def test_local_unavailable_model_returns_explicit_error(monkeypatch):
