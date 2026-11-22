@@ -32,6 +32,7 @@ def test_correct_quote_and_prompt_reuse(monkeypatch):
             "raw_response": '{"label":"contradicted"}',
             "response_sha256": cli.digest('{"label":"contradicted"}'),
             "provider_response_sha256": "local-response-digest",
+            "prompt_eval_count": 120,
         }
 
     monkeypatch.setattr(cli.shadow, "run_ollama_one", fake_ollama)
@@ -49,6 +50,8 @@ def test_correct_quote_and_prompt_reuse(monkeypatch):
     )
     assert result["prompt_sha256"] == cli.digest(sample["prompt"])
     assert result["provider_response_sha256"] == "local-response-digest"
+    assert result["prompt_eval_count"] == 120
+    assert result["context_window_tokens"] == cli.shadow.OLLAMA_NUM_CTX
 
 
 def test_absent_model_does_not_fabricate_semantic_label(monkeypatch):

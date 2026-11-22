@@ -191,6 +191,7 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
         "response": model_response,
         "done": True,
         "eval_count": 44,
+        "prompt_eval_count": 120,
     })
     observed = []
 
@@ -222,6 +223,49 @@ def test_local_ollama_response_preserves_original_prompt_and_verbatim_quote(monk
     assert payload["stream"] is False
     assert payload["options"]["temperature"] == 0
     assert len(observed) == 1
+
+
+@pytest.mark.parametrize(
+    "prompt_tokens,done_reason,expected_error", [
+        (None, "stop", "prompt_coverage_unverified"),
+        (4096, "stop", "prompt_context_near_limit"),
+        (100, "length", "generation_truncated"),
+    ],
+)
+def test_local_ollama_never_accepts_incomplete_source_coverage(
+    monkeypatch, prompt_tokens, done_reason, expected_error
+):
+    import io
+
+    case = shadow.load_cases()[0]
+    sample = shadow.assignments([case])[0]
+    fake_response = json.dumps({
+        "label": "supported",
+        "evidence_span": case["source_excerpt"][:25],
+        "reason": "The quoted source passage supports the claim.",
+    })
+    fake_api = json.dumps({
+        "model": "qwen3:14b",
+        "done": True,
+        "done_reason": done_reason,
+        "prompt_eval_count": prompt_tokens,
+        "response": fake_response,
+    })
+
+    class LocalOpener:
+        def open(self, request, timeout=None):
+            return io.BytesIO(fake_api.encode("utf-8"))
+
+    monkeypatch.setattr(
+        shadow.urllib.request, "build_opener", lambda *args: LocalOpener()
+    )
+    output = shadow.run_ollama_one(
+        sample, case["source_excerpt"], "qwen3:14b"
+    )
+    assert output["error"] == expected_error
+    assert output["prompt_eval_count"] == prompt_tokens
+    assert "judgment" not in output
+    assert output.get("status") != "valid"
 
 
 def test_local_unavailable_model_returns_explicit_error(monkeypatch):

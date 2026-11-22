@@ -111,6 +111,8 @@ python scripts/shadow_claim_evidence.py \
 
 Der Befehl nutzt ausschließlich das **bereits laufende lokale Ollama** und gibt ein JSON-Urteil (`supported`, `contradicted`, `insufficient`) mit exakt zitierter Belegstelle und SHA-256 des Eingabetexts aus. Es werden **keine externen Quellen abgerufen oder authentifiziert**; die Ausgabe ist nur eine aus dem selbst gelieferten Text begründete Einschätzung, keine geprüfte Wahrheit. Der Befehl schreibt keine Case-Dateien um und beeinflusst weder `make validate` noch CI.
 
+Ist die Vollständigkeit des vom Modell verarbeiteten Quelltextes nicht prüfbar oder das Token-Kontextfenster nahezu ausgeschöpft, liefert der lokale Prüfer **kein gültiges Urteil**, sondern einen expliziten Fehler (`prompt_coverage_unverified`, `prompt_context_near_limit` oder `generation_truncated`). Den Belegauszug dann eingrenzen und erneut prüfen; keine starke Schlussfolgerung aus potenziell gekürzten Belegen ableiten.
+
 ## Nicht-Ziele
 
 - Kein Wahrheitsorakel

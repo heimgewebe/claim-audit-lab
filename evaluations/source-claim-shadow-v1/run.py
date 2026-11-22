@@ -22,6 +22,9 @@ CASES_PATH = ROOT / "cases.json"
 MODEL = "gpt-6-astra"
 LOCAL_MODEL = "qwen3:14b"
 LOCAL_URL = "http://127.0.0.1:11434/api/generate"
+OLLAMA_NUM_CTX = 4096
+# Leave substantial generation/context headroom; never certify a possibly clipped excerpt.
+OLLAMA_CONTEXT_MARGIN = 512
 SEED = 20261121
 LABELS = ("supported", "contradicted", "insufficient")
 MAX_WORKERS = 3
@@ -179,7 +182,7 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
         "stream": False,
         "think": False,
         "format": "json",
-        "options": {"temperature": 0, "num_predict": 256, "num_ctx": 4096},
+        "options": {"temperature": 0, "num_predict": 256, "num_ctx": OLLAMA_NUM_CTX},
         "keep_alive": "3m",
     }
     request = urllib.request.Request(
@@ -204,9 +207,19 @@ def run_ollama_one(sample: dict, excerpt: str, model_name: str) -> dict:
         result["provider_response_sha256"] = sha(raw_api)
         result["model_used"] = data.get("model", "")
         result["eval_count"] = data.get("eval_count")
+        prompt_tokens = data.get("prompt_eval_count")
+        result["prompt_eval_count"] = prompt_tokens
         result["exit_code"] = 0 if data.get("done") is True else None
         if data.get("done") is not True:
             result["error"] = "incomplete_local_generation"
+        elif type(prompt_tokens) is not int or prompt_tokens < 1:
+            # Without provider token accounting full source coverage is unverified.
+            result["error"] = "prompt_coverage_unverified"
+        elif prompt_tokens >= OLLAMA_NUM_CTX - OLLAMA_CONTEXT_MARGIN:
+            # Near the context limit Ollama can silently lose source tokens.
+            result["error"] = "prompt_context_near_limit"
+        elif data.get("done_reason") == "length":
+            result["error"] = "generation_truncated"
         else:
             try:
                 result["judgment"] = parse_response(model_text, excerpt)

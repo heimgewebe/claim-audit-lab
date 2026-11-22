@@ -57,6 +57,8 @@ def evaluate(claim: str, excerpt: str, model: str) -> dict:
         "source_authenticity_verified": False,
         "inference": "from_supplied_excerpt_only",
         "model": model,
+        "prompt_eval_count": result.get("prompt_eval_count"),
+        "context_window_tokens": shadow.OLLAMA_NUM_CTX,
         "claim": claim,
         "source_excerpt": excerpt,
         "claim_sha256": digest(claim),
