@@ -65,14 +65,25 @@ def test_verbatim_span_and_missing_evidence_enforced():
             json.dumps({**correct, "evidence_span": "ten times greater"}),
             excerpt,
         )
-    with pytest.raises(ValueError, match="should not fabricate"):
-        shadow.parse_response(
-            json.dumps({**correct, "label": "insufficient"}),
-            excerpt,
-        )
+    limited_excerpt = "A causal relationship was not investigated."
+    limited = {
+        "label": "insufficient",
+        "evidence_span": "A causal relationship was not investigated.",
+        "reason": "The study did not test causation, so the world claim is not decided.",
+    }
+    assert shadow.parse_response(json.dumps(limited), limited_excerpt) == limited
     assert shadow.parse_response(json.dumps({
-        **correct, "label": "insufficient", "evidence_span": ""
-    }), excerpt)["label"] == "insufficient"
+        **limited, "evidence_span": ""
+    }), limited_excerpt)["label"] == "insufficient"
+    with pytest.raises(ValueError, match="verbatim"):
+        shadow.parse_response(
+            json.dumps({**limited, "evidence_span": "Cause disproven"}),
+            limited_excerpt,
+        )
+    with pytest.raises(ValueError, match="require a verbatim"):
+        shadow.parse_response(
+            json.dumps({**correct, "evidence_span": ""}), excerpt,
+        )
     with pytest.raises(ValueError):
         shadow.parse_response(json.dumps({**correct, "label": []}), excerpt)
     with pytest.raises(ValueError):

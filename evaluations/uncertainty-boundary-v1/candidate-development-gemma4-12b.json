@@ -1,0 +1,29 @@
+{
+  "schema_version": "claim-audit-lab.uncertainty-boundary-result-v1",
+  "phase": "candidate-development",
+  "candidate_rule_sha256": "736bfe1a352dd683296bbe94a51268cc0c194b735aee7cdfbde7c761b9fa864b",
+  "instruction_sha256": "56b8e3b51a18f7a9c1a45801fd449eda559a3f0491192f9f3b1bfbee6ec07b77",
+  "case_file_sha256": "c05be1632fbb888ff4bfd6689ed88700d367fbd8a231b1cdb2432cd9169c8de8",
+  "model": "gemma4:12b",
+  "cases": 9,
+  "attempted": 1,
+  "valid": 0,
+  "correct": 0,
+  "false_contradictions": 0,
+  "results": [
+    {
+      "id": "d01-causation-unmeasured",
+      "status": "error",
+      "label": null,
+      "reason": null,
+      "evidence_span": null,
+      "error": "invalid_output",
+      "prompt_sha256": "a20b4f27eb76044aaa874e0feb8082175d8927f0e9b252f4d549712bef32a984",
+      "response_sha256": "98b966e8e169eab14438fc6826572d291f6d350d6ad725e4cc9e8f0261fc42cf",
+      "raw_response": "{\n\"label\": \"insufficient\",\n\"evidence_span\": \"Eine Ursache-Wirkungs-Beziehung wurde nicht untersucht.\",\n\"reason\": \"The excerpt states that a causal relationship was not investigated, which means the study does not provide evidence to support or contradict the claim.\"\n}",
+      "model_digest": "6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b",
+      "prompt_eval_count": 343,
+      "duration_seconds": 6.61
+    }
+  ]
+}
