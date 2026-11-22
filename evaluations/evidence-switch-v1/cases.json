@@ -1,0 +1,444 @@
+{
+  "schema_version": "claim-audit-lab.evidence-switch-v1",
+  "scope": "controlled_synthetic_excerpt_only",
+  "annotation": "single-operator-precommitted",
+  "source_authenticity_verified": false,
+  "baseline_model_instruction": "unchanged-existing-shadow-instruction",
+  "seed": 20261122,
+  "families": [
+    {
+      "id": "d01-controlled-intervention",
+      "split": "development",
+      "lang": "de",
+      "claim": "Im kontrollierten Versuch Y senkte Intervention X die Ausfallrate."
+    },
+    {
+      "id": "d02-carbon-emissions",
+      "split": "development",
+      "lang": "en",
+      "claim": "Carbon dioxide emissions fell by eight percent in quarter Q."
+    },
+    {
+      "id": "d03-publisher-conclusion",
+      "split": "development",
+      "lang": "de",
+      "claim": "Der Bericht B behauptet ausdrücklich, eine kausale Wirkung von Stoff A auf Symptom B nachgewiesen zu haben."
+    },
+    {
+      "id": "d04-seismic-energy",
+      "split": "development",
+      "lang": "en",
+      "claim": "The released seismic energy of event E increased tenfold."
+    },
+    {
+      "id": "d05-political-payment-purpose",
+      "split": "development",
+      "lang": "de",
+      "claim": "Die interne Aktennotiz bezeichnet die Spende Z ausdrücklich als Mittel zur Beeinflussung der Abstimmung P."
+    },
+    {
+      "id": "d06-software-deployment",
+      "split": "development",
+      "lang": "en",
+      "claim": "Release R was deployed to production at 14:00 UTC on Tuesday."
+    },
+    {
+      "id": "h01-infection-study",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Intervention Q reduced infection incidence in experiment T."
+    },
+    {
+      "id": "h02-education-budget",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Der veröffentlichte Haushaltsplan H weist für Bildung genau zwei Millionen Euro aus."
+    },
+    {
+      "id": "h03-railway-departure",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Train R departed station S at 08:20 local time."
+    },
+    {
+      "id": "h04-payment-vote-causality",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten."
+    },
+    {
+      "id": "h05-temperature-vs-rainfall",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "The mean temperature in month M decreased by two degrees Celsius."
+    },
+    {
+      "id": "h06-radiology",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Im ausgewerteten CT-Bild der Patientin K wurde eine Fraktur der linken Speiche festgestellt."
+    }
+  ],
+  "cases": [
+    {
+      "id": "d01-controlled-intervention--supported",
+      "family": "d01-controlled-intervention",
+      "split": "development",
+      "lang": "de",
+      "claim": "Im kontrollierten Versuch Y senkte Intervention X die Ausfallrate.",
+      "source_excerpt": "Der Abschlussbericht zum kontrollierten Versuch Y stellt fest: Intervention X senkte die Ausfallrate im untersuchten Zeitraum von 20 Prozent auf 5 Prozent.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d01-controlled-intervention--contradicted",
+      "family": "d01-controlled-intervention",
+      "split": "development",
+      "lang": "de",
+      "claim": "Im kontrollierten Versuch Y senkte Intervention X die Ausfallrate.",
+      "source_excerpt": "Der Abschlussbericht zum kontrollierten Versuch Y stellt fest: Intervention X senkte die Ausfallrate nicht; sie stieg im untersuchten Zeitraum von 5 Prozent auf 20 Prozent.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d01-controlled-intervention--insufficient",
+      "family": "d01-controlled-intervention",
+      "split": "development",
+      "lang": "de",
+      "claim": "Im kontrollierten Versuch Y senkte Intervention X die Ausfallrate.",
+      "source_excerpt": "Im kontrollierten Versuch Y wurden die Ausfallraten erfasst. Ob Intervention X die Ausfallrate veränderte, wurde nicht untersucht.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "d02-carbon-emissions--supported",
+      "family": "d02-carbon-emissions",
+      "split": "development",
+      "lang": "en",
+      "claim": "Carbon dioxide emissions fell by eight percent in quarter Q.",
+      "source_excerpt": "The quarterly emissions inventory reports that carbon dioxide emissions in quarter Q fell by eight percent compared with the previous quarter.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d02-carbon-emissions--contradicted",
+      "family": "d02-carbon-emissions",
+      "split": "development",
+      "lang": "en",
+      "claim": "Carbon dioxide emissions fell by eight percent in quarter Q.",
+      "source_excerpt": "The quarterly emissions inventory reports that carbon dioxide emissions in quarter Q rose by eight percent compared with the previous quarter, rather than falling.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d02-carbon-emissions--insufficient",
+      "family": "d02-carbon-emissions",
+      "split": "development",
+      "lang": "en",
+      "claim": "Carbon dioxide emissions fell by eight percent in quarter Q.",
+      "source_excerpt": "The quarterly electricity report states that power production in quarter Q rose by eight percent. It does not report carbon dioxide emissions.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "d03-publisher-conclusion--supported",
+      "family": "d03-publisher-conclusion",
+      "split": "development",
+      "lang": "de",
+      "claim": "Der Bericht B behauptet ausdrücklich, eine kausale Wirkung von Stoff A auf Symptom B nachgewiesen zu haben.",
+      "source_excerpt": "Bericht B, Schlussabschnitt: Wir haben eine kausale Wirkung von Stoff A auf Symptom B nachgewiesen und erklären dies ausdrücklich als unsere Schlussfolgerung.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d03-publisher-conclusion--contradicted",
+      "family": "d03-publisher-conclusion",
+      "split": "development",
+      "lang": "de",
+      "claim": "Der Bericht B behauptet ausdrücklich, eine kausale Wirkung von Stoff A auf Symptom B nachgewiesen zu haben.",
+      "source_excerpt": "Bericht B, Schlussabschnitt: Wir behaupten ausdrücklich keinen kausalen Nachweis von Stoff A auf Symptom B und ziehen keine solche Schlussfolgerung.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d03-publisher-conclusion--insufficient",
+      "family": "d03-publisher-conclusion",
+      "split": "development",
+      "lang": "de",
+      "claim": "Der Bericht B behauptet ausdrücklich, eine kausale Wirkung von Stoff A auf Symptom B nachgewiesen zu haben.",
+      "source_excerpt": "Bericht B, Methodenteil: Die Häufigkeit von Stoff A und Symptom B wurde erfasst. Schlussfolgerungen zur Kausalität stehen nicht in diesem Auszug.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "d04-seismic-energy--supported",
+      "family": "d04-seismic-energy",
+      "split": "development",
+      "lang": "en",
+      "claim": "The released seismic energy of event E increased tenfold.",
+      "source_excerpt": "The energy analysis of event E states that the released seismic energy increased by a factor of ten.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d04-seismic-energy--contradicted",
+      "family": "d04-seismic-energy",
+      "split": "development",
+      "lang": "en",
+      "claim": "The released seismic energy of event E increased tenfold.",
+      "source_excerpt": "The energy analysis of event E states that the released seismic energy increased by a factor of two, not ten.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d04-seismic-energy--insufficient",
+      "family": "d04-seismic-energy",
+      "split": "development",
+      "lang": "en",
+      "claim": "The released seismic energy of event E increased tenfold.",
+      "source_excerpt": "The station's amplitude analysis of event E states that measured wave amplitude increased by a factor of ten. No energy estimate is given.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "d05-political-payment-purpose--supported",
+      "family": "d05-political-payment-purpose",
+      "split": "development",
+      "lang": "de",
+      "claim": "Die interne Aktennotiz bezeichnet die Spende Z ausdrücklich als Mittel zur Beeinflussung der Abstimmung P.",
+      "source_excerpt": "Die interne Aktennotiz lautet: Die Spende Z ist ausdrücklich ein Mittel, um die Abstimmung P zu beeinflussen.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d05-political-payment-purpose--contradicted",
+      "family": "d05-political-payment-purpose",
+      "split": "development",
+      "lang": "de",
+      "claim": "Die interne Aktennotiz bezeichnet die Spende Z ausdrücklich als Mittel zur Beeinflussung der Abstimmung P.",
+      "source_excerpt": "Die interne Aktennotiz lautet: Die Spende Z ist ausdrücklich kein Mittel zur Beeinflussung der Abstimmung P; ihr Zweck ist die Finanzierung der Bibliothek.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d05-political-payment-purpose--insufficient",
+      "family": "d05-political-payment-purpose",
+      "split": "development",
+      "lang": "de",
+      "claim": "Die interne Aktennotiz bezeichnet die Spende Z ausdrücklich als Mittel zur Beeinflussung der Abstimmung P.",
+      "source_excerpt": "Die interne Aktennotiz registriert Betrag und Datum der Spende Z sowie den Termin der Abstimmung P. Sie nennt keinen Zweck der Spende.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "d06-software-deployment--supported",
+      "family": "d06-software-deployment",
+      "split": "development",
+      "lang": "en",
+      "claim": "Release R was deployed to production at 14:00 UTC on Tuesday.",
+      "source_excerpt": "The production deployment log for release R records a completed deployment at 14:00 UTC on Tuesday.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "d06-software-deployment--contradicted",
+      "family": "d06-software-deployment",
+      "split": "development",
+      "lang": "en",
+      "claim": "Release R was deployed to production at 14:00 UTC on Tuesday.",
+      "source_excerpt": "The production deployment log for release R records a completed deployment at 15:00 UTC on Tuesday, not at 14:00 UTC.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "d06-software-deployment--insufficient",
+      "family": "d06-software-deployment",
+      "split": "development",
+      "lang": "en",
+      "claim": "Release R was deployed to production at 14:00 UTC on Tuesday.",
+      "source_excerpt": "The build log for release R records an artifact creation time of 14:00 UTC on Tuesday. Production deployment is not covered by this log.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h01-infection-study--supported",
+      "family": "h01-infection-study",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Intervention Q reduced infection incidence in experiment T.",
+      "source_excerpt": "The randomized experiment T measured infection incidence and found that intervention Q reduced it from 12 to 4 cases per hundred participants.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h01-infection-study--contradicted",
+      "family": "h01-infection-study",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Intervention Q reduced infection incidence in experiment T.",
+      "source_excerpt": "The randomized experiment T measured infection incidence and found that intervention Q did not reduce it; it increased from 4 to 12 cases per hundred participants.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h01-infection-study--insufficient",
+      "family": "h01-infection-study",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Intervention Q reduced infection incidence in experiment T.",
+      "source_excerpt": "Experiment T measured how often participants used intervention Q but did not measure infection incidence.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h02-education-budget--supported",
+      "family": "h02-education-budget",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Der veröffentlichte Haushaltsplan H weist für Bildung genau zwei Millionen Euro aus.",
+      "source_excerpt": "Haushaltsplan H, Position Bildung: Ausgabenansatz 2.000.000 Euro. Weitere Bildungsposten sind nicht enthalten.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h02-education-budget--contradicted",
+      "family": "h02-education-budget",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Der veröffentlichte Haushaltsplan H weist für Bildung genau zwei Millionen Euro aus.",
+      "source_excerpt": "Haushaltsplan H, Position Bildung: Ausgabenansatz 3.000.000 Euro, nicht 2.000.000 Euro. Weitere Bildungsposten sind nicht enthalten.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h02-education-budget--insufficient",
+      "family": "h02-education-budget",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Der veröffentlichte Haushaltsplan H weist für Bildung genau zwei Millionen Euro aus.",
+      "source_excerpt": "Haushaltsplan H, Position Gesundheit: Ausgabenansatz 2.000.000 Euro. Der Auszug enthält keine Angaben zur Bildung.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h03-railway-departure--supported",
+      "family": "h03-railway-departure",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Train R departed station S at 08:20 local time.",
+      "source_excerpt": "The station S departure record lists train R as having departed at 08:20 local time.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h03-railway-departure--contradicted",
+      "family": "h03-railway-departure",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Train R departed station S at 08:20 local time.",
+      "source_excerpt": "The station S departure record lists train R as having departed at 07:20 local time, not 08:20.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h03-railway-departure--insufficient",
+      "family": "h03-railway-departure",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "Train R departed station S at 08:20 local time.",
+      "source_excerpt": "The station S maintenance record lists train R as having undergone maintenance at 08:20 local time. It contains no departure information.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h04-payment-vote-causality--supported",
+      "family": "h04-payment-vote-causality",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten.",
+      "source_excerpt": "Die kontrollierte Untersuchung kam nach Auswertung der überprüften Entscheidungsbelege zu dem Ergebnis: Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h04-payment-vote-causality--contradicted",
+      "family": "h04-payment-vote-causality",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten.",
+      "source_excerpt": "Die kontrollierte Untersuchung kam nach Auswertung der überprüften Entscheidungsbelege zu dem Ergebnis: Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten nicht; die Stimme blieb unverändert.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h04-payment-vote-causality--insufficient",
+      "family": "h04-payment-vote-causality",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Die Zahlung an Person Q beeinflusste ihr späteres Abstimmungsverhalten.",
+      "source_excerpt": "Die Finanzprüfung registrierte die Zahlung an Person Q. Ob sie ihr späteres Abstimmungsverhalten beeinflusste, wurde nicht untersucht.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h05-temperature-vs-rainfall--supported",
+      "family": "h05-temperature-vs-rainfall",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "The mean temperature in month M decreased by two degrees Celsius.",
+      "source_excerpt": "The weather station's mean temperature measurements show a decrease of two degrees Celsius in month M.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h05-temperature-vs-rainfall--contradicted",
+      "family": "h05-temperature-vs-rainfall",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "The mean temperature in month M decreased by two degrees Celsius.",
+      "source_excerpt": "The weather station's mean temperature measurements show an increase of two degrees Celsius in month M, not a decrease.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h05-temperature-vs-rainfall--insufficient",
+      "family": "h05-temperature-vs-rainfall",
+      "split": "holdout",
+      "lang": "en",
+      "claim": "The mean temperature in month M decreased by two degrees Celsius.",
+      "source_excerpt": "The weather station reports a decrease in total rainfall by two millimeters in month M. It reports no temperature measurements.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    },
+    {
+      "id": "h06-radiology--supported",
+      "family": "h06-radiology",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Im ausgewerteten CT-Bild der Patientin K wurde eine Fraktur der linken Speiche festgestellt.",
+      "source_excerpt": "Radiologischer Abschlussbefund der CT-Auswertung bei Patientin K: Eine Fraktur der linken Speiche ist eindeutig nachgewiesen.",
+      "gold_label": "supported",
+      "gold_rationale": "The excerpt explicitly supports the same claim."
+    },
+    {
+      "id": "h06-radiology--contradicted",
+      "family": "h06-radiology",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Im ausgewerteten CT-Bild der Patientin K wurde eine Fraktur der linken Speiche festgestellt.",
+      "source_excerpt": "Radiologischer Abschlussbefund der CT-Auswertung bei Patientin K: Eine Fraktur der linken Speiche wurde ausgeschlossen; die linke Speiche ist intakt.",
+      "gold_label": "contradicted",
+      "gold_rationale": "The excerpt explicitly states an incompatible fact for the exact same referent."
+    },
+    {
+      "id": "h06-radiology--insufficient",
+      "family": "h06-radiology",
+      "split": "holdout",
+      "lang": "de",
+      "claim": "Im ausgewerteten CT-Bild der Patientin K wurde eine Fraktur der linken Speiche festgestellt.",
+      "source_excerpt": "Radiologischer Abschlussbefund bei Patientin K: Im CT wurde nur das rechte Knie untersucht. Die linke Speiche wurde nicht abgebildet.",
+      "gold_label": "insufficient",
+      "gold_rationale": "The excerpt does not establish or contradict the exact claim."
+    }
+  ]
+}
