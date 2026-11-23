@@ -15,6 +15,10 @@ _LATEX_RULE = re.compile(r"\\(?:midrule|bottomrule|toprule|hline|cmidrule)(?:\{[
 _HTML_ROW = re.compile(r"<tr\b[^>]*>(.*?)</tr\s*>", re.I | re.S)
 _HTML_CELL = re.compile(r"<t[dh]\b[^>]*>(.*?)</t[dh]\s*>", re.I | re.S)
 _HTML_TAG = re.compile(r"<[^>]*>")
+# Reject rather than glue distinct values or lose scientific notation inside a cell.
+_UNSUPPORTED_HTML_CELL_MARKUP = re.compile(
+    r"<(?:br|p|div|li|hr|sup|sub|math|img|ul|ol|table)\b", re.I,
+)
 _LATEX_TABLE_START = re.compile(r"\\begin\{tabular\*?\}|\\begin\{tabularx\}")
 _LATEX_TABLE_END = re.compile(r"\\end\{tabular\*?\}|\\end\{tabularx\}")
 
@@ -46,8 +50,12 @@ def display_html_row(source_fragment: str) -> str:
         raise ValueError("Not one complete HTML table row")
     cells = []
     for cell in _HTML_CELL.finditer(match.group(1)):
-        # HTML character entities and markup are rendered, never treated as
-        # literal quotations from the underlying raw HTML.
+        # A structural tag may separate values (1<br>2) or carry scientific
+        # meaning (10<sup>3</sup>); removing it could invent a number.
+        if _UNSUPPORTED_HTML_CELL_MARKUP.search(cell.group(1)):
+            raise ValueError("Unsupported semantic markup inside HTML table cell")
+        # HTML character entities and formatting markup are rendered, never
+        # treated as literal quotations from the underlying raw HTML.
         text = unescape(_HTML_TAG.sub("", cell.group(1)))
         cells.append(re.sub(r"\s+", " ", text).strip())
     return " | ".join(cells).strip(" |")
@@ -92,6 +100,27 @@ def render_table(raw: str) -> dict:
                 offset += len(line)
                 continue
             if inside:
+                # Reject multiple logical rows sharing one physical line.
+                # Escaped breaks within a known tabincell macro aren't rows.
+                without_tabincell = re.sub(
+                    r"\\tabincell\{[^{}]*\}\{[^{}]*\}", "", line,
+                )
+                # An inline nested tabular within a cell can itself use
+                # TeX line breaks. Mask only complete same-line inner tables;
+                # never mask separate outer-row delimiters.
+                without_inner = re.sub(
+                    r"\\begin\{tabular\}.*?\\end\{tabular\}", "",
+                    without_tabincell,
+                )
+                if (
+                    r"\begin{tabular}" in without_inner
+                    or r"\end{tabular}" in without_inner
+                ):
+                    raise ValueError("Incomplete inline tabular cell unsupported")
+                if without_inner.count(r"\\") > 1:
+                    raise ValueError(
+                        "Multiple LaTeX row delimiters on one line are unsupported"
+                    )
                 if not buffer:
                     fragment_start = offset
                 if not trimmed.startswith("%"):

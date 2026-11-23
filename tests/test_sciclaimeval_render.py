@@ -137,7 +137,11 @@ class DisplayProofTests(unittest.TestCase):
         )
         self.assertFalse(list(directory.glob("run-holdout-*.json")))
         manifest_sha = hashlib.sha256((directory / "manifest.json").read_bytes()).hexdigest()
-        renderer_sha = hashlib.sha256((directory / "render.py").read_bytes()).hexdigest()
+        # Results are immutable evidence from the preregistered pre-review
+        # renderer. Post-observation guards must not rewrite that origin.
+        renderer_sha = (
+            "b6542c4f3896dee1644ea7b45a8e3deaec9aff6b55626e6cfc8f2d90092b25cf"
+        )
         calls = 0
         for name, expected_sha in fixed.items():
             raw = (directory / name).read_bytes()
@@ -157,6 +161,50 @@ class DisplayProofTests(unittest.TestCase):
                         )
                     calls += 1
         self.assertEqual(calls, 60)
+
+    def test_two_latex_rows_on_one_physical_line_are_rejected(self):
+        original = (
+            "\\begin{tabular}{lr}\n"
+            "Alpha & 1 \\\\ Beta & 2 \\\\\n"
+            "Other & 3 \\\\\n"
+            "\\end{tabular}\n"
+        )
+        with self.assertRaises(ValueError):
+            R["render_table"](original)
+
+    def test_inline_latex_tabincell_break_is_not_a_row_separator(self):
+        original = (
+            "\\begin{tabular}{ll}\n"
+            "Dataset & \\tabincell{c}{FEVER\\\\-para} \\\\\n"
+            "Other & 2 \\\\\n"
+            "\\end{tabular}\n"
+        )
+        view = R["render_table"](original)
+        self.assertEqual(len(view["rows"]), 2)
+        proof = R["prove_quote"](
+            original, view, view["rows"][0]["display"],
+        )
+        self.assertEqual(proof["row_index"], 0)
+
+    def test_html_inline_structural_markup_must_not_join_numeric_values(self):
+        for cell in ("1<br>2", "1<p>2</p>", "10<sup>3</sup>",
+                     "1<div>2</div>", "1<sub>2</sub>"):
+            with self.subTest(cell=cell):
+                original = (
+                    "<table><tr><td>Alpha</td><td>" + cell + "</td></tr>"
+                    "<tr><td>Beta</td><td>3</td></tr></table>"
+                )
+                with self.assertRaises(ValueError):
+                    R["render_table"](original)
+
+    def test_html_mathml_is_not_silently_dropped(self):
+        source = (
+            "<table><tr><td>Power</td><td>"
+            "<math><msup><mn>10</mn><mn>3</mn></msup></math>"
+            "</td></tr><tr><td>Base</td><td>5</td></tr></table>"
+        )
+        with self.assertRaises(ValueError):
+            R["render_table"](source)
 
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
