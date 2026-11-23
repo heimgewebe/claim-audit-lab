@@ -1,0 +1,157 @@
+{
+  "schema_version": "claim-audit-lab.sciclaimeval-revision-manifest-v1",
+  "dataset_repository": "alabnii/sciclaimeval-shared-task",
+  "dataset_revision": "55ec80b427d9b4eaff8ed9b537a1ea6cb5d665d7",
+  "release_path": "data/dev_task1_release.json",
+  "release_sha256": "cbf0db967f285875b7b283ed56f4fed93bf4627f84d8e7f3c39489bc56f289ab",
+  "selection_seed": "20261123-v1",
+  "selection_rule": "For each domain ml/nlp/peerj select the first two SHA256-sorted eligible claim-evidence pairs from distinct papers, each with the official Supported/Refuted pair, identical claim, use_context=no, CC BY 4.0, table in native .tex/.html format of 350..6000 bytes, claim 24..240 characters with explicit nonbibliographic numeric value, and distinct original/modified source bytes. First per domain=development, second=holdout.",
+  "paired_claim_count": 6,
+  "annotation_semantics": "Published expert Supported and Refuted for one original and one deliberately modified table; not independently verified world truth and not independent corroborating papers",
+  "samples": [
+    {
+      "pair_id": "0023",
+      "paper_id": "2405.17991",
+      "domain": "ml",
+      "split": "development",
+      "claim_sha256": "8a3832222b6da59329e1016694915b0ec0ca8e89a8694f74148fcc8c7cc9c1e5",
+      "caption_sha256": "e851344db89eba6b2daed700cb80054519393c7c4c9a60516dfb6f6245801508",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0057",
+          "path": "data/tables/dev/val_tab_0057.tex",
+          "sha256": "f3153f896ea5d14914baa963a134cba304f225f145c3e1f1518f740a7d4609c7",
+          "bytes": 4796
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0058",
+          "path": "data/tables/dev/val_tab_0058.tex",
+          "sha256": "6330bc73ab08b2bb2a111495da32d01a9292066fee6e3ae8640afed6c3b3898a",
+          "bytes": 4796
+        }
+      }
+    },
+    {
+      "pair_id": "0120",
+      "paper_id": "2023.ijcnlp-main.35",
+      "domain": "nlp",
+      "split": "development",
+      "claim_sha256": "fc989f4227ff761843accecbe8a025660e780f3a672843f1945c9ffcd690f431",
+      "caption_sha256": "b23b8fc988373f4199e57ce1e02bf6a40fa59552906fa259eaa10a0208d1c0c0",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0184",
+          "path": "data/tables/dev/val_tab_0184.tex",
+          "sha256": "ccf8588221737ffa9375dc05c7e1f5a0d5ac14da83f45adcf9d0956844e66e90",
+          "bytes": 3097
+        },
+        "Refuted": {
+          "claim_id": "val_tab_1582",
+          "path": "data/tables/dev/val_tab_1582.tex",
+          "sha256": "e22eecdd79d85bf68a467db3c36a511545c9a66b5a63c35d450b509a3927291c",
+          "bytes": 3098
+        }
+      }
+    },
+    {
+      "pair_id": "0265",
+      "paper_id": "17459",
+      "domain": "peerj",
+      "split": "development",
+      "claim_sha256": "e1f80d1bd488e64b4e12ba8e9ecb18683965235e7eb5e17bce331f949f628a71",
+      "caption_sha256": "dfab28de5b0ef6e2b237789f8f87bb68adc02b2b1d2b9b5762012c983bba3ae0",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0420",
+          "path": "data/tables/dev/val_tab_0420.html",
+          "sha256": "7d37566f2e60b10a88c424d74a2de9c032452410bf9d9de359baa8cd4dd63439",
+          "bytes": 3874
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0421",
+          "path": "data/tables/dev/val_tab_0421.html",
+          "sha256": "12edade70a965d81f562ebbbfd75fbe275d3f11a9a1290527e06d13c9ed7f738",
+          "bytes": 3874
+        }
+      }
+    },
+    {
+      "pair_id": "0002",
+      "paper_id": "2203.01212",
+      "domain": "ml",
+      "split": "holdout",
+      "claim_sha256": "99f9ff48ad98ab4a7b9cff8f627d9702a28b65360525c5e7c611ece5dd1499f2",
+      "caption_sha256": "daa30f911788ed5b6867882efec52ed24a64753a588d1d269f2ec646af2bafae",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0004",
+          "path": "data/tables/dev/val_tab_0004.tex",
+          "sha256": "d0f35dff6e1062dfd533be61d42d6dd32257f5d48c7bcba915e3044395396ece",
+          "bytes": 2058
+        },
+        "Refuted": {
+          "claim_id": "val_tab_1567",
+          "path": "data/tables/dev/val_tab_1567.tex",
+          "sha256": "3db5c3a28d3a73d7dbf2577a7498b28127183da73ca20c9cb388d9434c6fd53d",
+          "bytes": 2049
+        }
+      }
+    },
+    {
+      "pair_id": "0209",
+      "paper_id": "2025.clpsych-1.1",
+      "domain": "nlp",
+      "split": "holdout",
+      "claim_sha256": "541b5c32201296efd346b678edc747e941b2db4f373f53647be427cdac2f33c3",
+      "caption_sha256": "403e0536de73157c6838bb2715d0473ce68f17579c3ec98fd8272c31ee47fc87",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0379",
+          "path": "data/tables/dev/val_tab_0379.tex",
+          "sha256": "8f2ecfa6507f65ca4023befc295fa43bbaef3e870110f2de7393bbbbd55efeeb",
+          "bytes": 2804
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0380",
+          "path": "data/tables/dev/val_tab_0380.tex",
+          "sha256": "0d39bdb6826061f6759aa78fba7f30c599b30216975201a6dc79ff2f3a1d0611",
+          "bytes": 2805
+        }
+      }
+    },
+    {
+      "pair_id": "0298",
+      "paper_id": "18596",
+      "domain": "peerj",
+      "split": "holdout",
+      "claim_sha256": "080ad83c8badf8ce79ef7ed8827cf34fd0be93ac85e8ccbcf261db51f140a7f0",
+      "caption_sha256": "41a35637e2acc03003b9642b95b34228ee53a24a025130de397e421aba208240",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0483",
+          "path": "data/tables/dev/val_tab_0483.html",
+          "sha256": "b73cd5f879ab0fc05715c6e85c6eac63a9315b9283622a14e773fe0ac984df74",
+          "bytes": 3861
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0484",
+          "path": "data/tables/dev/val_tab_0484.html",
+          "sha256": "5e2a4eeb3faf6c4d23197ae186bd78813493c7d173ed571d4c76637091d0efb8",
+          "bytes": 3862
+        }
+      }
+    }
+  ]
+}
