@@ -118,6 +118,46 @@ class DisplayProofTests(unittest.TestCase):
                 self.assertEqual(len(part["display_sha256"]), 64)
                 self.assertGreaterEqual(part["row_count"], 2)
 
+    def test_original_model_receipts_unchanged_and_no_holdout_inference(self):
+        import json
+        directory = ROOT / "evaluations" / "sciclaimeval-render-v1"
+        fixed = {
+            "run-development-qwen3-14b-raw.json":
+                "41ac1ec42ad5ccc202cc694d567e645e00f7f60625892c58e2f4e34935483dad",
+            "run-development-qwen3-14b-rendered.json":
+                "c33fd2e74524d57173b21981dc2dd5bcdc20996a930e7e12ff634db026cea005",
+            "run-development-gemma4-12b-raw.json":
+                "34aab99dd9da972d5379f470d10b09bc363fbb7563c857e429c04b25beacbd1d",
+            "run-development-gemma4-12b-rendered.json":
+                "5d1ec499338959d3f9862d50e4bd9b2116b61e2c2af6af698c287081baa0a998",
+        }
+        self.assertEqual(
+            {f.name for f in directory.glob("run-development-*.json")},
+            set(fixed),
+        )
+        self.assertFalse(list(directory.glob("run-holdout-*.json")))
+        manifest_sha = hashlib.sha256((directory / "manifest.json").read_bytes()).hexdigest()
+        renderer_sha = hashlib.sha256((directory / "render.py").read_bytes()).hexdigest()
+        calls = 0
+        for name, expected_sha in fixed.items():
+            raw = (directory / name).read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), expected_sha)
+            result = json.loads(raw)
+            self.assertEqual(result["manifest_sha256"], manifest_sha)
+            self.assertEqual(result["renderer_sha256"], renderer_sha)
+            self.assertEqual(result["split"], "development")
+            self.assertEqual(result["metrics"]["total_calls"], 15)
+            for pair in result["rows"]:
+                for row in pair["steps"].values():
+                    text = row.get("raw_response")
+                    if text is not None:
+                        self.assertEqual(
+                            hashlib.sha256(text.encode()).hexdigest(),
+                            row["response_sha256"],
+                        )
+                    calls += 1
+        self.assertEqual(calls, 60)
+
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
             R["render_table"]("not a table")
