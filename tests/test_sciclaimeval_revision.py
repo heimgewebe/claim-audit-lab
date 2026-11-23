@@ -70,6 +70,31 @@ class SciClaimEvalRevisionTests(unittest.TestCase):
         rows[0]["steps"]["unchanged_control"]["label"] = "contradicted"
         self.assertEqual(PILOT["score"](rows)["control_label_changed"], 1)
 
+    def test_original_development_receipts_are_immutable_and_holdout_unopened(self):
+        import hashlib
+        runs = sorted(ROOT.glob("run-development-*.json"))
+        self.assertEqual(
+            [p.name for p in runs],
+            ["run-development-gemma4-12b.json", "run-development-qwen3-14b.json"],
+        )
+        self.assertEqual(list(ROOT.glob("run-holdout-*.json")), [])
+        manifest_sha = hashlib.sha256((ROOT / "manifest.json").read_bytes()).hexdigest()
+        count = 0
+        for run in runs:
+            data = json.loads(run.read_text(encoding="utf-8"))
+            self.assertEqual(data["manifest_sha256"], manifest_sha)
+            self.assertEqual(data["split"], "development")
+            for pair in data["rows"]:
+                for step in pair["steps"].values():
+                    if step.get("raw_response") is not None:
+                        self.assertEqual(
+                            hashlib.sha256(step["raw_response"].encode("utf-8")).hexdigest(),
+                            step["response_sha256"],
+                        )
+                    count += 1
+        self.assertEqual(count, 26)
+
+
 
 if __name__ == "__main__":
     unittest.main()
