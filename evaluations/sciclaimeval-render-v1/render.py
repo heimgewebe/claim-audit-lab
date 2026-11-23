@@ -27,6 +27,21 @@ def sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def _has_unescaped_tex_comment(line: str) -> bool:
+    """An odd number of preceding backslashes means '%' is escaped."""
+    for index, character in enumerate(line):
+        if character != "%":
+            continue
+        count = 0
+        pos = index - 1
+        while pos >= 0 and line[pos] == "\\":
+            count += 1
+            pos -= 1
+        if count % 2 == 0:
+            return True
+    return False
+
+
 def display_latex_row(raw_line: str) -> str:
     """Reduce formatting, not values; deterministic for an original source line."""
     line = raw_line.strip()
@@ -100,6 +115,17 @@ def render_table(raw: str) -> dict:
                 offset += len(line)
                 continue
             if inside:
+                if trimmed.startswith("%"):
+                    # A full TeX comment line is not scientific table data.
+                    # Never include it in a pending multiline source row.
+                    if buffer:
+                        raise ValueError("TeX comment inside unfinished table row")
+                    offset += len(line)
+                    continue
+                if _has_unescaped_tex_comment(line):
+                    # TeX would ignore the rest of the line, whereas our
+                    # renderer would otherwise falsely authenticate it.
+                    raise ValueError("Unescaped TeX data-row comment unsupported")
                 # Reject multiple logical rows sharing one physical line.
                 # Escaped breaks within a known tabincell macro aren't rows.
                 without_tabincell = re.sub(

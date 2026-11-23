@@ -5,10 +5,10 @@
 It is **not** a new experimental condition, a reanalysis of unpublished
 holdout predictions, a gold correction, or proof of better model judgments.
 
-## Independent GitHub review found two genuine counterexamples
+## Independent GitHub review found three genuine counterexamples
 
 On PR #44 (original reviewed head 5aa43472a9b586865f50d44a3181e2fbc0ce9242),
-Codex pointed out two data-integrity errors in the preregistered renderer:
+Codex identified three independently reproducible data-integrity errors in the preregistered renderer:
 
 1. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663464465 :
    Two logical LaTeX table rows on one physical line were incorrectly merged
@@ -19,10 +19,14 @@ Codex pointed out two data-integrity errors in the preregistered renderer:
    numeric values. For example an original cell containing "1", a break tag,
    and "2" was displayed as "12". Superscript/subscript/MathML are also not
    safe to discard without a verified semantic representation.
+3. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663598794 :
+   Unescaped TeX '%' comments inside a data row could be rendered and quoted
+   as if the ignored text were scientific evidence; complete comment lines
+   could also be authenticated as independent table rows.
 
-Both minimal counterexamples were REPRODUCED before changing the renderer;
-the regression tests initially failed (RED). The original parser accepted
-joined LaTeX rows and displayed concatenated HTML cell values.
+All three counterexamples were REPRODUCED before their respective renderer
+repairs; the tests initially failed (RED). The frozen parser accepted joined
+LaTeX rows, concatenated HTML cell values, and non-data TeX comments.
 
 The minimal post-review repair is **fail closed** on unsupported evidence
 presentation, not to add a prompt or relax the source-quote validator:
@@ -33,10 +37,12 @@ presentation, not to add a prompt or relax the source-quote validator:
 - Refuse structural and mathematical HTML markup within source table cells
   whose removal could change numeric meaning, while continuing to decode
   plain escaped entities and harmless formatting markup.
-- Add direct regression cases for both exact reviewer counterexamples,
-  mixed inline-LaTeX cells, HTML sup/sub/break/paragraph and MathML,
-  while preserving the existing single-row source-offset and quotation
-  proofs.
+- Ignore complete TeX comment lines outside pending logical rows; refuse
+  unsupported unescaped inline comments to avoid laundering hidden text as
+  data, but preserve escaped percent values such as 87\%.
+- Add direct regression cases for all three reviewer counterexamples,
+  mixed inline-LaTeX cells, HTML sup/sub/break/paragraph, MathML and
+  escaped percentages while retaining the single-row source provenance proof.
 
 The existing original PR44 development-source presentations for all
 **six source versions** (three papers × Supported/Refuted) have unchanged
@@ -50,8 +56,10 @@ reference label, result row, comparison number, or stop criterion changed.
 - Original preregistration: commit 11f5d3b.
 - Original experiment renderer SHA-256:
   b6542c4f3896dee1644ea7b45a8e3deaec9aff6b55626e6cfc8f2d90092b25cf.
-- Hardened **post-observation** renderer SHA-256:
+- First post-observation hardened renderer SHA-256 (two findings):
   c8c5f440ea65d854a6c64ce601faf03c83e4584075b68f5ee9a1ced58f06dce5.
+- Current hardened renderer SHA-256 (including third comment finding):
+  45e7d3a619177813152914eb4e692308b6e5ff2e6398e9bb1a70cce0f401c16d.
 - Immutable four original result JSON files retain the ORIGINAL renderer
   hash and exact response/model/source/prompt hashes. Their integrity tests
   correctly bind to the frozen origin, not a later working-tree hash.

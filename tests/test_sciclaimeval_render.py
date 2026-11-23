@@ -206,6 +206,43 @@ class DisplayProofTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             R["render_table"](source)
 
+    def test_latex_full_comment_line_is_not_table_evidence(self):
+        source = (
+            "\\begin{tabular}{lr}\n"
+            "Alpha & 1 \\\\\n"
+            "% & deprecated value 99 \\\\\n"
+            "Beta & 3 \\\\\n"
+            "\\end{tabular}\n"
+        )
+        view = R["render_table"](source)
+        self.assertEqual(len(view["rows"]), 2)
+        self.assertNotIn("deprecated value 99", view["rendered_source"])
+        with self.assertRaises(ValueError):
+            R["prove_quote"](source, view, "deprecated value 99")
+
+    def test_latex_inline_unescaped_comment_rejected_not_evidence(self):
+        source = (
+            "\\begin{tabular}{lr}\n"
+            "Alpha & 1 % obsolete value 99\n"
+            "\\\\\n"
+            "Beta & 3 \\\\\n"
+            "\\end{tabular}\n"
+        )
+        with self.assertRaises(ValueError):
+            R["render_table"](source)
+
+    def test_latex_escaped_percentage_remains_scientific_data(self):
+        source = (
+            "\\begin{tabular}{lr}\n"
+            "Accuracy & 87\\% \\\\\n"
+            "Baseline & 83\\% \\\\\n"
+            "\\end{tabular}\n"
+        )
+        view = R["render_table"](source)
+        self.assertIn("Accuracy | 87%", view["rendered_source"])
+        proof = R["prove_quote"](source, view, "Accuracy | 87%")
+        self.assertFalse(proof["display_quote_is_raw_verbatim"])
+
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
             R["render_table"]("not a table")
