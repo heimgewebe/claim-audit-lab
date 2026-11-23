@@ -1,5 +1,18 @@
 # SciClaimEval native-table rendering: bound citations improved, scientific gate did not pass
 
+**Post-observation qualification:** A subsequent independent Codex review
+demonstrated four source-presentation defects in the original experimental
+renderer; one affected the displayed input of an actually model-tested
+development paper (pair 0126). The original 60 model outputs and all
+numbers below are preserved as historical evidence, **not** re-scored
+under the hardened renderer. The primary-source fidelity of the original
+treatment is therefore compromised. See
+[post-observation-erratum.md](post-observation-erratum.md) for exact changed
+display hashes, reproducible counterexamples and the unchanged holdout.
+No claim of improvement by the current hardened renderer follows.
+
+
+
 ## Scientific purpose and methodology
 
 Test whether an intact scientific table, transformed from native LaTeX or
@@ -98,34 +111,3 @@ versus 46.58 seconds RENDERED; chronological order and model warmup
 differ, so no causal latency claim follows. This experiment does not
 identify whether a future improvement came from rendering, removal of
 stylistic noise, shorter contexts or genuine better scientific reasoning.
-The three-paper development sample and lack of independent reannotation
-are far too small for generalized scientific truth or mandatory runtime
-enforcement.
-
-## Immutable input and original output identities
-
-- Before-inference finalized manifest SHA-256:
-  c5f91e3ed9240cd41ad4dd270e01dfd86944953ce3a1d015c25765283b2d863a.
-- Aborted, never model-tested pretrial manifest SHA-256:
-  375b79d7082f84829c25b220cd6150d2af7c8aa78c31ddfef91f20e4cf4ae497.
-- Qwen RAW: run-development-qwen3-14b-raw.json,
-  SHA-256 41ac1ec42ad5ccc202cc694d567e645e00f7f60625892c58e2f4e34935483dad.
-- Qwen RENDERED: run-development-qwen3-14b-rendered.json,
-  SHA-256 c33fd2e74524d57173b21981dc2dd5bcdc20996a930e7e12ff634db026cea005.
-- Gemma RAW: run-development-gemma4-12b-raw.json,
-  SHA-256 34aab99dd9da972d5379f470d10b09bc363fbb7563c857e429c04b25beacbd1d.
-- Gemma RENDERED: run-development-gemma4-12b-rendered.json,
-  SHA-256 5d1ec499338959d3f9862d50e4bd9b2116b61e2c2af6af698c287081baa0a998.
-
-All 60 original responses were read back with a second verifier. It
-reconstructed each real chat turn and compared its SHA-256, checked
-per-row source and display identities against the pinned original file,
-re-applied the existing strict output parser, and confirmed each valid
-rendered quote had the same unique original-row provenance. All
-reported invalid quote failures were reproduced; holdout output count
-was zero. This is a verified reproducibility result, not independent
-human annotation.
-
-**Decision:** retain source-bound row rendering as an experimental,
-opt-in research method only; do not modify the existing single-source
-verifier, global prompt, quality gate, services or regular chat flow.

@@ -243,6 +243,26 @@ class DisplayProofTests(unittest.TestCase):
         proof = R["prove_quote"](source, view, "Accuracy | 87%")
         self.assertFalse(proof["display_quote_is_raw_verbatim"])
 
+    def test_commented_html_rows_are_not_source_evidence(self):
+        original = (
+            "<html><table>"
+            "<tr><td>Alpha</td><td>1</td></tr>"
+            "<!-- <tr><td>Withdrawn</td><td>99.9</td></tr> -->"
+            "<tr><td>Beta</td><td>3</td></tr>"
+            "</table></html>"
+        )
+        with self.assertRaises(ValueError):
+            R["render_table"](original)
+
+    def test_unterminated_html_comment_is_not_rendered(self):
+        original = (
+            "<table><tr><td>Alpha</td><td>1</td></tr>"
+            "<!-- <tr><td>Hidden</td><td>99.9</td></tr>"
+            "</table>"
+        )
+        with self.assertRaises(ValueError):
+            R["render_table"](original)
+
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
             R["render_table"]("not a table")

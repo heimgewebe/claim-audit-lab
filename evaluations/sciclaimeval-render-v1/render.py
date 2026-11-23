@@ -82,6 +82,11 @@ def render_table(raw: str) -> dict:
     rows = []
     if "<table" in raw.lower():
         representation = "html"
+        # Regex row extraction cannot distinguish commented-out table rows
+        # from visible evidence. Reject this unsupported source class rather
+        # than authenticating hidden numbers or changing original offsets.
+        if "<!--" in raw or "-->" in raw:
+            raise ValueError("HTML comments unsupported for source-backed table evidence")
         for match in _HTML_ROW.finditer(raw):
             fragment = match.group()
             text = display_html_row(fragment)
