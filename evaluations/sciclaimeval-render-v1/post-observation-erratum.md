@@ -5,10 +5,10 @@
 It is **not** a new experimental condition, a reanalysis of unpublished
 holdout predictions, a gold correction, or proof of better model judgments.
 
-## Independent GitHub review found four genuine counterexamples
+## Independent GitHub review found six genuine counterexamples
 
 On PR #44 (original reviewed head 5aa43472a9b586865f50d44a3181e2fbc0ce9242),
-Codex identified four independently reproducible data-integrity errors in the preregistered renderer:
+Codex identified six independently reproducible data-integrity risks in the preregistered renderer:
 
 1. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663464465 :
    Two logical LaTeX table rows on one physical line were incorrectly merged
@@ -27,11 +27,24 @@ Codex identified four independently reproducible data-integrity errors in the pr
    HTML commented-out rows could be parsed as visible data and falsely
    authenticated, for example a withdrawn numeric value 99.9 in a hidden
    table row. Both closed and unterminated HTML comments must be refused.
+5. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4667375678 :
+   A LaTeX header sharing its physical line with the opening tabular command
+   was discarded by the original renderer. A bounded fix on commit 5b9726a
+   and a source-span regression test preserve the column header. This
+   finding was already resolved in code before the newer review was read.
+6. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4668542473 :
+   Stripping script, style, template or non-visible/custom HTML elements
+   could expose hidden text (e.g. a value 99 in a script) as numeric source
+   evidence. The original behavior was reproduced as failing tests. Only
+   simple lossless typographic cell tags are now admitted; other cell
+   markup is refused rather than reinterpreted.
 
-All four counterexamples were REPRODUCED before their respective renderer
-repairs; the tests initially failed (RED). The frozen parser accepted joined
+The first four counterexamples and the sixth were REPRODUCED as failing
+regression cases before the respective repair (RED). The fifth is covered
+by a regression test on the repaired code. The frozen parser accepted joined
 LaTeX rows, concatenated HTML cell values, non-data TeX comments and
-commented-out HTML rows.
+commented-out HTML rows; the later state additionally lacked a complete
+HTML-cell visibility check.
 
 The minimal post-review repair is **fail closed** on unsupported evidence
 presentation, not to add a prompt or relax the source-quote validator:
@@ -48,9 +61,15 @@ presentation, not to add a prompt or relax the source-quote validator:
 - Reject native HTML tables containing HTML comments entirely rather than
   extracting invisible rows. This is a deliberately narrow unsupported
   source class, not a new production-wide restriction.
-- Add direct regression cases for all four reviewer counterexamples,
-  mixed inline-LaTeX cells, HTML sup/sub/break/paragraph, MathML, HTML
-  comments and escaped percentages while retaining source provenance.
+- Preserve LaTeX table headers on the same line as the opening command,
+  with exact original-character spans.
+- Reject all HTML cell child tags other than attribute-free, simple
+  typographic formatting. Structural, semantic and non-visible elements
+  are out of scope for the experimental renderer.
+- Add direct regression cases for all six reviewer observations,
+  mixed inline-LaTeX cells, HTML sup/sub/break/paragraph, MathML,
+  hidden scripts/styles/templates, HTML comments and escaped percentages,
+  while retaining the one-source-row provenance proof.
 
 **Important new integrity finding:** The post-observation TeX-comment fix
 **does change two of the six original development source presentations**:
@@ -85,8 +104,10 @@ appropriate next study needs freshly preregistered, source-complete cases.
   c8c5f440ea65d854a6c64ce601faf03c83e4584075b68f5ee9a1ced58f06dce5.
 - Intermediate hardened renderer SHA-256 (including third TeX finding):
   45e7d3a619177813152914eb4e692308b6e5ff2e6398e9bb1a70cce0f401c16d.
-- Current post-review renderer SHA-256 (also rejecting HTML comments):
+- Post-review renderer SHA-256 after HTML comments:
   64678ed7eebfa7ac23d07d51431524f351186206242c5ff0b59c03620f3052fe.
+- Current additional visibility-hardened renderer SHA-256:
+  c05bfbc73707f4677b97210fda9bc51261f7875ee77d353721624d7a297a76a5.
 - Immutable four original result JSON files retain the ORIGINAL renderer
   hash and exact response/model/source/prompt hashes. Their integrity tests
   correctly bind to the frozen origin, not a later working-tree hash.

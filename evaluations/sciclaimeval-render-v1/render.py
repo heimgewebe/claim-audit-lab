@@ -69,8 +69,15 @@ def display_html_row(source_fragment: str) -> str:
         # meaning (10<sup>3</sup>); removing it could invent a number.
         if _UNSUPPORTED_HTML_CELL_MARKUP.search(cell.group(1)):
             raise ValueError("Unsupported semantic markup inside HTML table cell")
-        # HTML character entities and formatting markup are rendered, never
-        # treated as literal quotations from the underlying raw HTML.
+        # Only bare lossless typographic elements can be stripped. Anything
+        # else (script/style/template, hidden spans, custom/math/structural
+        # elements) may have invisible or scientific meaning: refuse rather
+        # than silently concatenate content into invented evidence.
+        for tag in _HTML_TAG.findall(cell.group(1)):
+            if re.fullmatch(r"</?(?:b|strong|em|i|span)>", tag, flags=re.I) is None:
+                raise ValueError("Unsupported or attributed HTML cell markup")
+        # HTML character entities and permitted formatting markup are rendered,
+        # not misrepresented as literal quotations from the underlying HTML.
         text = unescape(_HTML_TAG.sub("", cell.group(1)))
         cells.append(re.sub(r"\s+", " ", text).strip())
     return " | ".join(cells).strip(" |")

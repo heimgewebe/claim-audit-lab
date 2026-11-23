@@ -279,6 +279,36 @@ class DisplayProofTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             R["render_table"](original)
 
+    def test_nonvisible_html_cell_content_is_not_scientific_evidence(self):
+        cases = [
+            "1<script>99</script>2",
+            "1<style>99</style>2",
+            "1<template>99</template>2",
+            "1<noscript>99</noscript>2",
+            "1<span style=\"display:none\">99</span>2",
+            "1<div hidden>99</div>2",
+            "1<custom-element>99</custom-element>2",
+        ]
+        for cell in cases:
+            with self.subTest(cell=cell):
+                raw = (
+                    "<table><tr><td>Target</td><td>" + cell + "</td></tr>"
+                    "<tr><td>Comparator</td><td>3</td></tr></table>"
+                )
+                with self.assertRaises(ValueError):
+                    R["render_table"](raw)
+
+    def test_safe_simple_html_formatting_is_retained(self):
+        raw = (
+            "<table><tr><td><b>Alpha</b></td><td>1</td></tr>"
+            "<tr><td><em>Beta</em></td><td>3</td></tr></table>"
+        )
+        view = R["render_table"](raw)
+        self.assertEqual(view["rendered_source"], "Alpha | 1\nBeta | 3")
+        self.assertEqual(
+            R["prove_quote"](raw, view, "Alpha | 1")["row_index"], 0
+        )
+
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
             R["render_table"]("not a table")
