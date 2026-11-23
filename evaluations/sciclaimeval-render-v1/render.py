@@ -98,15 +98,29 @@ def render_table(raw: str) -> dict:
         offset = 0
         fragment_start = 0
         buffer = []
-        for line in raw.splitlines(keepends=True):
+        for physical_line in raw.splitlines(keepends=True):
+            line = physical_line
+            line_source_start = offset
             trimmed = line.lstrip()
             if trimmed.startswith(r"\begin{tabular"):
                 if inside:
                     raise ValueError("Nested tabular not supported: refuse partial rendering")
                 inside = True
                 buffer = []
-                offset += len(line)
-                continue
+                opening = re.match(
+                    r"^\s*\\begin\{(?:tabular\*?|tabularx)\}(?:\[[^\]]*\])?(?:\{[^{}]*\}){1,3}",
+                    line,
+                )
+                if not opening:
+                    raise ValueError("Unsupported LaTeX table declaration")
+                line_source_start += opening.end()
+                line = line[opening.end():]
+                if not line.strip():
+                    offset += len(physical_line)
+                    continue
+                if _LATEX_TABLE_END.search(line):
+                    raise ValueError("Inline LaTeX table closure unsupported")
+                trimmed = line.lstrip()
             if inside and trimmed.startswith(r"\end{tabular"):
                 # TeX permits the final data row without a trailing \\\\.
                 # Bind the entire final row to its original contiguous span.
@@ -153,7 +167,7 @@ def render_table(raw: str) -> dict:
                         "Multiple LaTeX row delimiters on one line are unsupported"
                     )
                 if not buffer:
-                    fragment_start = offset
+                    fragment_start = line_source_start
                 if not trimmed.startswith("%"):
                     buffer.append(line)
                 # Only a physical row terminator at the END of a source line
@@ -161,13 +175,13 @@ def render_table(raw: str) -> dict:
                 tail = line.rstrip()
                 if tail.endswith(r"\\") or any(tail.endswith(r"\\ " + "\\" + command)
                                               for command in ("midrule","bottomrule","hline","toprule")):
-                    fragment = raw[fragment_start:offset + len(line.rstrip("\r\n"))]
+                    fragment = raw[fragment_start:offset + len(physical_line.rstrip("\r\n"))]
                     if "&" in fragment:
                         text = display_latex_row(fragment)
                         if text:
                             rows.append((fragment_start, fragment_start + len(fragment), fragment, text))
                     buffer = []
-            offset += len(line)
+            offset += len(physical_line)
         if inside or any("&" in part for part in buffer):
             raise ValueError("Missing table closure or complete row delimiter")
     else:

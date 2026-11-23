@@ -162,6 +162,22 @@ class DisplayProofTests(unittest.TestCase):
                     calls += 1
         self.assertEqual(calls, 60)
 
+    def test_latex_header_on_tabular_opening_line_keeps_column_meanings(self):
+        original = (
+            r"\begin{tabular}{lrr} Model & Control & Treatment \\" + "\n"
+            + r"Baseline & 1 & 2 \\" + "\n"
+            + r"New & 3 & 4 \\" + "\n"
+            + r"\end{tabular}" + "\n"
+        )
+        view = R["render_table"](original)
+        self.assertEqual(
+            [row["display"] for row in view["rows"]],
+            ["Model | Control | Treatment", "Baseline | 1 | 2", "New | 3 | 4"],
+        )
+        proof = R["prove_quote"](original, view, "Model | Control | Treatment")
+        start, end = proof["original_source_chars"]
+        self.assertEqual(original[start:end].strip(), r"Model & Control & Treatment \\")
+
     def test_two_latex_rows_on_one_physical_line_are_rejected(self):
         original = (
             "\\begin{tabular}{lr}\n"
