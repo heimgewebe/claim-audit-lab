@@ -211,3 +211,11 @@ manifest, or STOP decision. The repaired renderer has no demonstrated
 scientific efficacy and cannot reproduce any of the six original display
 identities. The pilot remains a historical negative result; the current
 code is not a reusable representation standard. No holdout inference.
+
+## Retirement: archival result, not a runnable experiment (2026-11-24)
+
+A further Codex finding, [group headers](https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4675966055), was reproduced on commit `e02b4f189c197626ae98fc6bacb4a3129ed497cf`: two full-width LaTeX multicolumn rows naming Dataset A and Dataset B disappeared. The display was `Model | Accuracy\nAlpha | 91\nAlpha | 82`; the proof authenticated row 1 despite losing its dataset context. This is a real remaining defect of that historical implementation, **not a repaired parser feature**.
+
+The preceding four repairs reduced reproducibility of the original six development displays to zero identical, two changed and four rejected. The preregistered experiment already stopped. Continuing to add parser cases is not a justified research investment. Therefore this directory is now a **data and source archive only**. The active experimental renderer and runner are retired; the regular optional claim-evidence CLI is unaffected. No further inference on the reserved holdout is authorized by this historical experiment.
+
+The original, byte-identical program sources from preregistration commit `11f5d3b6a8004a79021ec87b716824178135da62` are preserved as `original-render.py.txt` (SHA-256 `b6542c4f3896dee1644ea7b45a8e3deaec9aff6b55626e6cfc8f2d90092b25cf`) and `original-run.py.txt` (SHA-256 `4fd816dd0202d67b3ee9bebced2d727ca3f47ef5b55d1c26739bf5a8ce3546b9`). They are historical source, not supported execution entrypoints. The later code and its regression history remain in the PR commit history through `e02b4f189c197626ae98fc6bacb4a3129ed497cf`. All original response files, manifests, preregistered criteria and reported outcomes remain unchanged; tests now verify archive integrity rather than maintain a scientifically unsuccessful parser. A new independently designed experiment is needed for any prospective efficacy claim.
