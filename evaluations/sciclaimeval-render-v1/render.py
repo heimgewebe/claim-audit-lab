@@ -94,6 +94,16 @@ def render_table(raw: str) -> dict:
         # than authenticating hidden numbers or changing original offsets.
         if "<!--" in raw or "-->" in raw:
             raise ValueError("HTML comments unsupported for source-backed table evidence")
+        # This is a plain-table display, not an HTML/CSS layout engine.
+        # Admit only the known attribute-free markup throughout the source:
+        # container attributes can hide data; rowspan/colspan alter alignment.
+        # Refuse such sources before extracting or authenticating any row.
+        for tag in _HTML_TAG.findall(raw):
+            if re.fullmatch(
+                r"</?(?:html|body|table|thead|tbody|tfoot|tr|td|th|b|strong|em|i|span)\s*>",
+                tag, flags=re.I,
+            ) is None:
+                raise ValueError("Unsupported or attributed HTML table markup")
         for match in _HTML_ROW.finditer(raw):
             fragment = match.group()
             text = display_html_row(fragment)

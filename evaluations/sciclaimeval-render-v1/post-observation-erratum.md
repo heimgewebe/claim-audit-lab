@@ -106,7 +106,7 @@ appropriate next study needs freshly preregistered, source-complete cases.
   45e7d3a619177813152914eb4e692308b6e5ff2e6398e9bb1a70cce0f401c16d.
 - Post-review renderer SHA-256 after HTML comments:
   64678ed7eebfa7ac23d07d51431524f351186206242c5ff0b59c03620f3052fe.
-- Current additional visibility-hardened renderer SHA-256:
+- Earlier visibility-hardened renderer SHA-256:
   c05bfbc73707f4677b97210fda9bc51261f7875ee77d353721624d7a297a76a5.
 - Immutable four original result JSON files retain the ORIGINAL renderer
   hash and exact response/model/source/prompt hashes. Their integrity tests
@@ -133,3 +133,43 @@ source representation must be scoped and adversarially tested. It does not authe
 papers or prove an improvement in world-truth reasoning. Nothing from this
 repair is made mandatory for normal ChatGPT answers, production sources,
 model inference, or claim-audit-lab cases.
+
+## Further post-observation HTML scope restriction (2026-11-24)
+
+Two additional Codex findings on the reviewed head 349f0f7 were
+reproduced with nine failing subcases before repair:
+
+- https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4669904214 :
+  visibility-changing attributes on table containers, rows and cells can
+  turn non-visible source values into apparent scientific evidence.
+- https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4669904224 :
+  rowspan/colspan can shift numeric values into incorrect column
+  associations or omit the shared model label.
+
+The renderer is deliberately not an HTML/CSS layout engine. Only its
+small attribute-free HTML tag vocabulary is now accepted throughout the
+source, including wrappers; styled or otherwise unsupported markup and
+spanning cells are refused before any rows can be authenticated.
+Nine counterexamples now pass, and ordinary rectangular attribute-free
+tables still render. This is a scope restriction, not a claim of complete
+HTML semantics or a new default verification policy.
+
+The new renderer SHA-256 is
+b0189ef4fd03e9748de6068bc6c925a6c3a94d934ccd5e439b72464215976426.
+A fresh structural-only recheck of all six development inputs verified
+the original raw SHA-256 values against the frozen manifest:
+
+- Pair 0126 (both versions): changed display, as recorded above.
+- Pair 0152 (both versions): original display hashes unchanged.
+- Pair 0281 (both versions): now refused as unsupported HTML. The
+  original document includes CSS, attributed table wrappers and
+  non-row markup. This refusal is not a new model error or a new
+  experimental result.
+
+Thus only two of six original development source versions retain
+identical accepted displays under the newly restricted renderer.
+The frozen 60 model responses, original labels, manifest and
+preregistered stopping decision remain untouched. No holdout inference
+was performed. Future source-representation work should use structured
+or independently checked evidence rather than accumulating more ad hoc
+HTML/CSS parsing rules in this stopped pilot.

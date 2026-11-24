@@ -298,6 +298,32 @@ class DisplayProofTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     R["render_table"](raw)
 
+    def test_attributed_html_containers_rows_and_cells_are_unsupported(self):
+        # The display has no CSS/layout semantics. Do not promote invisible
+        # content or shifted numeric values into authenticated evidence.
+        plain = (
+            "<html><body><table><tbody>"
+            "<tr><th>Model</th><th>Control</th><th>Treatment</th></tr>"
+            "<tr><td>Alpha</td><td>1</td><td>2</td></tr>"
+            "<tr><td>Beta</td><td>3</td><td>4</td></tr>"
+            "</tbody></table></body></html>"
+        )
+        for tag, attributed in (
+            ("<html>", "<html hidden>"),
+            ("<body>", '<body style="display:none">'),
+            ("<table>", "<table hidden>"),
+            ("<tbody>", '<tbody style="visibility:hidden">'),
+            ("<tr>", "<tr hidden>"),
+            ("<td>", '<td style="display:none">'),
+            ("<th>", '<th class="hidden">'),
+            ("<td>", '<td rowspan="2">'),
+            ("<th>", '<th colspan="2">'),
+        ):
+            with self.subTest(attributed=attributed):
+                with self.assertRaises(ValueError):
+                    R["render_table"](plain.replace(tag, attributed, 1))
+        self.assertIn("Beta | 3 | 4", R["render_table"](plain)["rendered_source"])
+
     def test_safe_simple_html_formatting_is_retained(self):
         raw = (
             "<table><tr><td><b>Alpha</b></td><td>1</td></tr>"
