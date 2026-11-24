@@ -1,0 +1,221 @@
+# Post-observation erratum: raw-source display integrity
+
+**Amendment classification:** engineering integrity repair performed AFTER the
+60 development model calls and AFTER immutable result files were committed.
+It is **not** a new experimental condition, a reanalysis of unpublished
+holdout predictions, a gold correction, or proof of better model judgments.
+
+## Independent GitHub review found six genuine counterexamples
+
+On PR #44 (original reviewed head 5aa43472a9b586865f50d44a3181e2fbc0ce9242),
+Codex identified six independently reproducible data-integrity risks in the preregistered renderer:
+
+1. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663464465 :
+   Two logical LaTeX table rows on one physical line were incorrectly merged
+   into a single display row. A model could then quote across both rows as if
+   the quote had unique one-row source provenance.
+2. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663464474 :
+   Stripping structural HTML tags inside a cell could invent concatenated
+   numeric values. For example an original cell containing "1", a break tag,
+   and "2" was displayed as "12". Superscript/subscript/MathML are also not
+   safe to discard without a verified semantic representation.
+3. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4663598794 :
+   Unescaped TeX '%' comments inside a data row could be rendered and quoted
+   as if the ignored text were scientific evidence; complete comment lines
+   could also be authenticated as independent table rows.
+4. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4667265029 :
+   HTML commented-out rows could be parsed as visible data and falsely
+   authenticated, for example a withdrawn numeric value 99.9 in a hidden
+   table row. Both closed and unterminated HTML comments must be refused.
+5. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4667375678 :
+   A LaTeX header sharing its physical line with the opening tabular command
+   was discarded by the original renderer. A bounded fix on commit 5b9726a
+   and a source-span regression test preserve the column header. This
+   finding was already resolved in code before the newer review was read.
+6. https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4668542473 :
+   Stripping script, style, template or non-visible/custom HTML elements
+   could expose hidden text (e.g. a value 99 in a script) as numeric source
+   evidence. The original behavior was reproduced as failing tests. Only
+   simple lossless typographic cell tags are now admitted; other cell
+   markup is refused rather than reinterpreted.
+
+The first four counterexamples and the sixth were REPRODUCED as failing
+regression cases before the respective repair (RED). The fifth is covered
+by a regression test on the repaired code. The frozen parser accepted joined
+LaTeX rows, concatenated HTML cell values, non-data TeX comments and
+commented-out HTML rows; the later state additionally lacked a complete
+HTML-cell visibility check.
+
+The minimal post-review repair is **fail closed** on unsupported evidence
+presentation, not to add a prompt or relax the source-quote validator:
+- Reject multiple outer LaTeX row terminators sharing a physical line.
+  Exclude complete inline tabincell/inner-tabular cell constructs from
+  the *delimiter count*, retaining original source characters and hashes;
+  reject unsupported incomplete nested table markup.
+- Refuse structural and mathematical HTML markup within source table cells
+  whose removal could change numeric meaning, while continuing to decode
+  plain escaped entities and harmless formatting markup.
+- Ignore complete TeX comment lines outside pending logical rows; refuse
+  unsupported unescaped inline comments to avoid laundering hidden text as
+  data, but preserve escaped percent values such as 87\%.
+- Reject native HTML tables containing HTML comments entirely rather than
+  extracting invisible rows. This is a deliberately narrow unsupported
+  source class, not a new production-wide restriction.
+- Preserve LaTeX table headers on the same line as the opening command,
+  with exact original-character spans.
+- Reject all HTML cell child tags other than attribute-free, simple
+  typographic formatting. Structural, semantic and non-visible elements
+  are out of scope for the experimental renderer.
+- Add direct regression cases for all six reviewer observations,
+  mixed inline-LaTeX cells, HTML sup/sub/break/paragraph, MathML,
+  hidden scripts/styles/templates, HTML comments and escaped percentages,
+  while retaining the one-source-row provenance proof.
+
+**Important new integrity finding:** The post-observation TeX-comment fix
+**does change two of the six original development source presentations**:
+SciClaimEval NLP pair 0126 (both Supported and Refuted) contained a whole
+comment line with pseudo-headers such as '-para' and '-sent'. The frozen
+renderer displayed that line as table data. It is now correctly excluded.
+The original displayed-source SHA-256 values in manifest.json were
+eab6a86ee85e9db6c403195ac8e81bc7622f8e5d10c5d37a8d74926156cdc0e9
+(Supported) and d0a66fb2cbb755af9b415640ba424edddc80fea13a5c2d99c6b2d0acfaee92bc
+(Refuted); the hardened output hashes are
+7e5475bf9f5ce2da9e205daed765d04dcdee2d545e1646717cee6d98077ae02a
+and b85d63a55a4ed3295ae87e8a8360b80563daec3cad417a1eeb9517f71a693fd0.
+The other **four** development source versions retain identical displays.
+No earlier claim, original source bytes, model instruction, model output,
+published label, result row, comparison number, or stop criterion changed.
+
+Therefore the 27/30 versus 17/30 provenance result measures the **frozen
+original experiment renderer, which now has demonstrated source
+presentation defects**. Even though the originally quoted Qwen spans in
+pair 0126 refer to visible FEVER data rows and not directly to the
+commented-out line, its influence on model reasoning cannot be ruled out.
+Do not represent the figures as performance of the hardened renderer
+or as a clean end-to-end proof of scientific source integrity. The
+appropriate next study needs freshly preregistered, source-complete cases.
+
+## Frozen experimental identities and explicit non-claims
+
+- Original preregistration: commit 11f5d3b.
+- Original experiment renderer SHA-256:
+  b6542c4f3896dee1644ea7b45a8e3deaec9aff6b55626e6cfc8f2d90092b25cf.
+- First post-observation hardened renderer SHA-256 (two findings):
+  c8c5f440ea65d854a6c64ce601faf03c83e4584075b68f5ee9a1ced58f06dce5.
+- Intermediate hardened renderer SHA-256 (including third TeX finding):
+  45e7d3a619177813152914eb4e692308b6e5ff2e6398e9bb1a70cce0f401c16d.
+- Post-review renderer SHA-256 after HTML comments:
+  64678ed7eebfa7ac23d07d51431524f351186206242c5ff0b59c03620f3052fe.
+- Earlier visibility-hardened renderer SHA-256:
+  c05bfbc73707f4677b97210fda9bc51261f7875ee77d353721624d7a297a76a5.
+- Immutable four original result JSON files retain the ORIGINAL renderer
+  hash and exact response/model/source/prompt hashes. Their integrity tests
+  correctly bind to the frozen origin, not a later working-tree hash.
+- The final manifest remains unchanged, SHA-256
+  c5f91e3ed9240cd41ad4dd270e01dfd86944953ce3a1d015c25765283b2d863a.
+- The original development outcome still fails the preregistered no-control-
+  change criterion. Holdout remains 0 model inferences.
+- A structural-only recheck of the untested holdout exposed native MathML
+  inside paper 18589 (SciClaimEval pair 0296). The original renderer would
+  erase that markup. The hardened renderer correctly **rejects** that
+  source as unsupported instead of claiming semantically faithful display.
+  This freezes the original holdout as historical, unrun trial input; it
+  is **not usable with the hardened renderer**, and no replacement paper,
+  changed manifest or new "clean" holdout has been selected post-observation.
+  Any fresh trial must preregister its own supported source set before
+  model inference.
+
+The apparent development gain in quote validity remains a result of
+the **frozen, now demonstrably imperfect original renderer and three
+selected papers**. It is not evidence that the hardened renderer already
+delivers the same gain. The review demonstrates why complete native-table
+source representation must be scoped and adversarially tested. It does not authenticate the scientific
+papers or prove an improvement in world-truth reasoning. Nothing from this
+repair is made mandatory for normal ChatGPT answers, production sources,
+model inference, or claim-audit-lab cases.
+
+## Further post-observation HTML scope restriction (2026-11-24)
+
+Two additional Codex findings on the reviewed head 349f0f7 were
+reproduced with nine failing subcases before repair:
+
+- https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4669904214 :
+  visibility-changing attributes on table containers, rows and cells can
+  turn non-visible source values into apparent scientific evidence.
+- https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4669904224 :
+  rowspan/colspan can shift numeric values into incorrect column
+  associations or omit the shared model label.
+
+The renderer is deliberately not an HTML/CSS layout engine. Only its
+small attribute-free HTML tag vocabulary is now accepted throughout the
+source, including wrappers; styled or otherwise unsupported markup and
+spanning cells are refused before any rows can be authenticated.
+Nine counterexamples now pass, and ordinary rectangular attribute-free
+tables still render. This is a scope restriction, not a claim of complete
+HTML semantics or a new default verification policy.
+
+The new renderer SHA-256 is
+b0189ef4fd03e9748de6068bc6c925a6c3a94d934ccd5e439b72464215976426.
+A fresh structural-only recheck of all six development inputs verified
+the original raw SHA-256 values against the frozen manifest:
+
+- Pair 0126 (both versions): changed display, as recorded above.
+- Pair 0152 (both versions): original display hashes unchanged.
+- Pair 0281 (both versions): now refused as unsupported HTML. The
+  original document includes CSS, attributed table wrappers and
+  non-row markup. This refusal is not a new model error or a new
+  experimental result.
+
+Thus only two of six original development source versions retain
+identical accepted displays under the newly restricted renderer.
+The frozen 60 model responses, original labels, manifest and
+preregistered stopping decision remain untouched. No holdout inference
+was performed. Future source-representation work should use structured
+or independently checked evidence rather than accumulating more ad hoc
+HTML/CSS parsing rules in this stopped pilot.
+
+## Empty edge cells (2026-11-24)
+
+A further self-review counterexample showed that `.strip(" |")` erased empty
+leading and trailing cells in both otherwise simple HTML and LaTeX tables:
+under `A | B`, the original row with empty A and B=42 became `42` and still
+received a provenance proof. Removing only outer whitespace preserves the
+column separators. The new regression failed in both formats before the fix
+and passed afterward. Renderer SHA-256 after this bounded correction:
+30785a0dac5babd117b49c77766f23a5c47c94155a402bc0396104cc2de10c5c.
+The structural recheck of all six SHA-verified development sources still
+finds exactly two unchanged displays (0152), two changed displays (0126)
+and two unsupported sources (0281). All four archived result files and the
+manifest remain unchanged. This pilot remains stopped; these corrections
+are not a certification of arbitrary table semantics. Do not extend this
+ad hoc renderer into a general-purpose source representation; use independently
+verified structured source data or the original evidence in a new trial.
+
+## Unsupported TeX row-break suffixes (2026-11-24)
+
+Codex finding https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4675898891
+was independently reproduced: a logical row ending in `\\[2pt]` was merged
+with the following row and authenticated as one source row. Three negative
+regression subcases (`[2pt]`, `*`, `[1ex]`) failed before repair and pass
+now. Rather than implement optional TeX spacing syntax, the renderer rejects
+any unmasked row delimiter that is not a supported end-of-row terminator.
+Renderer SHA-256: a988cc4bfdc134b949fb1b9db99b549f85f1850440346a490a59bb276225174b.
+
+The new structural-only recheck verified the exact original source bytes
+for all six development versions. It supersedes the compatibility counts
+above for the current renderer: **zero identical accepted displays, two
+changed displays (0126), and four unsupported versions (0152 and 0281)**.
+The 0152 inputs use an unsupported delimiter suffix. This does not alter
+any of the 60 original model outputs, original evaluation metrics, labels,
+manifest, or STOP decision. The repaired renderer has no demonstrated
+scientific efficacy and cannot reproduce any of the six original display
+identities. The pilot remains a historical negative result; the current
+code is not a reusable representation standard. No holdout inference.
+
+## Retirement: archival result, not a runnable experiment (2026-11-24)
+
+A further Codex finding, [group headers](https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4675966055), was reproduced on commit `e02b4f189c197626ae98fc6bacb4a3129ed497cf`: two full-width LaTeX multicolumn rows naming Dataset A and Dataset B disappeared. The display was `Model | Accuracy\nAlpha | 91\nAlpha | 82`; the proof authenticated row 1 despite losing its dataset context. This is a real remaining defect of that historical implementation, **not a repaired parser feature**.
+
+The preceding four repairs reduced reproducibility of the original six development displays to zero identical, two changed and four rejected. The preregistered experiment already stopped. Continuing to add parser cases is not a justified research investment. Therefore this directory is now a **data and source archive only**. The active experimental renderer and runner are retired; the regular optional claim-evidence CLI is unaffected. No further inference on the reserved holdout is authorized by this historical experiment.
+
+The original, byte-identical program sources from preregistration commit `11f5d3b6a8004a79021ec87b716824178135da62` are preserved as `original-render.py.txt` (SHA-256 `b6542c4f3896dee1644ea7b45a8e3deaec9aff6b55626e6cfc8f2d90092b25cf`) and `original-run.py.txt` (SHA-256 `4fd816dd0202d67b3ee9bebced2d727ca3f47ef5b55d1c26739bf5a8ce3546b9`). They are historical source, not supported execution entrypoints. The later code and its regression history remain in the PR commit history through `e02b4f189c197626ae98fc6bacb4a3129ed497cf`. All original response files, manifests, preregistered criteria and reported outcomes remain unchanged; tests now verify archive integrity rather than maintain a scientifically unsuccessful parser. A new independently designed experiment is needed for any prospective efficacy claim.

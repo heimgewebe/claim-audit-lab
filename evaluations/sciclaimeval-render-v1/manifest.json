@@ -1,0 +1,181 @@
+{
+  "schema_version": "claim-audit-lab.sciclaimeval-render-manifest-v1",
+  "dataset_revision": "55ec80b427d9b4eaff8ed9b537a1ea6cb5d665d7",
+  "release_sha256": "cbf0db967f285875b7b283ed56f4fed93bf4627f84d8e7f3c39489bc56f289ab",
+  "selection_seed": "20261123-source-row-v1",
+  "old_manifest_sha256": "76cc43e2ca9a9f0820be1ccd499654dadbd6ccdbc61330393d45f4b5743de805",
+  "catalog_listing_sha256": "26101e3cb23182fb6b86f484c066f1a0d925c2badc6001f941fa03ebf80cac23",
+  "selection": "SciClaimEval prior-pilot pair_pool filter, exclude all six prior papers; SHA-sort by 20261123-source-row-v1/domain/paper/pair, 4 new distinct-paper NLP pairs and 2 new distinct-paper PeerJ pairs; source versions must differ in raw bytes and rendered rows; first 2 NLP and 1 PeerJ development, next 2 NLP and 1 PeerJ holdout. All prior PR43 paper IDs are excluded; ML quota zero because all remaining eligible numeric ML paper identities belonged to PR43",
+  "source_relative_gold_only": true,
+  "modified_sources_are_not_independent_world_evidence": true,
+  "samples": [
+    {
+      "pair_id": "0126",
+      "paper_id": "2023.ijcnlp-main.34",
+      "domain": "nlp",
+      "split": "development",
+      "claim_sha256": "7e17a5e7a1461a8eae5640c9d0f6b1704bf7b6968ee658b0ca70d228004fdaf4",
+      "caption_sha256": "f69f16b30a3e0416fbe135efab4bdc3998dfee408c56fd4d8552ebc0236ac4db",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0196",
+          "path": "data/tables/dev/val_tab_0196.tex",
+          "sha256": "0a41e7f2182f47ed88ed37432b03411328fc73273be0c611ddbd23a289459874",
+          "bytes": 3298,
+          "display_sha256": "eab6a86ee85e9db6c403195ac8e81bc7622f8e5d10c5d37a8d74926156cdc0e9",
+          "row_count": 11
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0197",
+          "path": "data/tables/dev/val_tab_0197.tex",
+          "sha256": "b00c685c2e52a6e7aca2f0cad3ec88951b67a1e5b58627a7b021f8e1b1e0dc7c",
+          "bytes": 3298,
+          "display_sha256": "d0a66fb2cbb755af9b415640ba424edddc80fea13a5c2d99c6b2d0acfaee92bc",
+          "row_count": 11
+        }
+      }
+    },
+    {
+      "pair_id": "0152",
+      "paper_id": "2024.eacl-long.6",
+      "domain": "nlp",
+      "split": "development",
+      "claim_sha256": "55ee850599b151edc193ddf93a159dc59277ea1a7575dc4ed03932f3fcb6eecb",
+      "caption_sha256": "d305192ccaa33fa4b80e94807f9214dbb1df4d9ed452a7d7bee81fa9b2a16dcd",
+      "license_name": "CC BY 4.0",
+      "license_url": "http://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0245",
+          "path": "data/tables/dev/val_tab_0245.tex",
+          "sha256": "1716300e7cc00c991885a5e2eb7736215553899595d759946319ed3032299a35",
+          "bytes": 3743,
+          "display_sha256": "7e85202c1520130ebd19635f54439db675892db138823731224932ff19543e16",
+          "row_count": 13
+        },
+        "Refuted": {
+          "claim_id": "val_tab_1572",
+          "path": "data/tables/dev/val_tab_1572.tex",
+          "sha256": "8eaa262d34f1f7943946665d0bbc94cd2370e9e324d2edef030b27536e2482b5",
+          "bytes": 3744,
+          "display_sha256": "708bbb89b69c905a1d9f92e4e18de06cbc568e376971843b220026fc45d8050f",
+          "row_count": 13
+        }
+      }
+    },
+    {
+      "pair_id": "0281",
+      "paper_id": "16988",
+      "domain": "peerj",
+      "split": "development",
+      "claim_sha256": "00bde088b6b0b610f48b2ba2e9725bc1782edfdde1808eb80e6ba1066e2d75ed",
+      "caption_sha256": "4f7227c754ee5dfc25a957b30bfaef2e1b7448cf2d14ffec7565b964cbb908ab",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0449",
+          "path": "data/tables/dev/val_tab_0449.html",
+          "sha256": "3fdcfaffe8405f069acf7eaddd19fd5b83ce35dff8db7a95185e50c095cec1f5",
+          "bytes": 2682,
+          "display_sha256": "8ddd8fba13135ec4529ba1d8f97b7654a0c7efa40cec2c243dfc4fb77059f441",
+          "row_count": 9
+        },
+        "Refuted": {
+          "claim_id": "val_tab_1528",
+          "path": "data/tables/dev/val_tab_1528.html",
+          "sha256": "74d51b3fbbbf499d84c08949354e29515f616cbf3f72b0a95ebc11f64732960e",
+          "bytes": 2682,
+          "display_sha256": "65d52dcc20b3e7b253f290265011c8f3f62e00939fbd9a00b5b660103f2be0d0",
+          "row_count": 9
+        }
+      }
+    },
+    {
+      "pair_id": "0138",
+      "paper_id": "2024.eacl-long.9",
+      "domain": "nlp",
+      "split": "holdout",
+      "claim_sha256": "5ea2c51d6740c6714fc2f3ff0b8381cd126b4bea76d5390a7bd22aa544f0b567",
+      "caption_sha256": "49a6465228a82c707913e678fb58e18bd21a81467abaafe437d06950c7cec6ff",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0220",
+          "path": "data/tables/dev/val_tab_0220.tex",
+          "sha256": "73849ef20ea288c83e94a47f29e7715c27af9df2fbde5fe9300859051b527568",
+          "bytes": 2677,
+          "display_sha256": "80e32e737981125d71205db32ca8832c7e8b32bbd5157b3fc717fd69e4fc0c9f",
+          "row_count": 3
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0221",
+          "path": "data/tables/dev/val_tab_0221.tex",
+          "sha256": "f91b41e7579ae864739f46292fcb1e2fa1b232c1b2f999bbb0019f709533c5f7",
+          "bytes": 2674,
+          "display_sha256": "dd0ca6d0f3e1e94508323e3b0138f388e7436ed93fd0e889aeddd713a64476cd",
+          "row_count": 3
+        }
+      }
+    },
+    {
+      "pair_id": "0192",
+      "paper_id": "2025.naacl-long.4",
+      "domain": "nlp",
+      "split": "holdout",
+      "claim_sha256": "fdf00a5dbe2e166120fabfb0955a76e9b12e08d45b6997fe873cb937af05ba32",
+      "caption_sha256": "7162561c14ff50f55c1be20f026dddb52038d292350b537550394acd99dcc599",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0347",
+          "path": "data/tables/dev/val_tab_0347.tex",
+          "sha256": "165f879ba0b4658382fbb658160a49bd648b2073e026cd47e2dfdd69969b4809",
+          "bytes": 3579,
+          "display_sha256": "1d6ad827403c7ea0669200a5356914666826281fb9ccc84e0d905cd231b0e9f6",
+          "row_count": 6
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0348",
+          "path": "data/tables/dev/val_tab_0348.tex",
+          "sha256": "2a2f1f7bc73f1c44553729f54f82eab41c1b6750cc70670d06fe14f9858b52f3",
+          "bytes": 3579,
+          "display_sha256": "5f3d1f34c2292c0c3aaff25373d70dbdcdc1b6f2617d73e7985beaa4c66ddd28",
+          "row_count": 6
+        }
+      }
+    },
+    {
+      "pair_id": "0296",
+      "paper_id": "18589",
+      "domain": "peerj",
+      "split": "holdout",
+      "claim_sha256": "f6de98f861a650b005887e46c1841b21731aaf6dcd4448f1d5480cbae2bf34fa",
+      "caption_sha256": "02887b9600e84274763dab5c0905b6ab3844601b03e3db16ae81de499bedb16d",
+      "license_name": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "sources": {
+        "Supported": {
+          "claim_id": "val_tab_0479",
+          "path": "data/tables/dev/val_tab_0479.html",
+          "sha256": "994c5a33d939192af96fb6a65fe2fc898f11c1b0ed37b62fae5cdbe5e074aea2",
+          "bytes": 3845,
+          "display_sha256": "a5e7d91d482a7bea011df3a2b563f2f5ace6ddeb56a91e80ecb826f7e8ff734e",
+          "row_count": 14
+        },
+        "Refuted": {
+          "claim_id": "val_tab_0480",
+          "path": "data/tables/dev/val_tab_0480.html",
+          "sha256": "3f41ccc44b4ecd0728ea1d5d89f989bc62b93039f166e061a1364e6461c7421a",
+          "bytes": 3845,
+          "display_sha256": "1b3e88c63791176be90b409695083a1f8008444cb8276cd2380258e9c7935ffa",
+          "row_count": 14
+        }
+      }
+    }
+  ]
+}
