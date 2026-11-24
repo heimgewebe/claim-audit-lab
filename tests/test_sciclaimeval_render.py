@@ -335,6 +335,29 @@ class DisplayProofTests(unittest.TestCase):
             R["prove_quote"](raw, view, "Alpha | 1")["row_index"], 0
         )
 
+    def test_empty_edge_cells_keep_column_positions(self):
+        html = (
+            "<table><tr><th>A</th><th>B</th></tr>"
+            "<tr><td></td><td>42</td></tr>"
+            "<tr><td>17</td><td></td></tr></table>"
+        )
+        latex = (
+            r"\begin{tabular}{rr}" + "\n"
+            + r"A & B \\" + "\n"
+            + r" & 42 \\" + "\n"
+            + r"17 & \\" + "\n"
+            + r"\end{tabular}" + "\n"
+        )
+        for source in (html, latex):
+            with self.subTest(source=source):
+                view = R["render_table"](source)
+                rows = [
+                    [cell.strip() for cell in row["display"].split("|")]
+                    for row in view["rows"]
+                ]
+                self.assertEqual(rows, [["A", "B"], ["", "42"], ["17", ""]])
+                self.assertEqual(R["prove_quote"](source, view, "42")["row_index"], 1)
+
     def test_unknown_format_and_wrong_length_rejected(self):
         with self.assertRaises(ValueError):
             R["render_table"]("not a table")

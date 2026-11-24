@@ -56,7 +56,7 @@ def display_latex_row(raw_line: str) -> str:
     line = line.replace(r"\uparrow", "↑").replace(r"\downarrow", "↓")
     line = line.replace(r"\pm", "±").replace("$", "")
     line = re.sub(r"\s*&\s*", " | ", line)
-    return re.sub(r"\s+", " ", line).strip(" |")
+    return re.sub(r"\s+", " ", line).strip()
 
 
 def display_html_row(source_fragment: str) -> str:
@@ -80,7 +80,7 @@ def display_html_row(source_fragment: str) -> str:
         # not misrepresented as literal quotations from the underlying HTML.
         text = unescape(_HTML_TAG.sub("", cell.group(1)))
         cells.append(re.sub(r"\s+", " ", text).strip())
-    return " | ".join(cells).strip(" |")
+    return " | ".join(cells).strip()
 
 
 def render_table(raw: str) -> dict:

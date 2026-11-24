@@ -173,3 +173,20 @@ preregistered stopping decision remain untouched. No holdout inference
 was performed. Future source-representation work should use structured
 or independently checked evidence rather than accumulating more ad hoc
 HTML/CSS parsing rules in this stopped pilot.
+
+## Empty edge cells (2026-11-24)
+
+A further self-review counterexample showed that `.strip(" |")` erased empty
+leading and trailing cells in both otherwise simple HTML and LaTeX tables:
+under `A | B`, the original row with empty A and B=42 became `42` and still
+received a provenance proof. Removing only outer whitespace preserves the
+column separators. The new regression failed in both formats before the fix
+and passed afterward. Renderer SHA-256 after this bounded correction:
+30785a0dac5babd117b49c77766f23a5c47c94155a402bc0396104cc2de10c5c.
+The structural recheck of all six SHA-verified development sources still
+finds exactly two unchanged displays (0152), two changed displays (0126)
+and two unsupported sources (0281). All four archived result files and the
+manifest remain unchanged. This pilot remains stopped; these corrections
+are not a certification of arbitrary table semantics. Do not extend this
+ad hoc renderer into a general-purpose source representation; use independently
+verified structured source data or the original evidence in a new trial.
