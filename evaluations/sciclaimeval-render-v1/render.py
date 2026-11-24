@@ -183,15 +183,22 @@ def render_table(raw: str) -> dict:
                     raise ValueError(
                         "Multiple LaTeX row delimiters on one line are unsupported"
                     )
+                # A delimiter that does not end the supported physical row
+                # (e.g. \\[2pt] or \\*) must not join the following row.
+                tail = line.rstrip()
+                closes_row = tail.endswith(r"\\") or any(
+                    tail.endswith(r"\\ " + "\\" + command)
+                    for command in ("midrule", "bottomrule", "hline", "toprule")
+                )
+                if without_inner.count(r"\\") and not closes_row:
+                    raise ValueError("Unsupported LaTeX row delimiter suffix")
                 if not buffer:
                     fragment_start = line_source_start
                 if not trimmed.startswith("%"):
                     buffer.append(line)
                 # Only a physical row terminator at the END of a source line
                 # closes one logical data row. Multiline cells are not discarded.
-                tail = line.rstrip()
-                if tail.endswith(r"\\") or any(tail.endswith(r"\\ " + "\\" + command)
-                                              for command in ("midrule","bottomrule","hline","toprule")):
+                if closes_row:
                     fragment = raw[fragment_start:offset + len(physical_line.rstrip("\r\n"))]
                     if "&" in fragment:
                         text = display_latex_row(fragment)

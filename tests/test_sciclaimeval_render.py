@@ -335,6 +335,19 @@ class DisplayProofTests(unittest.TestCase):
             R["prove_quote"](raw, view, "Alpha | 1")["row_index"], 0
         )
 
+    def test_unsupported_latex_row_break_suffix_is_rejected(self):
+        for suffix in ("[2pt]", "*", "[1ex]"):
+            with self.subTest(suffix=suffix):
+                raw = (
+                    r"\begin{tabular}{lr}" + "\n"
+                    + r"Model & Value \\" + "\n"
+                    + r"Alpha & 1 \\" + suffix + "\n"
+                    + r"Beta & 2 \\" + "\n"
+                    + r"\end{tabular}" + "\n"
+                )
+                with self.assertRaises(ValueError):
+                    R["render_table"](raw)
+
     def test_empty_edge_cells_keep_column_positions(self):
         html = (
             "<table><tr><th>A</th><th>B</th></tr>"

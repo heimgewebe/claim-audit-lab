@@ -190,3 +190,24 @@ manifest remain unchanged. This pilot remains stopped; these corrections
 are not a certification of arbitrary table semantics. Do not extend this
 ad hoc renderer into a general-purpose source representation; use independently
 verified structured source data or the original evidence in a new trial.
+
+## Unsupported TeX row-break suffixes (2026-11-24)
+
+Codex finding https://github.com/heimgewebe/claim-audit-lab/pull/44#discussion_r4675898891
+was independently reproduced: a logical row ending in `\\[2pt]` was merged
+with the following row and authenticated as one source row. Three negative
+regression subcases (`[2pt]`, `*`, `[1ex]`) failed before repair and pass
+now. Rather than implement optional TeX spacing syntax, the renderer rejects
+any unmasked row delimiter that is not a supported end-of-row terminator.
+Renderer SHA-256: a988cc4bfdc134b949fb1b9db99b549f85f1850440346a490a59bb276225174b.
+
+The new structural-only recheck verified the exact original source bytes
+for all six development versions. It supersedes the compatibility counts
+above for the current renderer: **zero identical accepted displays, two
+changed displays (0126), and four unsupported versions (0152 and 0281)**.
+The 0152 inputs use an unsupported delimiter suffix. This does not alter
+any of the 60 original model outputs, original evaluation metrics, labels,
+manifest, or STOP decision. The repaired renderer has no demonstrated
+scientific efficacy and cannot reproduce any of the six original display
+identities. The pilot remains a historical negative result; the current
+code is not a reusable representation standard. No holdout inference.
